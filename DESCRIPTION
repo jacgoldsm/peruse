@@ -8,9 +8,9 @@ Authors@R:
            email = "first.last@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+License: GPL-2
 Encoding: UTF-8
+Imports: rlang
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
