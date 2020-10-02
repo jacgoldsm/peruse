@@ -29,7 +29,8 @@ Replicates Python's set comprehension using tidy syntax.
 Always use the syntax: set1 \%>\% that_for_all(set2) \%>\% we_have(formula).
 }
 \examples{
-1:10 \%>\% that_for_all(1:5) \%>\% we_have(~.x \%\% .y != 0)
+2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0) #is equivalent to
+reticulate::py_eval('{i for i in range(2,101) if all(i \% y for y in range(2,i-1))}')
 c("I", "Don't", "wan't", "chicken") \%>\% that_for_all('\'') \%>\% we_have(~stringr::str_detect(.x, .y))
 
 }

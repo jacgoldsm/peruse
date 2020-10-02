@@ -9,7 +9,8 @@
 #' @param set2 A subset of set1
 #' @param formula A logical formula to test elements from set1 against those from set2
 #' @examples
-#' 1:10 %>% that_for_all(1:5) %>% we_have(~.x %% .y != 0)
+#' 2:100 %>% that_for_all(range(2,x)) %>% we_have(~.x %% .y != 0) #is equivalent to
+#' reticulate::py_eval('{i for i in range(2,101) if all(i % y for y in range(2,i-1))}')
 #' c("I", "Don't", "wan't", "chicken") %>% that_for_all('\'') %>% we_have(~stringr::str_detect(.x, .y))
 #'
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
