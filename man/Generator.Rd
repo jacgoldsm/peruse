@@ -2,20 +2,21 @@
 % Please edit documentation in R/Generator.R
 \name{Generator}
 \alias{Generator}
-\title{Making a Python-style Generator
-Uses R's S3 OO paradigm and lazy evaluation}
+\title{Making a Python-style Generator}
 \usage{
 Generator(result, current, yield)
 }
 \arguments{
-\item{result}{R expression to run}
+\item{result}{R expression to run each time 'yield_next' is called}
 
-\item{current}{current value}
+\item{current}{current values of all variables in 'result'}
 
 \item{yield}{variable to yield}
 }
+\value{
+An object of S3 type generator
+}
 \description{
-Making a Python-style Generator
 Uses R's S3 OO paradigm and lazy evaluation
 }
 \examples{

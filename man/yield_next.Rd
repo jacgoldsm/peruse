@@ -2,17 +2,17 @@
 % Please edit documentation in R/yield_next.R
 \name{yield_next}
 \alias{yield_next}
-\title{Equivalent to Python's 'next'
-Finds the value of the next iteration of 'gen'
-If argument is list, attempts to coerce to Generator}
+\title{Equivalent to Python's 'next'}
 \usage{
 yield_next(gen)
 }
 \arguments{
-\item{gen}{generator object}
+\item{gen}{a generator object}
+}
+\value{
+an object of whatever type 'result' evaluates to from the Generator
 }
 \description{
-Equivalent to Python's 'next'
 Finds the value of the next iteration of 'gen'
 If argument is list, attempts to coerce to Generator
 }

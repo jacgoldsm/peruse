@@ -1,9 +1,11 @@
 #' Use an approximation of Python's set builder
+#'
 #' Notation in R, based around the magrittr pipe
-#' @param a desc
-#' @param b desc
-#' @example
-#' range(1,4)
+#' @param a minimum, integer
+#' @param b supremum, integer
+#' @examples
+#' range(1,5)
+#' range(9,10)
 #' @export
 
 range <- function(a,b) {

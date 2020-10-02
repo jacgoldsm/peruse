@@ -2,17 +2,19 @@
 % Please edit documentation in R/range.R
 \name{range}
 \alias{range}
-\title{Use an approximation of Python's set builder
-Notation in R, based around the magrittr pipe}
+\title{Use an approximation of Python's set builder}
 \usage{
 range(a, b)
 }
 \arguments{
-\item{a}{desc}
+\item{a}{minimum, integer}
 
-\item{b}{desc}
+\item{b}{supremum, integer}
 }
 \description{
-Use an approximation of Python's set builder
 Notation in R, based around the magrittr pipe
+}
+\examples{
+range(1,5)
+range(9,10)
 }

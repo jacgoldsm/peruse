@@ -1,8 +1,10 @@
 #' Making a Python-style Generator
+#'
 #' Uses R's S3 OO paradigm and lazy evaluation
-#' @param result R expression to run
-#' @param current current value
+#' @param result R expression to run each time 'yield_next' is called
+#' @param current current values of all variables in 'result'
 #' @param yield variable to yield
+#' @return An object of S3 type generator
 #' @examples
 #' expr <- "if (i == 0) {
 #'             n0 <- 0;
