@@ -2,10 +2,12 @@
 #'
 #' Uses R's S3 OO paradigm and lazy evaluation
 #' @param result R expression to run each time 'yield_next' is called
-#' @param current current values of all variables in 'result'
-#' @param yield variable to yield
+#' @param current declare and initialize every variable that appears in 'result'
+#' @param yield variable to yield when 'yield_next' is called
 #' @return An object of S3 type generator
 #' @examples
+#' #Fibonacci sequence: Each time yield_next is called, the next
+#' #number from the sequence will be generated and returned
 #' expr <- "if (i == 0) {
 #'             n0 <- 0;
 #'            n1 <- 0;
