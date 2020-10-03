@@ -17,36 +17,24 @@ Generator(result, current, yield)
 An object of S3 type generator
 }
 \description{
-Uses R's S3 OO paradigm and lazy evaluation
+Create a Generator object, where the user defines a sequence and a
+set of initial values, and then calls 'yield_next' to generate the
+next element of the sequence
 }
 \examples{
-#Fibonacci sequence: Each time yield_next is called, the next
-#number from the sequence will be generated and returned
-expr <- "if (i == 0) {
-            n0 <- 0
-           n1 <- 0
-           n <- n0 + n1
-            }
-        if (i == 1) {
-           n0 <- 0; n1 <- 1
-           n <- n0 + n1
-        }
-        if (i > 1) {
+#Create the Collatz sequence starting with 50 and print out the first
+#30 elements
+expr <- "if (n0 \%\% 2 == 0) n <- n0 / 2
+if (n0 \%\% 2 != 0) n <- n0*3 + 1
+n0 <- n"
+collatz <- Generator(result = expr,
+                     current = c(n0 = 50,
+                                 n = 0),
+                     yield = n)
 
-           n <- n0 + n1
-           a <- n1
-            b <- n0 + n1
-            n0 <- a
-            n1 <- b
-          }
-          i <- i + 1"
+a <- numeric(length = 30)
+for (i in 1:30) {
+  a[i] <- yield_next(collatz)
+}
 
-gen <- Generator(result = expr,
-                current = c(i = 0,
-                            a = 0,
-                            b = 0,
-                            n0 = 0,
-                            n1 = 0,
-                            n = 0),
-                yield = n)
 }

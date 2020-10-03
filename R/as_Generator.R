@@ -1,5 +1,5 @@
 #' Coerce a list to generator
-#' @param list a list to coerce
+#' @param list A list to coerce to Generator
 #' @export
 
 as_Generator <- function(list) {
