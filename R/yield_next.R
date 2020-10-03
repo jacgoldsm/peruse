@@ -22,8 +22,7 @@ yield_next <- function(gen) {
   for (key in names(gen$current)) {
     gen$current[key] <- eval(rlang::parse_expr(key), envir = e1)
   }
-
-  return(gen$current[[yield_name]])
   #pushes the local copy of 'gen' into the parent environment
   assign(gen_name, gen, pos = parent.frame(n = 1))
+  return(gen$current[[yield_name]])
 }
