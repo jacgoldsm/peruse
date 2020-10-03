@@ -7,7 +7,7 @@
 is_Generator(list)
 }
 \arguments{
-\item{list?}{object to test}
+\item{list}{Object to test}
 }
 \description{
 Test if an object is a Generator

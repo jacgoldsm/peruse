@@ -7,10 +7,10 @@
 yield_next(gen)
 }
 \arguments{
-\item{gen}{a generator object}
+\item{gen}{A generator object}
 }
 \value{
-an object of whatever type 'result' evaluates to from the Generator
+An object of whatever type 'result' evaluates to from the Generator
 }
 \description{
 Finds the value of the next iteration of 'gen'

@@ -7,7 +7,7 @@
 as_Generator(list)
 }
 \arguments{
-\item{list}{a list to coerce}
+\item{list}{A list to coerce to Generator}
 }
 \description{
 Coerce a list to generator
