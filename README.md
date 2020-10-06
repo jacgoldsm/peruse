@@ -1,4 +1,6 @@
 # {itertools}: Tools for Lazy and Eager Iteration and Set Construction
+## Install: 
+```devtools::install_github("jacgoldsm/itertools")```
 ## Set Builder:
 ### Generate a Set:
 ```that_for_all()...we_have(...eval="eager")``` and ```that_for_any()...we_have(...eval="eager")```
