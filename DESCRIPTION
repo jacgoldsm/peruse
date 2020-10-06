@@ -1,5 +1,5 @@
-Package: pytools
-Title: Create Versions of some Common Python Tools in R
+Package: itertools
+Title: Tools for Lazy and Eager Iteration and Set Construction
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Jacob",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "jacobg314@hotmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Create versions of some common Python tools in R
+Description: Create Python-style iterators and utilize Python-style set comprehension.
 License: GPL-2
 Encoding: UTF-8
 Imports: rlang, forcats, magrittr
