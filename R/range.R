@@ -1,6 +1,5 @@
-#' Use an approximation of Python's set builder
+#' Create a Python-style range vector
 #'
-#' Notation in R, based around the magrittr pipe
 #' @param a minimum, integer
 #' @param b supremum, integer
 #' @examples

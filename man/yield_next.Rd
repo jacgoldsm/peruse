@@ -13,6 +13,6 @@ yield_next(gen)
 An object of whatever type 'result' evaluates to from the Generator
 }
 \description{
-Finds the value of the next iteration of 'gen'
-If argument is list, attempts to coerce to Generator
+Finds the value of the next iteration of 'gen'.
+If argument is list, attempts to coerce to Generator.
 }

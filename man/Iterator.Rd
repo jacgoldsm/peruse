@@ -19,14 +19,13 @@ An object of S3 type Iterator
 \description{
 Create an Iterator object, where the user defines a sequence and a
 set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence
+next element of the sequence.
 }
 \examples{
-#Create the Collatz sequence starting with 50 and print out the first
-#30 elements
+#Create the Collatz sequence starting with 50 and print out the first 30 elements
 expr <- 'if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1'
 collatz <- Generator(result = expr,
-                     current = c(n = 10),
+                     current = c(n = 50),
                      yield = n)
 a <- numeric(length = 30)
 for (i in 1:30) {
