@@ -11,7 +11,7 @@ that_for_all(set1, set2)
 
 that_for_any(set1, set2)
 
-we_have(that_for, formula)
+we_have(that_for, formula, eval = "eager")
 }
 \arguments{
 \item{set1}{A superset}
@@ -19,18 +19,23 @@ we_have(that_for, formula)
 \item{set2}{A subset of set1}
 
 \item{formula}{A logical formula to test elements from set1 against those from set2}
+
+\item{eval}{Should evaluation be eager (return a vector) or lazy (return an Iterator)?}
 }
 \value{
 For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
-For we_have, a vector of the same type as set1
+For we_have, a vector of the same type as set1 if eval == 'eager' and an Iterator object if eval == 'lazy'.
 }
 \description{
-Replicates Python's set comprehension using tidy syntax.
+Set comprehension with the Magrittr Pipe.
 Always use the syntax: set1 \%>\% that_for_all(set2) \%>\% we_have(formula).
 }
 \examples{
 2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0) #is equivalent to
 reticulate::py_eval('{i for i in range(2,101) if all(i \% y for y in range(2,i-1))}')
+#c.f.
+primes <- 2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0, "lazy")
+yield_next(primes)
 c("I", "Don't", "wan't", "chicken") \%>\% that_for_all('\'') \%>\% we_have(~stringr::str_detect(.x, .y))
 
 }

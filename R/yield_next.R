@@ -10,19 +10,19 @@
 
 yield_next <- function(gen) {
   e1 <- environment()
-  if (!is_Generator(gen)) gen <- as_Generator(gen)
+  if (!is_Iterator(gen)) gen <- as_Iterator(gen)
   gen_name <- deparse(substitute(gen))
   yield_name <- as.character(gen$yield)
-  list2env(gen$current, envir = e1)
+  list2env(gen$initial, envir = e1)
 
   for (j in 1:length(gen$result)) {
     eval(gen$result[[j]], envir = e1)
   }
 
-  for (key in names(gen$current)) {
-    gen$current[key] <- eval(rlang::parse_expr(key), envir = e1)
+  for (key in names(gen$initial)) {
+    gen$initial[key] <- eval(rlang::parse_expr(key), envir = e1)
   }
   #pushes the local copy of 'gen' into the parent environment
   assign(gen_name, gen, pos = parent.frame(n = 1))
-  return(gen$current[[yield_name]])
+  return(gen$initial[[yield_name]])
 }

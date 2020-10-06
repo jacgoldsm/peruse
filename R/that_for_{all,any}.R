@@ -3,55 +3,99 @@
 #'
 #' @title R Set Comprehension
 #'
-#' @description  Replicates Python's set comprehension using tidy syntax.
+#' @description Set comprehension with the Magrittr Pipe.
 #' Always use the syntax: set1 %>% that_for_all(set2) %>% we_have(formula).
 #' @param set1 A superset
 #' @param set2 A subset of set1
 #' @param formula A logical formula to test elements from set1 against those from set2
+#' @param eval Should evaluation be eager (return a vector) or lazy (return an Iterator)?
 #' @examples
 #' 2:100 %>% that_for_all(range(2,x)) %>% we_have(~.x %% .y != 0) #is equivalent to
 #' reticulate::py_eval('{i for i in range(2,101) if all(i % y for y in range(2,i-1))}')
+#' #c.f.
+#' primes <- 2:100 %>% that_for_all(range(2,x)) %>% we_have(~.x %% .y != 0, "lazy")
+#' yield_next(primes)
 #' c("I", "Don't", "wan't", "chicken") %>% that_for_all('\'') %>% we_have(~stringr::str_detect(.x, .y))
 #'
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
-#' For we_have, a vector of the same type as set1
+#' For we_have, a vector of the same type as set1 if eval == 'eager' and an Iterator object if eval == 'lazy'.
 #' @export
+#' @import magrittr
 
 that_for_all <- function(set1, set2) {
   set2 <- rlang::enexpr(set2)
-  structure(list(set1,set2, 'all'), class = "that_for_all")
+  structure(list(set1 = set1,
+                 set2 = set2,
+                 quant = 'all',
+                 type = class(set1)))
 }
 
 #' @rdname funs
 #' @export
 that_for_any <- function(set1, set2) {
   set2 <- rlang::enexpr(set2)
-  structure(list(set1,set2, 'any'), class = "that_for_any")
+  structure(list(set1 = set1,
+                 set2 = set2,
+                 quant = 'any',
+                 type = class(set1)))
 }
+
+
 
 #' @rdname funs
 #' @export
-we_have <- function(that_for, formula) {
-  ret <- list()
-  if (that_for[[3]] == 'all') {
-    for (x in 1:length(that_for[[1]])) {
-      bool_vec <- purrr::map2_lgl(that_for[[1]][x], eval(that_for[[2]]), formula)
-      bool_vec <- ifelse(is.na(bool_vec), FALSE, bool_vec)
-      if (all(bool_vec)) {
-        ret <- append(ret,that_for[[1]][x])
-      }
-    }
-  }
+we_have <- function(that_for, formula, eval = "eager") {
 
-  if (that_for[[3]] == 'any') {
-    for (x in 1:length(that_for[[1]])) {
-      bool_vec <- purrr::map2_lgl(that_for[[1]][x], eval(that_for[[2]]), formula)
-      bool_vec <- ifelse(is.na(bool_vec), FALSE, bool_vec)
-      if (any(bool_vec)) {
-        ret <- append(ret,that_for[[1]][x])
+  if (eval == "eager") {
+    base <- rep(NA, length(that_for$set1))
+
+    ret <- as.vector(mode = that_for$type,
+                     x = base)
+
+    if (that_for$quant == 'all') {
+      for (i in seq_along(that_for$set1)) {
+        ex <- new.env()
+        assign("x", that_for$set1[i], pos = ex)
+        bool_vec <- purrr::map2_lgl(that_for$set1[i], eval(that_for$set2, envir = ex), formula)
+        if (all(bool_vec)) ret[i] <- that_for$set1[i]
       }
     }
 
+    if (that_for$quant == 'any') {
+      for (i in seq_along(that_for$set1)) {
+        ex <- new.env()
+        assign("x", that_for$set1[i], pos = ex)
+        bool_vec <- purrr::map2_lgl(that_for$set1[i], eval(that_for$set2, envir = ex), formula)
+        if (any(bool_vec)) ret[i] <- that_for$set1[i]
+      }
+    }
+    ret <- ret[which(!is.na(ret))]
+
+    return(ret)
   }
-  return(unlist(ret))
+
+  if (eval == "lazy") {
+    assign("set1", that_for$set1, pos = sys.frame(which = -9))
+    assign("set2", that_for$set2, pos = sys.frame(which = -9))
+    assign("formula", formula, pos = sys.frame(which = -9))
+    expr <- "
+    repeat {
+    ex <- new.env()
+    assign('x', set1[i], pos = ex)
+    bool_vec <- purrr::map2_lgl(set1[i], eval(set2, envir = ex), formula)
+
+    if (all(bool_vec)) {
+          nth <- set1[i]
+          i <- i + 1
+          break
+    } else {
+          i <- i + 1
+    }
+    }
+
+    "
+    return(
+      Iterator(result = expr, initial = c(i = 1, nth = 0), yield = nth)
+    )
+  }
 }
