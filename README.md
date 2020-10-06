@@ -5,7 +5,7 @@
 ### Generate an Iterator from Sets:
 ```that_for_all()...we_have(...eval="lazy")``` and ```that_for_any()...we_have(...eval="lazy")```
 
-## Define and manipulate Iterator:
+## Define and manipulate Iterators:
 
 <ul> 
   <li> <code>Iterator()</code> </li> 
