@@ -2,7 +2,7 @@
 % Please edit documentation in R/range.R
 \name{range}
 \alias{range}
-\title{Use an approximation of Python's set builder}
+\title{Create a Python-style range vector}
 \usage{
 range(a, b)
 }
@@ -12,7 +12,7 @@ range(a, b)
 \item{b}{supremum, integer}
 }
 \description{
-Notation in R, based around the magrittr pipe
+Create a Python-style range vector
 }
 \examples{
 range(1,5)
