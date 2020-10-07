@@ -29,6 +29,11 @@ For we_have, a vector of the same type as set1 if eval == 'eager' and an Iterato
 \description{
 Set comprehension with the Magrittr Pipe.
 Always use the syntax: set1 \%>\% that_for_all(set2) \%>\% we_have(formula).
+Note: if set2 is an numeric vector, you probably want a value obtained from
+itertools::range(start, end) rather than start:end or seq(start,end), as when
+start is greater than end you want an empty vector rather than counting backwards.
+Note that itertools::range views end as a supremum, not a maximum, thus range(a,b)
+is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
 }
 \examples{
 2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0) #is equivalent to

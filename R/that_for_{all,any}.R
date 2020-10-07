@@ -5,6 +5,11 @@
 #'
 #' @description Set comprehension with the Magrittr Pipe.
 #' Always use the syntax: set1 %>% that_for_all(set2) %>% we_have(formula).
+#' Note: if set2 is an numeric vector, you probably want a value obtained from
+#' itertools::range(start, end) rather than start:end or seq(start,end), as when
+#' start is greater than end you want an empty vector rather than counting backwards.
+#' Note that itertools::range views end as a supremum, not a maximum, thus range(a,b)
+#' is equivalent to the set `[`a,b) when a < b or `{}` when b >= a.
 #' @param set1 A superset
 #' @param set2 A subset of set1
 #' @param formula A logical formula to test elements from set1 against those from set2
@@ -78,6 +83,7 @@ we_have <- function(that_for, formula, eval = "eager") {
     assign("set1", that_for$set1, pos = sys.frame(which = -9))
     assign("set2", that_for$set2, pos = sys.frame(which = -9))
     assign("formula", formula, pos = sys.frame(which = -9))
+  if (that_for$quant == "all") {
     expr <- "
     repeat {
     ex <- new.env()
@@ -94,6 +100,24 @@ we_have <- function(that_for, formula, eval = "eager") {
     }
 
     "
+  } else {
+    expr <- "
+    repeat {
+    ex <- new.env()
+    assign('x', set1[i], pos = ex)
+    bool_vec <- purrr::map2_lgl(set1[i], eval(set2, envir = ex), formula)
+
+    if (any(bool_vec)) {
+          nth <- set1[i]
+          i <- i + 1
+          break
+    } else {
+          i <- i + 1
+    }
+    }
+
+    "
+  }
     return(
       Iterator(result = expr, initial = c(i = 1, nth = 0), yield = nth)
     )
