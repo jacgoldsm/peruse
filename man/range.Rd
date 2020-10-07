@@ -2,17 +2,22 @@
 % Please edit documentation in R/range.R
 \name{range}
 \alias{range}
-\title{Create a Python-style range vector}
+\title{Python-style range function}
 \usage{
-range(a, b)
+range(a, b, ...)
 }
 \arguments{
 \item{a}{minimum, integer}
 
 \item{b}{supremum, integer}
+
+\item{...}{other params passed to base::seq()}
 }
 \description{
-Create a Python-style range vector
+Wrapper around base::seq that replaces the maximal end value with the supremum
+and returns an empty vector if b <= a, in the style of Python's range().
+Note that itertools::range views end as a supremum, not a maximum, thus range(a,b)
+is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
 }
 \examples{
 range(1,5)
