@@ -42,5 +42,11 @@ reticulate::py_eval('{i for i in range(2,101) if all(i \% y for y in range(2,i-1
 primes <- 2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0, "lazy")
 yield_next(primes)
 c("I", "Don't", "wan't", "chicken") \%>\% that_for_all('\'') \%>\% we_have(~stringr::str_detect(.x, .y))
+#Twin primes 1 through 100
+primes <- 2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0)
+primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
+#Prime numbers 1 through 100 that are two away from a square number
+(2:100 \%>\% that_for_all(range(2,x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
+    that_for_any(range(2,x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
 }

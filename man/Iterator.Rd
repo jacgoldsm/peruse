@@ -9,9 +9,9 @@ Iterator(result, initial, yield)
 \arguments{
 \item{result}{R expression to run each time 'yield_next' is called}
 
-\item{yield}{variable to yield when 'yield_next' is called}
+\item{initial}{declare and initialize every variable that appears in 'result'}
 
-\item{current}{declare and initialize every variable that appears in 'result'}
+\item{yield}{variable to yield when 'yield_next' is called}
 }
 \value{
 An object of S3 type Iterator
