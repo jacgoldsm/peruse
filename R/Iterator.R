@@ -4,7 +4,7 @@
 #' set of initial values, and then calls 'yield_next' to generate the
 #' next element of the sequence.
 #' @param result R expression to run each time 'yield_next' is called
-#' @param current declare and initialize every variable that appears in 'result'
+#' @param initial declare and initialize every variable that appears in 'result'
 #' @param yield variable to yield when 'yield_next' is called
 #' @return An object of S3 type Iterator
 #' @examples
