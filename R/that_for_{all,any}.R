@@ -1,11 +1,14 @@
 #' @name sets
 #' @rdname funs
 #'
+#' @import magrittr
 #' @title R Set Comprehension
 #'
 #' @description Set comprehension with the Magrittr Pipe.
-#' Always use the syntax: set1 %>% that_for_all(set2) %>% we_have(formula).
-#' Note: if set2 is an numeric vector, you probably want a value obtained from
+#' Always use the syntax:
+#' set1 %>% that_for_all(set2) %>% we_have(formula).
+#'
+#' @note if set2 is an numeric vector, you probably want a value obtained from
 #' itertools::range(start, end) rather than start:end or seq(start,end), as when
 #' start is greater than end you want an empty vector rather than counting backwards.
 #' Note that itertools::range views end as a supremum, not a maximum, thus range(a,b)
@@ -15,8 +18,9 @@
 #' @param formula A logical formula to test elements from set1 against those from set2
 #' @param eval Should evaluation be eager (return a vector) or lazy (return an Iterator)?
 #' @examples
+#' library(magrittr)
 #' 2:100 %>% that_for_all(range(2,x)) %>% we_have(~.x %% .y != 0) #is equivalent to
-#' reticulate::py_eval('{i for i in range(2,101) if all(i % y for y in range(2,i-1))}')
+#' #reticulate::py_eval('{i for i in range(2,101) if all(i % y for y in range(2,i-1))}')
 #' #c.f.
 #' primes <- 2:100 %>% that_for_all(range(2,x)) %>% we_have(~.x %% .y != 0, "lazy")
 #' yield_next(primes)
@@ -31,7 +35,6 @@
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
 #' For we_have, a vector of the same type as set1 if eval == 'eager' and an Iterator object if eval == 'lazy'.
 #' @export
-#' @import magrittr
 
 that_for_all <- function(set1, set2) {
   set2 <- rlang::enexpr(set2)

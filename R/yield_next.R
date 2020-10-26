@@ -1,28 +1,28 @@
 #' Equivalent to Python's 'next'
 #'
-#' Finds the value of the next iteration of 'gen'.
-#' If argument is list, attempts to coerce to Generator.
-#' @param gen A generator object
-#' @return An object of whatever type 'result' evaluates to from the Generator
+#' Finds the value of the next iteration of an Iterator object
+#' If argument is list, attempts to coerce to Iterator.
+#' @param iter An Iterator object object
+#' @return An object of whatever type 'result' evaluates to from the Iterator
 #' @export
 
 
 
-yield_next <- function(gen) {
+yield_next <- function(iter) {
   e1 <- environment()
-  if (!is_Iterator(gen)) gen <- as_Iterator(gen)
-  gen_name <- deparse(substitute(gen))
-  yield_name <- as.character(gen$yield)
-  list2env(gen$initial, envir = e1)
+  if (!is_Iterator(iter)) iter <- as_Iterator(iter)
+  iter_name <- deparse(substitute(iter))
+  yield_name <- as.character(iter$yield)
+  list2env(iter$initial, envir = e1)
 
-  for (j in 1:length(gen$result)) {
-    eval(gen$result[[j]], envir = e1)
+  for (j in 1:length(iter$result)) {
+    eval(iter$result[[j]], envir = e1)
   }
 
-  for (key in names(gen$initial)) {
-    gen$initial[key] <- eval(rlang::parse_expr(key), envir = e1)
+  for (key in names(iter$initial)) {
+    iter$initial[key] <- eval(rlang::parse_expr(key), envir = e1)
   }
   #pushes the local copy of 'gen' into the parent environment
-  assign(gen_name, gen, pos = parent.frame(n = 1))
-  return(gen$initial[[yield_name]])
+  assign(iter_name, iter, pos = parent.frame(n = 1))
+  return(iter$initial[[yield_name]])
 }

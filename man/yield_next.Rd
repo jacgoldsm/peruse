@@ -4,15 +4,15 @@
 \alias{yield_next}
 \title{Equivalent to Python's 'next'}
 \usage{
-yield_next(gen)
+yield_next(iter)
 }
 \arguments{
-\item{gen}{A generator object}
+\item{iter}{An Iterator object object}
 }
 \value{
-An object of whatever type 'result' evaluates to from the Generator
+An object of whatever type 'result' evaluates to from the Iterator
 }
 \description{
-Finds the value of the next iteration of 'gen'.
-If argument is list, attempts to coerce to Generator.
+Finds the value of the next iteration of an Iterator object
+If argument is list, attempts to coerce to Iterator.
 }
