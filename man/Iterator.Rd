@@ -23,12 +23,12 @@ next element of the sequence.
 }
 \examples{
 #Create the Collatz sequence starting with 50 and print out the first 30 elements
-expr <- 'if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1'
-collatz <- Generator(result = expr,
-                     current = c(n = 50),
-                     yield = n)
+expr <- "if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1"
+collatz <- Iterator(result = expr,
+                    initial = c(n = 50),
+                    yield = n)
 a <- numeric(length = 30)
-for (i in 1:30) {
+for (i in 1:50) {
   a[i] <- yield_next(collatz)
 }
 

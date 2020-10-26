@@ -10,7 +10,7 @@ Authors@R:
 Description: Create Python-style iterators and utilize Python-style set comprehension.
 License: GPL-2
 Encoding: UTF-8
-Imports: rlang, forcats, magrittr
+Imports: rlang, forcats, magrittr, purrr
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
