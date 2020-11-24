@@ -83,15 +83,14 @@ we_have <- function(that_for, formula, eval = "eager") {
         if (any(bool_vec)) ret[i] <- that_for$set1[i]
       }
     }
-    ret <- ret[which(!is.na(ret))]
+    return(ret[which(!is.na(ret))])
 
-    return(ret)
   }
 
   if (eval == "lazy") {
-    assign("set1", that_for$set1, pos = sys.frame(which = -9))
-    assign("set2", that_for$set2, pos = sys.frame(which = -9))
-    assign("formula", formula, pos = sys.frame(which = -9))
+    assign("set1", that_for$set1, pos = sys.frame(which = -2))
+    assign("set2", that_for$set2, pos = sys.frame(which = -2))
+    assign("formula", formula, pos = sys.frame(which = -2))
   if (that_for$quant == "all") {
     expr <- "
     repeat {
