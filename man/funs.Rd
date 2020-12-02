@@ -7,34 +7,50 @@
 \alias{we_have}
 \title{R Set Comprehension}
 \usage{
-that_for_all(set1, set2)
+that_for_all(.x, .y)
 
-that_for_any(set1, set2)
+that_for_any(.x, .y)
 
-we_have(that_for, formula, eval = "eager")
+we_have(that_for, formula, result = "vector")
 }
 \arguments{
-\item{set1}{A superset}
+\item{.x}{A set, represented as either an atomic vector or a list}
 
-\item{set2}{A subset of set1}
+\item{.y}{A set to compare to \code{.x}}
 
-\item{formula}{A logical formula to test elements from set1 against those from set2}
+\item{formula}{A boolean-valued function, lambda, or formula}
 
-\item{eval}{Should evaluation be eager (return a vector) or lazy (return an Iterator)?}
+\item{result}{Should the expression return a \code{vector} or an \code{Iterator}?}
 }
 \value{
 For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
-For we_have, a vector of the same type as set1 if eval == 'eager' and an Iterator object if eval == 'lazy'.
+For we_have, a vector of the same type as .x if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
 }
 \description{
 Set comprehension with the Magrittr Pipe.
 Always use the syntax:
-set1 \%>\% that_for_all(set2) \%>\% we_have(formula).
+\code{.x \%>\% that_for_all(f(.x)) \%>\% we_have(f(.x, .y))}.
 }
 \note{
 if set2 is an numeric vector, you probably want a value obtained from
-itertools::range(start, end) rather than start:end or seq(start,end), as when
+\code{itertools::range(start, end)} rather than start:end or seq(start,end), as when
 start is greater than end you want an empty vector rather than counting backwards.
-Note that itertools::range views end as a supremum, not a maximum, thus range(a,b)
+Note that \code{itertools::range} views end as a supremum, not a maximum, thus range(a,b)
 is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
+}
+\examples{
+library(magrittr)
+2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(function(.x, .y) .x \%\% .y != 0) #is the same as
+2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
+#c.f.
+primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0, "Iterator")
+yield_next(primes)
+c("I", "Don't", "wan't", "chicken") \%>\% that_for_all("\'") \%>\% we_have(~stringr::str_detect(.x, .y))
+#Twin primes 1 through 100
+primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
+primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
+#Prime numbers 1 through 100 that are two away from a square number
+(2:100 \%>\% that_for_all(range(2, ,.x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
+    that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
+
 }
