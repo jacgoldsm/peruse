@@ -2,6 +2,7 @@
 
 export(Iterator)
 export(as_Iterator)
+export(hash_df)
 export(is_Iterator)
 export(range)
 export(that_for_all)
