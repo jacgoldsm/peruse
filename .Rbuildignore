@@ -3,3 +3,4 @@
 ^README\.Rmd$
 ^itertools\.Rproj$
 ^wide\.rds$
+^cran-comments\.md$

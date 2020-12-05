@@ -44,7 +44,11 @@
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
 #' For we_have, a vector of the same type as .x if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
 #' @export
+#'
 
+.e1 <- new.env(parent = emptyenv())
+#' @rdname funs
+#' @export
 that_for_all <- function(.x, .y) {
   .y <- rlang::enexpr(.y)
   structure(list(.x = .x,
@@ -97,18 +101,18 @@ we_have <- function(that_for, formula, result = "vector") {
   }
 
   if (result == "Iterator") {
-    assign(".x", that_for$.x, pos = sys.frame(which = -2))
-    assign(".y", that_for$.y, pos = sys.frame(which = -2))
-    assign(".formula", formula, pos = sys.frame(which = -2))
+    assign(".x", that_for$.x, pos = .e1)
+    assign(".y", that_for$.y, pos = .e1)
+    assign(".formula", formula, pos = .e1)
   if (that_for$quant == "all") {
     expr <- "
     repeat {
     ex <- new.env()
-    assign('.x', .x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), .formula)
+    assign('.x', .e1$.x[i], pos = ex)
+    bool_vec <- purrr::map2_lgl(.e1$.x[i], eval(.e1$.y, envir = ex), .e1$.formula)
 
     if (all(bool_vec)) {
-          nth <- .x[i]
+          .nth <- .e1$.x[i]
           i <- i + 1
           break
     } else {
@@ -121,11 +125,11 @@ we_have <- function(that_for, formula, result = "vector") {
     expr <- "
     repeat {
     ex <- new.env()
-    assign('.x', .x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), .formula)
+    assign('.x', .e1$.x[i], pos = ex)
+    bool_vec <- purrr::map2_lgl(.e1$.x[i], eval(.e1$.y, envir = ex), .e1$.formula)
 
     if (any(bool_vec)) {
-          nth <- .x[i]
+          .nth <- .e1$.x[i]
           i <- i + 1
           break
     } else {
@@ -136,7 +140,7 @@ we_have <- function(that_for, formula, result = "vector") {
     "
   }
     return(
-      Iterator(result = expr, initial = c(i = 1, nth = 0), yield = nth)
+      Iterator(result = expr, initial = c(i = 1, .nth = 0), yield = .nth)
     )
   }
 }
