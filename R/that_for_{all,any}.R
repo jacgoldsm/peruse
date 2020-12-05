@@ -8,7 +8,7 @@
 #' Always use the syntax:
 #' `.x %>% that_for_all(f(.x)) %>% we_have(f(.x, .y))`.
 #'
-#' @note if set2 is an numeric vector, you probably want a value obtained from
+#' @note if .y is an numeric vector, you probably want a value obtained from
 #' `itertools::range(start, end)` rather than start:end or seq(start,end), as when
 #' start is greater than end you want an empty vector rather than counting backwards.
 #' Note that `itertools::range` views end as a supremum, not a maximum, thus range(a,b)
@@ -17,10 +17,9 @@
 #' @param .y A set to compare to `.x`
 #' @param formula A boolean-valued function, lambda, or formula
 #' @param result Should the expression return a `vector` or an `Iterator`?
-<<<<<<< HEAD
+
 #' @param that_for A list passed to `we_have`--can be ignored with proper syntax
-=======
->>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
+
 #'
 #' @examples
 #' library(magrittr)
@@ -29,28 +28,22 @@
 #' #c.f.
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
 #' yield_next(primes)
-<<<<<<< HEAD
+
 #' \dontrun{c("I", "Don't", "wan't", "chicken") %>%
 #'              that_for_all("\'") %>%
 #'              we_have(~stringr::str_detect(.x, .y))}
-=======
-#' c("I", "Don't", "wan't", "chicken") %>% that_for_all("\'") %>% we_have(~stringr::str_detect(.x, .y))
->>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
+
 #' #Twin primes 1 through 100
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
 #' primes %>% that_for_any(primes) %>% we_have(~abs(.x - .y) == 2)
 #' #Prime numbers 1 through 100 that are two away from a square number
-<<<<<<< HEAD
-#' (2:100 %>% that_for_all(range(2,.x)) %>% we_have(~.x %% .y != 0)) %>%
-=======
-#' (2:100 %>% that_for_all(range(2, ,.x)) %>% we_have(~.x %% .y != 0)) %>%
->>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
+
+#' (2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)) %>%
 #'     that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 #'
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
 #' For we_have, a vector of the same type as .x if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
 #' @export
-#' @export magrittr
 
 that_for_all <- function(.x, .y) {
   .y <- rlang::enexpr(.y)
@@ -106,13 +99,13 @@ we_have <- function(that_for, formula, result = "vector") {
   if (result == "Iterator") {
     assign(".x", that_for$.x, pos = sys.frame(which = -2))
     assign(".y", that_for$.y, pos = sys.frame(which = -2))
-    assign("formula", formula, pos = sys.frame(which = -2))
+    assign(".formula", formula, pos = sys.frame(which = -2))
   if (that_for$quant == "all") {
     expr <- "
     repeat {
     ex <- new.env()
     assign('.x', .x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), formula)
+    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), .formula)
 
     if (all(bool_vec)) {
           nth <- .x[i]
@@ -129,7 +122,7 @@ we_have <- function(that_for, formula, result = "vector") {
     repeat {
     ex <- new.env()
     assign('.x', .x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), formula)
+    bool_vec <- purrr::map2_lgl(.x[i], eval(.y, envir = ex), .formula)
 
     if (any(bool_vec)) {
           nth <- .x[i]

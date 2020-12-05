@@ -1,33 +1,19 @@
-#' Summary and print method for objects of S3 class Iterator
-#' @param iter an object of S3 class Iterator
-#'
-#' @examples
-#' expr <- 'if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1'
-#' collatz <- Iterator(result = expr,
-#'                      initial = c(n = 50),
-#'                      yield = n)
-#' print(collatz)
-#' summary(collatz) #equivalent
-<<<<<<< HEAD
-#' @export
-=======
->>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 
 
-print.Iterator <- function(iter) {
+print.Iterator <- function(x, ...) {
   cat(" Expression: ",
-      as.character(iter$result[[1]]),
+      as.character(x$result[[1]]),
       "\n",
       "Initial Value(s): ",
-      unlist(names(iter$initial)),
+      unlist(names(x$initial)),
       " = ",
-      unlist(iter$initial),
+      unlist(x$initial),
       "\n",
       "Variable to Yield:",
-      as.character(iter$yield))
+      as.character(x$yield))
 }
 
-summary.Iterator <- function(iter) {
-  print(iter)
+summary.Iterator <- function(object, ...) {
+  print(object)
 }
 

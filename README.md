@@ -145,3 +145,17 @@ given review.
     #> 3         0      0            0        1               0
     #> 4         0      0            0        2               0
     #> 5         0      1            0        3               0
+
+What if we want to normalize all these columns by the absolute frequency
+of the word in the data set? Normally, it would take a very long time to
+iterate over all 9,195 columns. However, it is very fast with a
+`hash_df`:
+
+``` r
+hash_frequencies <- hash_df$new(wide_descriptions)
+
+hash_frequencies$data <- lapply(hash_frequencies$data,
+                              function(x) x / sum(x))
+```
+
+Any such task is easy with the `hash_df`\!

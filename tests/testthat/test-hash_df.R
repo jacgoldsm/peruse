@@ -33,10 +33,3 @@ test_that("lapply", {
           tolerance = 8e-7)
 })
 
-test_that("lazy", {
-  expect_equal({primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator");
-  yield_next(primes)},
-  2L)
-})
-
-
