@@ -45,7 +45,7 @@ devtools::install_github("jacgoldsm/itertools")
 
 ## Example
 
-### Collatz
+### Collatz Sequence
 
 A Collatz sequence is a particular sequence of natural numbers that
 mathematicians think always reaches \(1\) at some point, no matter the

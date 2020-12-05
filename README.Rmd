@@ -43,7 +43,7 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("jacgoldsm/itertools")
 ```
 ## Example
-### Collatz
+### Collatz Sequence
 
 A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches $1$ at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches $1$:
 

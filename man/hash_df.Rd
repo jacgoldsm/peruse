@@ -2,7 +2,11 @@
 % Please edit documentation in R/hash_df.R
 \name{hash_df}
 \alias{hash_df}
+<<<<<<< HEAD
 \title{\code{data.frame}s with hash table internals}
+=======
+\title{Hashed (Random-access) \code{data.frame}s}
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 \value{
 A \code{hash_df} object, built on \code{R6} and \code{env} \code{S3} classes
 }
@@ -17,6 +21,7 @@ applied to the container (the list of pointers to the columns of the \code{data.
 can still significantly slow down loops that modify large numbers of columns
 on wide \code{data.frame}s.
 
+<<<<<<< HEAD
 \code{hash_df}s also offer access to their columns in amortized constant
 time (\code{O(1)}) due to their internal structure as a hash table.
 
@@ -30,29 +35,48 @@ therefore they are not implemented here.
 Data wrangling and analysis functions not implemented in \code{hash_df}
 should be done after converting back to a \code{data.frame}
 object with \code{hash_df$return_df()}.
+=======
+\code{hash_df}s are bare-bones, with methods for adding (\code{bind}ing)
+and deleting (\code{unbind}ing) variables as well as printing a
+preview of the data. However, data analysis should be
+done after converting back to a \code{data.frame} object with
+\code{hash_df$return_df()}.
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 }
 \examples{
 df <- hash_df$new(iris)
 for (name in df$vars) {
  if (is.numeric(df$data[[name]])) df$data[[name]] <- 2 * df$data[[name]]
 }
+<<<<<<< HEAD
 
 hash_mtcars <- hash_df$new(mtcars)
 hash_mtcars$data <- lapply(hash_mtcars$data, function(x) log(x + 1))
 hash_mtcars$print()
 
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 wide_df <- as.data.frame(matrix(1:5000, nrow = 2))
 hash_wide_df <- hash_df$new(wide_df)
 
 for (name in hash_wide_df$vars) {
   hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 }
+<<<<<<< HEAD
 \dontrun{
 timer <- bench::mark(
  check = F,
  for(name in names(wide_df)) wide_df[[name]] <- -1 * wide_df[[name]],
  for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 )}
+=======
+
+timer <- bench::mark(
+ check = F,
+ for(name in names(wide_df)) wide_df[[name]] <- -1 * wide_df[[name]],
+ for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data`[[name]]`
+)
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #> hash_df: Median = 22.2.3ms
 #> data.frame: Median = 615.3ms
 
@@ -70,6 +94,7 @@ df$print()
 ## ------------------------------------------------
 
 df <- hash_df$new(iris)
+<<<<<<< HEAD
 df$unbind(Petal.Length)
 df$print()
 
@@ -94,6 +119,11 @@ df$print()
 
 \code{dplyr::select}
 }
+=======
+hash_df$unbind(Petal.Length)
+df$print()
+}
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -120,9 +150,12 @@ df$print()
 \item \href{#method-return_df}{\code{hash_df$return_df()}}
 \item \href{#method-print}{\code{hash_df$print()}}
 \item \href{#method-new}{\code{hash_df$new()}}
+<<<<<<< HEAD
 \item \href{#method-View}{\code{hash_df$View()}}
 \item \href{#method-mutate}{\code{hash_df$mutate()}}
 \item \href{#method-select}{\code{hash_df$select()}}
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 \item \href{#method-clone}{\code{hash_df$clone()}}
 }
 }
@@ -172,7 +205,11 @@ remove \code{data.frame} columns
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{df <- hash_df$new(iris)
+<<<<<<< HEAD
 df$unbind(Petal.Length)
+=======
+hash_df$unbind(Petal.Length)
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 df$print()
 }
 \if{html}{\out{</div>}}
@@ -221,6 +258,7 @@ create a new \code{hash_df} from a \code{data.frame}
 }
 }
 \if{html}{\out{<hr>}}
+<<<<<<< HEAD
 \if{html}{\out{<a id="method-View"></a>}}
 \if{latex}{\out{\hypertarget{method-View}{}}}
 \subsection{Method \code{View()}}{
@@ -285,6 +323,8 @@ df$print()
 
 }
 \if{html}{\out{<hr>}}
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 \if{html}{\out{<a id="method-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-clone}{}}}
 \subsection{Method \code{clone()}}{

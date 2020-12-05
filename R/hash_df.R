@@ -1,7 +1,11 @@
 #'@name hash_df
 #'
 #'
+<<<<<<< HEAD
 #'@title  `data.frame`s with hash table internals
+=======
+#'@title Hashed (Random-access) `data.frame`s
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #'
 #'@description Create a `data.frame` built on the `environment`
 #'`S3` class and embedded in an `R6` object. The primary advantage
@@ -13,6 +17,7 @@
 #'can still significantly slow down loops that modify large numbers of columns
 #'on wide `data.frame`s.
 #'
+<<<<<<< HEAD
 #'`hash_df`s also offer access to their columns in amortized constant
 #'time (`O(1)`) due to their internal structure as a hash table.
 #'
@@ -26,29 +31,48 @@
 #' Data wrangling and analysis functions not implemented in `hash_df`
 #' should be done after converting back to a `data.frame`
 #' object with `hash_df$return_df()`.
+=======
+#'`hash_df`s are bare-bones, with methods for adding (`bind`ing)
+#' and deleting (`unbind`ing) variables as well as printing a
+#' preview of the data. However, data analysis should be
+#' done after converting back to a `data.frame` object with
+#' `hash_df$return_df()`.
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #'
 #'@examples
 #'df <- hash_df$new(iris)
 #'for (name in df$vars) {
 #'  if (is.numeric(df$data[[name]])) df$data[[name]] <- 2 * df$data[[name]]
 #'}
+<<<<<<< HEAD
 #'
 #'hash_mtcars <- hash_df$new(mtcars)
 #'hash_mtcars$data <- lapply(hash_mtcars$data, function(x) log(x + 1))
 #'hash_mtcars$print()
 #'
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #'wide_df <- as.data.frame(matrix(1:5000, nrow = 2))
 #'hash_wide_df <- hash_df$new(wide_df)
 #'
 #'for (name in hash_wide_df$vars) {
 #'   hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 #'}
+<<<<<<< HEAD
 #'\dontrun{
 #'timer <- bench::mark(
 #'  check = F,
 #'  for(name in names(wide_df)) wide_df[[name]] <- -1 * wide_df[[name]],
 #'  for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 #')}
+=======
+#'
+#'timer <- bench::mark(
+#'  check = F,
+#'  for(name in names(wide_df)) wide_df[[name]] <- -1 * wide_df[[name]],
+#'  for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data`[[name]]`
+#')
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #'#> hash_df: Median = 22.2.3ms
 #'#> data.frame: Median = 615.3ms
 #'
@@ -76,10 +100,17 @@ hash_df <- R6::R6Class("hash_df",
   #' @param ... names of the columns to remove
   #' @examples
   #' df <- hash_df$new(iris)
+<<<<<<< HEAD
   #' df$unbind(Petal.Length)
   #' df$print()
   unbind = function(...) {
     x <- unlist(as.character(rlang::enexprs(...)))
+=======
+  #' hash_df$unbind(Petal.Length)
+  #' df$print()
+  unbind = function(...) {
+    x <- unlist(as.character(enexprs(...)))
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
     rlang::env_unbind(self$data, x)
     invisible(self)
   },
@@ -95,12 +126,16 @@ hash_df <- R6::R6Class("hash_df",
   #' @description create a new `hash_df` from a `data.frame`
   #' @param df a `data.frame`
   initialize = function(df) {
+<<<<<<< HEAD
     if (is.matrix(df)) df <- as.data.frame(df)
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
     stopifnot(is.data.frame(df))
     self$data = list2env(df)
     private$.nrow = nrow(df)
     private$.ncol = ncol(df)
     private$.vars = names(df)
+<<<<<<< HEAD
   },
   #' @description open the data in the `View` pane
   View = function() {
@@ -135,6 +170,9 @@ hash_df <- R6::R6Class("hash_df",
         error = function(e) stop("Error: attempt to select columns that don't exist")
       )
     }
+=======
+  }
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
  ),
   active = list(
     #' @field nrow the number of rows of the `data.frame`

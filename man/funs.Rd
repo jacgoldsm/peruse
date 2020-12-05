@@ -18,8 +18,11 @@ we_have(that_for, formula, result = "vector")
 
 \item{.y}{A set to compare to \code{.x}}
 
+<<<<<<< HEAD
 \item{that_for}{A list passed to \code{we_have}--can be ignored with proper syntax}
 
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 \item{formula}{A boolean-valued function, lambda, or formula}
 
 \item{result}{Should the expression return a \code{vector} or an \code{Iterator}?}
@@ -47,14 +50,22 @@ library(magrittr)
 #c.f.
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0, "Iterator")
 yield_next(primes)
+<<<<<<< HEAD
 \dontrun{c("I", "Don't", "wan't", "chicken") \%>\%
              that_for_all("\'") \%>\%
              we_have(~stringr::str_detect(.x, .y))}
+=======
+c("I", "Don't", "wan't", "chicken") \%>\% that_for_all("\'") \%>\% we_have(~stringr::str_detect(.x, .y))
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 #Twin primes 1 through 100
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
 #Prime numbers 1 through 100 that are two away from a square number
+<<<<<<< HEAD
 (2:100 \%>\% that_for_all(range(2,.x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
+=======
+(2:100 \%>\% that_for_all(range(2, ,.x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
     that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
 }

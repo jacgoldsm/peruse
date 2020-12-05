@@ -1,16 +1,30 @@
 Package: itertools
+<<<<<<< HEAD
 Title: Set Comprehension, Lazy Iteration, and Reference Semantics Data Tools
 Version: 1.0.0
+=======
+Title: Tools for Lazy and Eager Iteration and Set Construction
+Version: 0.0.0.9000
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 Authors@R: 
     person(given = "Jacob",
            family = "Goldsmith",
            role = c("aut", "cre"),
+<<<<<<< HEAD
            email = "jacobg314@hotmail.com")
 Description: A friendly API for iteration and set comprehension, and 
     a tool for constructing and manipulating hash-table based `data.frame`s.
 License: GPL-2
 Encoding: UTF-8
 Imports: rlang, magrittr (>= 2.0.1), purrr, R6
+=======
+           email = "jacobg314@hotmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Create Python-style iterators and utilize Python-style set comprehension.
+License: GPL-2
+Encoding: UTF-8
+Imports: rlang, forcats, magrittr, purrr
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

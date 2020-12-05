@@ -8,7 +8,10 @@
 #'                      yield = n)
 #' print(collatz)
 #' summary(collatz) #equivalent
+<<<<<<< HEAD
 #' @export
+=======
+>>>>>>> 4740ccddd35aa43b82ae3f65d3fa181262711579
 
 
 print.Iterator <- function(iter) {
