@@ -8,6 +8,7 @@
 #'                      yield = n)
 #' print(collatz)
 #' summary(collatz) #equivalent
+#' @export
 
 
 print.Iterator <- function(iter) {

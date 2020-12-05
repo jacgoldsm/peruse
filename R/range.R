@@ -7,7 +7,7 @@
 #'
 #' @param a minimum, integer
 #' @param b supremum, integer
-#' @param ... other params passed to base::seq()
+#' @param ... other params passed to `base::seq()`
 #' @examples
 #' range(1,5)
 #' range(9,10)

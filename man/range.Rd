@@ -11,7 +11,7 @@ range(a, b, ...)
 
 \item{b}{supremum, integer}
 
-\item{...}{other params passed to base::seq()}
+\item{...}{other params passed to \code{base::seq()}}
 }
 \description{
 Wrapper around base::seq that replaces the maximal end value with the supremum

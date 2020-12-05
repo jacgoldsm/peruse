@@ -2,7 +2,7 @@
 % Please edit documentation in R/hash_df.R
 \name{hash_df}
 \alias{hash_df}
-\title{Hashed (Random-access) \code{data.frame}s}
+\title{\code{data.frame}s with hash table internals}
 \value{
 A \code{hash_df} object, built on \code{R6} and \code{env} \code{S3} classes
 }
@@ -17,29 +17,42 @@ applied to the container (the list of pointers to the columns of the \code{data.
 can still significantly slow down loops that modify large numbers of columns
 on wide \code{data.frame}s.
 
+\code{hash_df}s also offer access to their columns in amortized constant
+time (\code{O(1)}) due to their internal structure as a hash table.
+
 \code{hash_df}s are bare-bones, with methods for adding (\code{bind}ing)
 and deleting (\code{unbind}ing) variables as well as printing a
-preview of the data. However, data analysis should be
-done after converting back to a \code{data.frame} object with
-\code{hash_df$return_df()}.
+preview of the data. In addition, {dplyr} functions \code{select}
+and \code{mutate} have implementations for \code{hash_df}'s (that do not
+depend on {dplyr}). Other {dplyr} functions like \code{summarise()}
+and \verb{*_join} cannot easily take advantage of the \code{hash_df} structure,
+therefore they are not implemented here.
+Data wrangling and analysis functions not implemented in \code{hash_df}
+should be done after converting back to a \code{data.frame}
+object with \code{hash_df$return_df()}.
 }
 \examples{
 df <- hash_df$new(iris)
 for (name in df$vars) {
  if (is.numeric(df$data[[name]])) df$data[[name]] <- 2 * df$data[[name]]
 }
+
+hash_mtcars <- hash_df$new(mtcars)
+hash_mtcars$data <- lapply(hash_mtcars$data, function(x) log(x + 1))
+hash_mtcars$print()
+
 wide_df <- as.data.frame(matrix(1:5000, nrow = 2))
 hash_wide_df <- hash_df$new(wide_df)
 
 for (name in hash_wide_df$vars) {
   hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 }
-
+\dontrun{
 timer <- bench::mark(
  check = F,
  for(name in names(wide_df)) wide_df[[name]] <- -1 * wide_df[[name]],
- for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data`[[name]]`
-)
+ for (name in hash_wide_df$vars) hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
+)}
 #> hash_df: Median = 22.2.3ms
 #> data.frame: Median = 615.3ms
 
@@ -57,8 +70,29 @@ df$print()
 ## ------------------------------------------------
 
 df <- hash_df$new(iris)
-hash_df$unbind(Petal.Length)
+df$unbind(Petal.Length)
 df$print()
+
+## ------------------------------------------------
+## Method `hash_df$mutate`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
+df$print()
+
+## ------------------------------------------------
+## Method `hash_df$select`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$select(Sepal.Length, Species)
+df$print()
+}
+\seealso{
+\code{dplyr::mutate}
+
+\code{dplyr::select}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -86,6 +120,9 @@ df$print()
 \item \href{#method-return_df}{\code{hash_df$return_df()}}
 \item \href{#method-print}{\code{hash_df$print()}}
 \item \href{#method-new}{\code{hash_df$new()}}
+\item \href{#method-View}{\code{hash_df$View()}}
+\item \href{#method-mutate}{\code{hash_df$mutate()}}
+\item \href{#method-select}{\code{hash_df$select()}}
 \item \href{#method-clone}{\code{hash_df$clone()}}
 }
 }
@@ -135,7 +172,7 @@ remove \code{data.frame} columns
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{df <- hash_df$new(iris)
-hash_df$unbind(Petal.Length)
+df$unbind(Petal.Length)
 df$print()
 }
 \if{html}{\out{</div>}}
@@ -182,6 +219,70 @@ create a new \code{hash_df} from a \code{data.frame}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-View"></a>}}
+\if{latex}{\out{\hypertarget{method-View}{}}}
+\subsection{Method \code{View()}}{
+open the data in the \code{View} pane
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$View()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-mutate"></a>}}
+\if{latex}{\out{\hypertarget{method-mutate}{}}}
+\subsection{Method \code{mutate()}}{
+a bare-bones \code{dplyr::mutate} that takes advantage of the hashed data structure
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$mutate(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{named R expressions to mutate the columns by}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-select"></a>}}
+\if{latex}{\out{\hypertarget{method-select}{}}}
+\subsection{Method \code{select()}}{
+a bare-bones \code{dplyr::select} that takes advantage of the hashed data structure
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$select(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{variables to select, separated by a comma}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$select(Sepal.Length, Species)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

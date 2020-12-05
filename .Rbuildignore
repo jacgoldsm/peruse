@@ -1,2 +1,4 @@
 ^pytools\.Rproj$
 ^\.Rproj\.user$
+^README\.Rmd$
+^itertools\.Rproj$
