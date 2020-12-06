@@ -6,7 +6,7 @@
 #'
 #' @description Set comprehension with the Magrittr Pipe.
 #' Always use the syntax:
-#' `.x %>% that_for_all(f(.x)) %>% we_have(f(.x, .y))`.
+#' `.x %>% that_for_all(.y) %>% we_have(f(.x, .y))`.
 #'
 #' @note if .y is an numeric vector, you probably want a value obtained from
 #' `itertools::range(start, end)` rather than start:end or seq(start,end), as when
@@ -43,10 +43,12 @@
 #'
 #' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
 #' For we_have, a vector of the same type as .x if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
-#' @export
-#'
 
+
+
+utils::globalVariables(".nth", "itertools", add = TRUE)
 .e1 <- new.env(parent = emptyenv())
+
 #' @rdname funs
 #' @export
 that_for_all <- function(.x, .y) {

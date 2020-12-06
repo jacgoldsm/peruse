@@ -5,16 +5,9 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 
-There were 2 NOTEs:
+There was 1 NOTE:
 
-* This is my first submission to CRAN
-* we_have: no visible binding for global variable ‘.nth’
-  Undefined global functions or variables:
-    .nth
-    
-    This is a known issue with
-
-  R6 is a build-time dependency.
+* This is my first submission to CRAN.
 
 ## Downstream dependencies
-This package has no downstream dependencies
+This package has no downstream dependencies.
