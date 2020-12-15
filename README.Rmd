@@ -169,6 +169,7 @@ Any such task is quick and easy with the `hash_df`!
 - that_for_all()
 - that_for_any()
 - we_have()
+- range()
 
 ### hash_df
 - $bind()

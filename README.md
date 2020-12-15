@@ -229,6 +229,7 @@ Any such task is quick and easy with the `hash_df`\!
   - that\_for\_all()
   - that\_for\_any()
   - we\_have()
+  - range()
 
 ### hash\_df
 

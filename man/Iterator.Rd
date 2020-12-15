@@ -28,7 +28,7 @@ collatz <- Iterator(result = expr,
                     initial = c(n = 50),
                     yield = n)
 a <- numeric(length = 30)
-for (i in 1:50) {
+for (i in 1:30) {
   a[i] <- yield_next(collatz)
 }
 

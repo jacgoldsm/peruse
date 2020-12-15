@@ -50,7 +50,7 @@
 #'     that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 #'
 #' @return For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
-#' For we_have, a vector of the same type as .x if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
+#' For we_have, a vector of the same type as `.x` if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
 NULL
 
 #' @rdname funs

@@ -26,7 +26,7 @@ we_have(that_for, formula, result = "vector")
 }
 \value{
 For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
-For we_have, a vector of the same type as .x if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
+For we_have, a vector of the same type as \code{.x} if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
 }
 \description{
 Set comprehension with the Magrittr Pipe.
