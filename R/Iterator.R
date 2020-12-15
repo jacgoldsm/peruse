@@ -1,4 +1,4 @@
-#' Making a Python-style Iterator
+#' Making an Irregular Sequence Iterator
 #'
 #' Create an Iterator object, where the user defines a sequence and a
 #' set of initial values, and then calls 'yield_next' to generate the
@@ -27,7 +27,7 @@ Iterator <- function(result,
                       yield) {
   yield <- rlang::enexpr(yield)
   result <- rlang::parse_exprs(result)
-  list <- list(initial = as.list(initial),
+  list <- list(initial = list2env(as.list(initial)),
                result = result,
                yield = yield)
   structure(list,

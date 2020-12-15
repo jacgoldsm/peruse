@@ -2,7 +2,7 @@
 % Please edit documentation in R/Iterator.R
 \name{Iterator}
 \alias{Iterator}
-\title{Making a Python-style Iterator}
+\title{Making an Irregular Sequence Iterator}
 \usage{
 Iterator(result, initial, yield)
 }

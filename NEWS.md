@@ -1,3 +1,3 @@
-# First Release of {itertools}!
-## Current Version: `itertools 1.0.0`
+# First Release of {peruse}!
+## Current Version: `peruse 1.0.0`
 ===========================================

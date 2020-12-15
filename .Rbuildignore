@@ -4,4 +4,6 @@
 ^itertools\.Rproj$
 ^wide\.rds$
 ^cran-comments\.md$
+^peruse\.Rproj$
+
 

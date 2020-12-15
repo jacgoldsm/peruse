@@ -25,7 +25,7 @@ we_have(that_for, formula, result = "vector")
 \item{result}{Should the expression return a \code{vector} or an \code{Iterator}?}
 }
 \value{
-For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
+For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
 For we_have, a vector of the same type as .x if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
 }
 \description{
@@ -33,11 +33,21 @@ Set comprehension with the Magrittr Pipe.
 Always use the syntax:
 \code{.x \%>\% that_for_all(.y) \%>\% we_have(f(.x, .y))}.
 }
+\details{
+This function is designed to be used with \code{magrittr::\verb{\%>\%}}.
+Essentially, this function evaluates \code{f \%>\% g()} as
+\code{eval(g(f), envir = new.env(parent = parent.frame())}. Any pipe or pipe-like
+function that works similarly should work with \code{that_for_*}. In particular,
+the R Core Team is expected to implement a base R pipe in the near future with
+the syntax \code{|>}. While these functions will likely work properly with the new
+\code{base::`|>`}, as of right now the only pipe that is guaranteed to work is
+\code{magrittr::\verb{\%>\%}}.
+}
 \note{
 if .y is an numeric vector, you probably want a value obtained from
-\code{itertools::range(start, end)} rather than start:end or seq(start,end), as when
+\code{peruse::range(start, end)} rather than \code{start:end} or \code{seq(start,end)}, as when
 start is greater than end you want an empty vector rather than counting backwards.
-Note that \code{itertools::range} views end as a supremum, not a maximum, thus range(a,b)
+Note that \code{itertools::range} views end as a supremum, not a maximum, thus \code{range(a,b)}
 is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
 }
 \examples{
@@ -47,9 +57,9 @@ library(magrittr)
 #c.f.
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0, "Iterator")
 yield_next(primes)
-\dontrun{c("I", "Don't", "wan't", "chicken") \%>\%
+{c("I", "Don't", "wan't", "chicken") \%>\%
              that_for_all("\'") \%>\%
-             we_have(~stringr::str_detect(.x, .y))}
+             we_have(~grepl(.x, .y))}
 #Twin primes 1 through 100
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)

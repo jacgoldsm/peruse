@@ -1,4 +1,4 @@
 library(testthat)
-library(itertools)
+library(peruse)
 
-test_check("itertools")
+test_check("peruse")

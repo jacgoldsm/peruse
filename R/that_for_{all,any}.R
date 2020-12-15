@@ -9,9 +9,9 @@
 #' `.x %>% that_for_all(.y) %>% we_have(f(.x, .y))`.
 #'
 #' @note if .y is an numeric vector, you probably want a value obtained from
-#' `itertools::range(start, end)` rather than start:end or seq(start,end), as when
+#' `peruse::range(start, end)` rather than `start:end` or `seq(start,end)`, as when
 #' start is greater than end you want an empty vector rather than counting backwards.
-#' Note that `itertools::range` views end as a supremum, not a maximum, thus range(a,b)
+#' Note that `itertools::range` views end as a supremum, not a maximum, thus `range(a,b)`
 #' is equivalent to the set `[`a,b) when a < b or `{}` when b >= a.
 #' @param .x A set, represented as either an atomic vector or a list
 #' @param .y A set to compare to `.x`
@@ -20,6 +20,14 @@
 
 #' @param that_for A list passed to `we_have`--can be ignored with proper syntax
 
+#' @details This function is designed to be used with \code{magrittr::`%>%`}.
+#' Essentially, this function evaluates \code{f %>% g()} as
+#' \code{eval(g(f), envir = new.env(parent = parent.frame())}. Any pipe or pipe-like
+#' function that works similarly should work with \code{that_for_*}. In particular,
+#' the R Core Team is expected to implement a base R pipe in the near future with
+#' the syntax \code{|>}. While these functions will likely work properly with the new
+#' \code{base::`|>`}, as of right now the only pipe that is guaranteed to work is
+#' \code{magrittr::`%>%`}.
 #'
 #' @examples
 #' library(magrittr)
@@ -29,9 +37,9 @@
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
 #' yield_next(primes)
 
-#' \dontrun{c("I", "Don't", "wan't", "chicken") %>%
+#' {c("I", "Don't", "wan't", "chicken") %>%
 #'              that_for_all("\'") %>%
-#'              we_have(~stringr::str_detect(.x, .y))}
+#'              we_have(~grepl(.x, .y))}
 
 #' #Twin primes 1 through 100
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
@@ -41,13 +49,9 @@
 #' (2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)) %>%
 #'     that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 #'
-#' @return For that_for_all and that_for_any, an object of S3 class that_for_all or that_for_any.
+#' @return For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
 #' For we_have, a vector of the same type as .x if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
-
-
-
-utils::globalVariables(".nth", "itertools", add = TRUE)
-.e1 <- new.env(parent = emptyenv())
+NULL
 
 #' @rdname funs
 #' @export

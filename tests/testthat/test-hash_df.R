@@ -9,7 +9,7 @@ test_that("prime_within_two", {
           11L)
 })
 
-test_that("collatz", {
+test_that("collatz", { .yieldenv <- new.env(parent = emptyenv())
           expect_equal({expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
            collatz <- Iterator(result = expr,
                              initial = c(n = 50),
@@ -31,5 +31,32 @@ test_that("lapply", {
           (hash_mtcars$return_df())[1,1]},
           1.609438,
           tolerance = 8e-7)
+})
+
+test_that("mutate", {
+  expect_equal({df <- hash_df$new(iris)
+                df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
+                df$data$Sepal.Size[1]},
+                17.85)
+})
+
+test_that("mutate_if", {
+    expect_equal({
+      df <- hash_df$new(iris)
+      df$mutate_if(is.numeric, log)
+      df$data$Sepal.Length[1]
+    },
+    1.629241,
+    tolerance = 5e-7)
+})
+
+test_that("mutate_at", {
+  expect_equal({
+    df <- hash_df$new(iris)
+    df$mutate_at("Sepal*", log)
+    df$data$Sepal.Length[1]
+  },
+  1.629241,
+  tolerance = 5e-7)
 })
 

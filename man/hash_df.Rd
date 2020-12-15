@@ -23,10 +23,11 @@ time (\code{O(1)}) due to their internal structure as a hash table.
 \code{hash_df}s are bare-bones, with methods for adding (\code{bind}ing)
 and deleting (\code{unbind}ing) variables as well as printing a
 preview of the data. In addition, {dplyr} functions \code{select}
-and \code{mutate} have implementations for \code{hash_df}'s (that do not
-depend on {dplyr}). Other {dplyr} functions like \code{summarise()}
-and \verb{*_join} cannot easily take advantage of the \code{hash_df} structure,
-therefore they are not implemented here.
+and \code{mutate} (as well as its scoped versions) have implementations for
+\code{hash_df}'s (that do not depend on \code{{dplyr}}). Note that in \code{{dplyr}},
+\code{across()} and \code{tidyselect()} have superceded scoped verbs. However,
+\code{hash_df}s do not understand \code{tidyselect}, so we must rely on the
+scoped versions (\verb{mutate_*}) when wrangling these objects.
 Data wrangling and analysis functions not implemented in \code{hash_df}
 should be done after converting back to a \code{data.frame}
 object with \code{hash_df$return_df()}.
@@ -44,9 +45,17 @@ hash_mtcars$print()
 wide_df <- as.data.frame(matrix(1:5000, nrow = 2))
 hash_wide_df <- hash_df$new(wide_df)
 
+# using a `for` loop:
 for (name in hash_wide_df$vars) {
   hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 }
+
+# using `lapply`:
+hash_wide_df$data <- lapply(hash_wide_df$data, function(x) x * -1)
+
+# using `mutate`:
+hash_wide_df$mutate(~.x * -1)
+
 \dontrun{
 timer <- bench::mark(
  check = F,
@@ -83,6 +92,30 @@ df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
 df$print()
 
 ## ------------------------------------------------
+## Method `hash_df$mutate_if`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$mutate_if(is.numeric, log)
+df$print()
+
+## ------------------------------------------------
+## Method `hash_df$mutate_all`
+## ------------------------------------------------
+
+df <- hash_df$new(mtcars)
+df$mutate_all(~.x - mean(.x))
+df$print()
+
+## ------------------------------------------------
+## Method `hash_df$mutate_at`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$mutate_at("Sepal*", ~.x / 100)
+df$print()
+
+## ------------------------------------------------
 ## Method `hash_df$select`
 ## ------------------------------------------------
 
@@ -91,9 +124,11 @@ df$select(Sepal.Length, Species)
 df$print()
 }
 \seealso{
-\code{dplyr::mutate}
+\code{\link[dplyr:mutate]{dplyr::mutate()}}
 
-\code{dplyr::select}
+\code{\link[base:grep]{base::grepl()}}
+
+\code{\link[dplyr:select]{dplyr::select()}}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -123,6 +158,9 @@ df$print()
 \item \href{#method-new}{\code{hash_df$new()}}
 \item \href{#method-View}{\code{hash_df$View()}}
 \item \href{#method-mutate}{\code{hash_df$mutate()}}
+\item \href{#method-mutate_if}{\code{hash_df$mutate_if()}}
+\item \href{#method-mutate_all}{\code{hash_df$mutate_all()}}
+\item \href{#method-mutate_at}{\code{hash_df$mutate_at()}}
 \item \href{#method-select}{\code{hash_df$select()}}
 \item \href{#method-clone}{\code{hash_df$clone()}}
 }
@@ -251,6 +289,100 @@ a bare-bones \code{dplyr::mutate} that takes advantage of the hashed data struct
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{df <- hash_df$new(iris)
 df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-mutate_if"></a>}}
+\if{latex}{\out{\hypertarget{method-mutate_if}{}}}
+\subsection{Method \code{mutate_if()}}{
+think \code{dplyr::mutate_if} or \code{mutate(across(where(...)))},
+but only takes one function, not a list.
+For all the scoped mutates in \code{{dplyr}}, functions can be functions/lambdas, formulas, or
+certain syntactic sugar expressions like \code{mean} --> \code{~mean(.x)}.
+See \code{purrr::as_mapper} for more information about function conversions.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$mutate_if(test, fun)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{test}}{a predicate function}
+
+\item{\code{fun}}{a function to apply when \code{test} is \code{TRUE}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$mutate_if(is.numeric, log)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-mutate_all"></a>}}
+\if{latex}{\out{\hypertarget{method-mutate_all}{}}}
+\subsection{Method \code{mutate_all()}}{
+think \code{dplyr::mutate_all} or \code{mutate(across(everything, ...))},
+but again only takes one function, not a list.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$mutate_all(fun)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{fun}}{a function to apply to every variable}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(mtcars)
+df$mutate_all(~.x - mean(.x))
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-mutate_at"></a>}}
+\if{latex}{\out{\hypertarget{method-mutate_at}{}}}
+\subsection{Method \code{mutate_at()}}{
+think \code{dplyr::mutate_at}, but again only takes one function, not a list.
+Also does not understand \code{tidyselect} syntax, so \code{regex} must be a regular expression
+that is understood by \code{base::grepl}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$mutate_at(regex, fun, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{regex}}{a regular expression}
+
+\item{\code{fun}}{a function to apply to variables whose names match \code{regex}}
+
+\item{\code{...}}{additional arguments passed to \code{regex}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$mutate_at("Sepal*", ~.x / 100)
 df$print()
 }
 \if{html}{\out{</div>}}

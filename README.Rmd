@@ -13,34 +13,34 @@ knitr::opts_chunk$set(
 )
 ```
 
-# itertools
+# peruse
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The {itertools} package is aimed at making it easier to generate irregular
+The {peruse} package is aimed at making it easier to generate irregular
 sequences that are difficult to generate with existing tools. The heart
-of {itertools} is the `S3` class `Iterator`. An `Iterator` allows the
+of {peruse} is the `S3` class `Iterator`. An `Iterator` allows the
 user to write an arbitrary R expression that returns the next
 element of a sequence of R objects. It then saves the state of the `Iterator`, meaning the next time `yield_next` is called, the subsequent element of the sequence will be returned.
 
 The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an `Iterator` that lazily generates the chosen elements.
 
-Finally, {itertools} also provides a new data structure stores a `data.frame` as an object with reference semantics and `O(1)` access to columns. This is useful when iterating over `data.frame`s with many columns, because the object is modified in place, rather than making a shallow copy on every iteration.
+Finally, {peruse} also provides a new data structure stores a `data.frame` as an object with reference semantics and `O(1)` access to columns. This is useful when iterating over `data.frame`s with many columns, because the object is modified in place, rather than making a shallow copy on every iteration.
 
 ## Installation
 
-You can install the released version of itertools from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of peruse from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("itertools")
+install.packages("peruse")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jacgoldsm/itertools")
+devtools::install_github("jacgoldsm/peruse")
 ```
 ## Example
 ### Collatz Sequence
@@ -48,8 +48,7 @@ devtools::install_github("jacgoldsm/itertools")
 A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches $1$ at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches $1$:
 
 ```{r example}
-library(itertools)
-library(magrittr)
+library(peruse)
 expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
   
 # Collatz generator starting at 50
@@ -95,7 +94,15 @@ hash_frequencies <- hash_df$new(wide_descriptions)
 
 hash_frequencies$data <- lapply(hash_frequencies$data,
                               function(x) x / sum(x))
+
+(hash_frequencies$return_df)[1:5, 1:5]
 ```
 
-Any such task is easy with the `hash_df`!
+Even easier, we can use implementations of `dplyr`-esque `mutate_*` functions on the objects:
+
+```{r}
+hash_frequencies$mutate_all(~.x / sum(.x))
+```
+
+Any such task is quick and easy with the `hash_df`!
 

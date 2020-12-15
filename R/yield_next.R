@@ -7,22 +7,17 @@
 #' @export
 
 
-
 yield_next <- function(iter) {
-  e1 <- environment()
-  if (!is_Iterator(iter)) iter <- as_Iterator(iter)
   iter_name <- deparse(substitute(iter))
   yield_name <- as.character(iter$yield)
-  list2env(iter$initial, envir = e1)
 
-  for (j in 1:length(iter$result)) {
-    eval(iter$result[[j]], envir = e1)
+  for (j in seq_along(iter$result)) {
+    eval(iter$result[[j]], envir = iter$initial)
   }
 
   for (key in names(iter$initial)) {
-    iter$initial[key] <- eval(rlang::parse_expr(key), envir = e1)
+    iter$initial[[key]] <- eval(rlang::parse_expr(key), envir = iter$initial)
   }
-  #pushes the local copy of 'gen' into the parent environment
-  assign(iter_name, iter, pos = parent.frame(n = 1))
+  assign(iter_name, iter, pos = .yieldenv)
   return(iter$initial[[yield_name]])
 }

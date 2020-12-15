@@ -19,10 +19,11 @@
 #'`hash_df`s are bare-bones, with methods for adding (`bind`ing)
 #' and deleting (`unbind`ing) variables as well as printing a
 #' preview of the data. In addition, {dplyr} functions `select`
-#' and `mutate` have implementations for `hash_df`'s (that do not
-#' depend on {dplyr}). Other {dplyr} functions like `summarise()`
-#' and `*_join` cannot easily take advantage of the `hash_df` structure,
-#' therefore they are not implemented here.
+#' and `mutate` (as well as its scoped versions) have implementations for
+#' `hash_df`'s (that do not depend on `{dplyr}`). Note that in `{dplyr}`,
+#' `across()` and `tidyselect()` have superceded scoped verbs. However,
+#' `hash_df`s do not understand `tidyselect`, so we must rely on the
+#' scoped versions (`mutate_*`) when wrangling these objects.
 #' Data wrangling and analysis functions not implemented in `hash_df`
 #' should be done after converting back to a `data.frame`
 #' object with `hash_df$return_df()`.
@@ -40,9 +41,17 @@
 #'wide_df <- as.data.frame(matrix(1:5000, nrow = 2))
 #'hash_wide_df <- hash_df$new(wide_df)
 #'
+#'# using a `for` loop:
 #'for (name in hash_wide_df$vars) {
 #'   hash_wide_df$data[[name]] <- -1 *  hash_wide_df$data[[name]]
 #'}
+#'
+#'# using `lapply`:
+#'hash_wide_df$data <- lapply(hash_wide_df$data, function(x) x * -1)
+#'
+#'# using `mutate`:
+#'hash_wide_df$mutate(~.x * -1)
+#'
 #'\dontrun{
 #'timer <- bench::mark(
 #'  check = F,
@@ -113,7 +122,7 @@ hash_df <- R6::R6Class("hash_df",
   #'df <- hash_df$new(iris)
   #'df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
   #'df$print()
-  #'@seealso `dplyr::mutate`
+  #'@seealso [dplyr::mutate()]
   mutate = function(...) {
     exprs <- rlang::enexprs(...)
     cols <- names(exprs)
@@ -122,13 +131,62 @@ hash_df <- R6::R6Class("hash_df",
       self$data[[key]] <- eval(exprs[[key]], envir = self$data)
     }
   },
+  #'@description Think `dplyr::mutate_if` or `mutate(across(where(...)))`,
+  #'but only taking one function, not a list.
+  #'For all the scoped mutates in `{dplyr}`, functions can be functions/lambdas, formulas, or
+  #'certain syntactic sugar expressions like `mean` --> `~mean(.x)`.
+  #'See `purrr::as_mapper` for more information about function conversions.
+  #'@param test a predicate function
+  #'@param fun a function to apply when `test` is `TRUE`
+  #'@examples
+  #'df <- hash_df$new(iris)
+  #'df$mutate_if(is.numeric, log)
+  #'df$print()
+  mutate_if = function(test, fun) {
+    test <- purrr::as_mapper(test)
+    fun <- purrr::as_mapper(fun)
+    for (name in self$vars) {
+      if (test(self$data[[name]]))
+         self$data[[name]] <- fun(self$data[[name]])
+      }
+  },
+  #'@description Think `dplyr::mutate_all` or `mutate(across(everything, ...))`,
+  #'but again only taking one function, not a list.
+  #'@param fun a function to apply to every variable
+  #'@examples
+  #'df <- hash_df$new(mtcars)
+  #'df$mutate_all(~.x - mean(.x))
+  #'df$print()
+  mutate_all = function(fun) {
+    fun <- purrr::as_mapper(fun)
+    self$data <- lapply(self$data, fun)
+  },
+  #'@description Think `dplyr::mutate_at`, but again only taking one function, not a list.
+  #'Also does not understand `tidyselect` syntax, so `regex` must be a regular expression
+  #'that is understood by `base::grepl`.
+  #'@param regex a regular expression
+  #'@param... additional arguments passed to `regex`
+  #'@param fun a function to apply to variables whose names match `regex`
+  #'@seealso [base::grepl()]
+  #'@examples
+  #'df <- hash_df$new(iris)
+  #'df$mutate_at("Sepal*", ~.x / 100)
+  #'df$print()
+  mutate_at = function(regex, fun, ...) {
+    fun <- purrr::as_mapper(fun)
+      for (name in self$vars) {
+       if (grepl(regex, name, ...)) {
+          self$data[[name]] <- fun(self$data[[name]])
+       }
+      }
+  },
   #'@description a bare-bones `dplyr::select` that takes advantage of the hashed data structure
   #'@param ... variables to select, separated by a comma
   #'@examples
   #'df <- hash_df$new(iris)
   #'df$select(Sepal.Length, Species)
   #'df$print()
-  #'@seealso `dplyr::select`
+  #'@seealso [dplyr::select()]
   select = function(...) {
       vars <- unlist(as.character(rlang::enexprs(...)))
       tryCatch(
@@ -136,7 +194,7 @@ hash_df <- R6::R6Class("hash_df",
         error = function(e) stop("Error: attempt to select columns that don't exist")
       )
     }
- ),
+  ),
   active = list(
     #' @field nrow the number of rows of the `data.frame`
     nrow = function(value) {
@@ -156,5 +214,6 @@ hash_df <- R6::R6Class("hash_df",
    .ncol = NA,
    .vars = NA
  ))
+
 
 

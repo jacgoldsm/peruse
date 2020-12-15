@@ -1,4 +1,4 @@
-Package: itertools
+Package: peruse
 Title: Set Comprehension, Lazy Iteration, and Reference Semantics Data Tools
 Version: 1.0.0
 Authors@R: 
@@ -11,7 +11,7 @@ Description: A friendly API for iteration and set comprehension, and
 License: GPL-2
 Encoding: UTF-8
 Imports: rlang, purrr, R6
-Depends: magrittr (>= 2.0.1)
+Depends: magrittr
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
