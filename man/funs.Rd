@@ -31,17 +31,17 @@ For we_have, a vector of the same type as .x if \code{return == 'vector'} and an
 \description{
 Set comprehension with the Magrittr Pipe.
 Always use the syntax:
-\code{.x \%>\% that_for_all(.y) \%>\% we_have(f(.x, .y))}.
+\code{.x \%>\% that_for_all(.y) \%>\% we_have_*(f(.x, .y))}.
 }
 \details{
-This function is designed to be used with \code{magrittr::\verb{\%>\%}}.
+This function is designed to be used with \code{\%>\%} from \code{magrittr}.
 Essentially, this function evaluates \code{f \%>\% g()} as
 \code{eval(g(f), envir = new.env(parent = parent.frame())}. Any pipe or pipe-like
 function that works similarly should work with \code{that_for_*}. In particular,
 the R Core Team is expected to implement a base R pipe in the near future with
 the syntax \code{|>}. While these functions will likely work properly with the new
-\code{base::`|>`}, as of right now the only pipe that is guaranteed to work is
-\code{magrittr::\verb{\%>\%}}.
+\code{|>}, as of right now the only pipe that is guaranteed to work is
+\code{\%>\%}.
 }
 \note{
 if .y is an numeric vector, you probably want a value obtained from
@@ -59,7 +59,7 @@ primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0,
 yield_next(primes)
 {c("I", "Don't", "wan't", "chicken") \%>\%
              that_for_all("\'") \%>\%
-             we_have(~grepl(.x, .y))}
+             we_have(~grepl(.y, .x))}
 #Twin primes 1 through 100
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)

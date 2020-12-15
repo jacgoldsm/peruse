@@ -7,7 +7,7 @@
 as_Iterator(list)
 }
 \arguments{
-\item{list}{A list to coerce to Iterator}
+\item{list}{a list to coerce to Iterator}
 }
 \description{
 Coerce a list to Iterator object

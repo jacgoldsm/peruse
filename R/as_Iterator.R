@@ -1,5 +1,5 @@
 #' Coerce a list to Iterator object
-#' @param list A list to coerce to Iterator
+#' @param list a list to coerce to Iterator
 #' @export
 
 as_Iterator <- function(list) {

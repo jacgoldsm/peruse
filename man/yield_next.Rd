@@ -2,7 +2,7 @@
 % Please edit documentation in R/yield_next.R
 \name{yield_next}
 \alias{yield_next}
-\title{Equivalent to Python's 'next'}
+\title{Increment an Iterator and Return the Next Value}
 \usage{
 yield_next(iter)
 }
@@ -14,5 +14,5 @@ An object of whatever type 'result' evaluates to from the Iterator
 }
 \description{
 Finds the value of the next iteration of an Iterator object
-If argument is list, attempts to coerce to Iterator.
+and increments the Iterator to the next value.
 }

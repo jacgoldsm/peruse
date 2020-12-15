@@ -45,7 +45,7 @@ devtools::install_github("jacgoldsm/peruse")
 ## Example
 ### Collatz Sequence
 
-A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches $1$ at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches $1$:
+A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches `1` at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches `1`:
 
 ```{r example}
 library(peruse)
@@ -62,8 +62,31 @@ while (i != 1L) {
   cat(paste0(i, "\n"))
 }
 ```
+### Random Walk with Drift
+Random Walks, with or without drift, are one of the most commonly used type of stochastic processes. How can we simulate one with \code{peruse}?
+
+```{r}
+set.seed(1)
+expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
+rwd <- Iterator(result = expr,
+                initial = c(n = 0),
+                yield = n)
+
+
+Value <- integer()
+reach <- 0L
+while (reach != 50L & reach != -50L) {
+  reach <- yield_next(rwd)
+  Value <- c(Value, reach)
+}
+
+plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
+```
+
+Here, we can see that `seq` gets to `50` after about `100` iterations when it is weighted `3:1` odds in favor of adding `1` over adding `-1` to the prior value.
+
 ### Primes
-How about generating all the prime numbers between $1$ and $100$? We can easily do that with the set-builder API:
+How about generating all the prime numbers between `1` and `100`? We can easily do that with the set-builder API:
 ```{r}
 cat(2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0))
 ```
@@ -84,25 +107,81 @@ cat(sequence)
 When dealing with text data, it is common to run models on a very wide data set, with thousands of variables representing each token. Doing transformations on a wide data set can be very expensive, as every time a column is transformed, a shallow copy is made of the `data.frame`.
 
 Here is an example of a wide data set representing the reviews of a great variety of wines. Each column represents a token, and the values represent the raw count of the number of times the word appears in a given review.
-```{r echo=FALSE}
-load("wide.rds")
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidytext)
+library(tidyverse)
+
+desc <- read_csv("/home/storeddocumentsonline/data/winemag-data_first150k.csv")
+desc <- desc[1:20000,]
+tidy_descriptions <- desc %>%
+  mutate(ident = as.character(1:nrow(desc))) %>%
+  unnest_tokens(word, description) %>%
+  count(ident, word) %>%
+  bind_tf_idf(word, ident, n)
+
+rm(desc)
+
+wide_descriptions <- tidy_descriptions %>%
+  select(ident, word, n) %>%
+  pivot_wider(names_from = word, 
+              names_prefix = "word_",
+              values_from = n, 
+              values_fill = 0) %>%
+  as_tibble()
+
+rm(tidy_descriptions)
+cat(paste0("Dimensions: ", nrow(wide_descriptions), " by ", ncol(wide_descriptions)))
 wide_descriptions[1:5, 1:5]
 ```
-What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all 9,195 columns. However, it is very fast with a `hash_df`:
+What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all $15,578$ columns. However, it is very fast with a `hash_df`:
 ```{r}
 hash_frequencies <- hash_df$new(wide_descriptions)
 
+transform <- function(x) {
+  if (is.numeric(x)) x / sum(x) else x
+}
 hash_frequencies$data <- lapply(hash_frequencies$data,
-                              function(x) x / sum(x))
+                            transform)
 
-(hash_frequencies$return_df)[1:5, 1:5]
+(hash_frequencies$return_df())[1:5, 1:5]
 ```
+(Note that the column order gets scrambled, as environments have no element order).
 
 Even easier, we can use implementations of `dplyr`-esque `mutate_*` functions on the objects:
 
 ```{r}
-hash_frequencies$mutate_all(~.x / sum(.x))
+hash_frequencies <- hash_df$new(wide_descriptions)
+
+hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
 ```
 
 Any such task is quick and easy with the `hash_df`!
+
+## Functions
+
+### Iterators:
+- as_Iterator()
+- is_Iterator()
+- Iterator()
+- yield_next()
+
+### Sets
+- that_for_all()
+- that_for_any()
+- we_have()
+
+### hash_df
+- $bind()
+- $unbind()
+- $return_df()
+- $print()
+- $new()
+- $View()
+- $mutate()
+- $mutate_if()
+- $mutate_all()
+- $select()
+- $select_if()
+- $select_at()
+- $clone()
 

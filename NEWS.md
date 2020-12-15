@@ -1,3 +1,8 @@
-# First Release of {peruse}!
-## Current Version: `peruse 1.0.0`
-===========================================
+## {peruse} Version 0.1.0: First CRAN Release!
+
+### See http://github.com/jacgoldsm/peruse
+
+Future release notes will be  made here.
+
+__________________________________________________________________________________
+

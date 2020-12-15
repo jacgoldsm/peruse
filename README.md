@@ -1,19 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# itertools
+# peruse
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The {itertools} package is aimed at making it easier to generate
-irregular sequences that are difficult to generate with existing tools.
-The heart of {itertools} is the `S3` class `Iterator`. An `Iterator`
-allows the user to write an arbitrary R expression that returns the next
-element of a sequence of R objects. It then saves the state of the
-`Iterator`, meaning the next time `yield_next` is called, the subsequent
-element of the sequence will be returned.
+The {peruse} package is aimed at making it easier to generate irregular
+sequences that are difficult to generate with existing tools. The heart
+of {peruse} is the `S3` class `Iterator`. An `Iterator` allows the user
+to write an arbitrary R expression that returns the next element of a
+sequence of R objects. It then saves the state of the `Iterator`,
+meaning the next time `yield_next` is called, the subsequent element of
+the sequence will be returned.
 
 The package also provides a simple, tidy API for set building, allowing
 the user to generate a set consisting of the elements of a vector that
@@ -21,7 +21,7 @@ meet specific criteria. This can either return a vector consisting of
 all the chosen elements or it can return an `Iterator` that lazily
 generates the chosen elements.
 
-Finally, {itertools} also provides a new data structure stores a
+Finally, {peruse} also provides a new data structure stores a
 `data.frame` as an object with reference semantics and `O(1)` access to
 columns. This is useful when iterating over `data.frame`s with many
 columns, because the object is modified in place, rather than making a
@@ -29,18 +29,18 @@ shallow copy on every iteration.
 
 ## Installation
 
-You can install the released version of itertools from
+You can install the released version of peruse from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("itertools")
+install.packages("peruse")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jacgoldsm/itertools")
+devtools::install_github("jacgoldsm/peruse")
 ```
 
 ## Example
@@ -48,19 +48,19 @@ devtools::install_github("jacgoldsm/itertools")
 ### Collatz Sequence
 
 A Collatz sequence is a particular sequence of natural numbers that
-mathematicians think always reaches \(1\) at some point, no matter the
+mathematicians think always reaches `1` at some point, no matter the
 starting point. We can’t prove that one way or the other, but we can
 create an `Iterator` that lazily generates a Collatz sequence until it
-reaches \(1\):
+reaches `1`:
 
 ``` r
-library(itertools)
+library(peruse)
+#> Loading required package: magrittr
 #> 
-#> Attaching package: 'itertools'
+#> Attaching package: 'peruse'
 #> The following object is masked from 'package:base':
 #> 
 #>     range
-library(magrittr)
 expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
   
 # Collatz generator starting at 50
@@ -99,10 +99,39 @@ while (i != 1L) {
 #> 1
 ```
 
+### Random Walk with Drift
+
+Random Walks, with or without drift, are one of the most commonly used
+type of stochastic processes. How can we simulate one with ?
+
+``` r
+set.seed(1)
+expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
+rwd <- Iterator(result = expr,
+                initial = c(n = 0),
+                yield = n)
+
+
+Value <- integer()
+reach <- 0L
+while (reach != 50L & reach != -50L) {
+  reach <- yield_next(rwd)
+  Value <- c(Value, reach)
+}
+
+plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+Here, we can see that `seq` gets to `50` after about `100` iterations
+when it is weighted `3:1` odds in favor of adding `1` over adding `-1`
+to the prior value.
+
 ### Primes
 
-How about generating all the prime numbers between \(1\) and \(100\)? We
-can easily do that with the set-builder API:
+How about generating all the prime numbers between `1` and `100`? We can
+easily do that with the set-builder API:
 
 ``` r
 cat(2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0))
@@ -139,23 +168,80 @@ great variety of wines. Each column represents a token, and the values
 represent the raw count of the number of times the word appears in a
 given review.
 
-    #>   word_2015 word_a word_accents word_and word_blackberry
-    #> 1         1      2            1        4               1
-    #> 2         0      1            0        2               0
-    #> 3         0      0            0        1               0
-    #> 4         0      0            0        2               0
-    #> 5         0      1            0        3               0
+    #> Dimensions: 20000 by 15578
+    #> # A tibble: 5 x 5
+    #>   ident word_100 word_2022 word_2030 word_a
+    #>   <chr>    <int>     <int>     <int>  <int>
+    #> 1 1            1         1         1      2
+    #> 2 10           0         0         0      1
+    #> 3 100          0         0         0      2
+    #> 4 1000         0         0         0      2
+    #> 5 10000        0         0         0      2
 
 What if we want to normalize all these columns by the absolute frequency
 of the word in the data set? Normally, it would take a very long time to
-iterate over all 9,195 columns. However, it is very fast with a
+iterate over all \(15,578\) columns. However, it is very fast with a
 `hash_df`:
 
 ``` r
 hash_frequencies <- hash_df$new(wide_descriptions)
 
+transform <- function(x) {
+  if (is.numeric(x)) x / sum(x) else x
+}
 hash_frequencies$data <- lapply(hash_frequencies$data,
-                              function(x) x / sum(x))
+                            transform)
+
+(hash_frequencies$return_df())[1:5, 1:5]
+#>   word_frail word_pineapples word_clarion word_joey word_pineappley
+#> 1          0               0            0         0               0
+#> 2          0               0            0         0               0
+#> 3          0               0            0         0               0
+#> 4          0               0            0         0               0
+#> 5          0               0            0         0               0
 ```
 
-Any such task is easy with the `hash_df`\!
+(Note that the column order gets scrambled, as environments have no
+element order).
+
+Even easier, we can use implementations of `dplyr`-esque `mutate_*`
+functions on the objects:
+
+``` r
+hash_frequencies <- hash_df$new(wide_descriptions)
+
+hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
+```
+
+Any such task is quick and easy with the `hash_df`\!
+
+## Functions
+
+### Iterators:
+
+  - as\_Iterator()
+  - is\_Iterator()
+  - Iterator()
+  - yield\_next()
+
+### Sets
+
+  - that\_for\_all()
+  - that\_for\_any()
+  - we\_have()
+
+### hash\_df
+
+  - $bind()
+  - $unbind()
+  - $return\_df()
+  - $print()
+  - $new()
+  - $View()
+  - $mutate()
+  - $mutate\_if()
+  - $mutate\_all()
+  - $select()
+  - $select\_if()
+  - $select\_at()
+  - $clone()

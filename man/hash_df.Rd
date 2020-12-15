@@ -2,7 +2,7 @@
 % Please edit documentation in R/hash_df.R
 \name{hash_df}
 \alias{hash_df}
-\title{\code{data.frame}s with hash table internals}
+\title{Data with hash table internals}
 \value{
 A \code{hash_df} object, built on \code{R6} and \code{env} \code{S3} classes
 }
@@ -25,7 +25,7 @@ and deleting (\code{unbind}ing) variables as well as printing a
 preview of the data. In addition, {dplyr} functions \code{select}
 and \code{mutate} (as well as its scoped versions) have implementations for
 \code{hash_df}'s (that do not depend on \code{{dplyr}}). Note that in \code{{dplyr}},
-\code{across()} and \code{tidyselect()} have superceded scoped verbs. However,
+\code{across()} and \code{tidyselect()} have superseded scoped verbs. However,
 \code{hash_df}s do not understand \code{tidyselect}, so we must rely on the
 scoped versions (\verb{mutate_*}) when wrangling these objects.
 Data wrangling and analysis functions not implemented in \code{hash_df}
@@ -122,13 +122,33 @@ df$print()
 df <- hash_df$new(iris)
 df$select(Sepal.Length, Species)
 df$print()
+
+## ------------------------------------------------
+## Method `hash_df$select_if`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$select_if(is.numeric)
+df$print()
+
+## ------------------------------------------------
+## Method `hash_df$select_at`
+## ------------------------------------------------
+
+df <- hash_df$new(iris)
+df$select_at("Sepal*")
+df$print()
 }
 \seealso{
 \code{\link[dplyr:mutate]{dplyr::mutate()}}
 
+\code{\link[dplyr:mutate_all]{dplyr::mutate_if()}}, \code{\link[purrr:as_mapper]{purrr::as_mapper()}}
+
 \code{\link[base:grep]{base::grepl()}}
 
 \code{\link[dplyr:select]{dplyr::select()}}
+
+\code{\link[dplyr:select_all]{dplyr::select_if()}}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -162,6 +182,8 @@ df$print()
 \item \href{#method-mutate_all}{\code{hash_df$mutate_all()}}
 \item \href{#method-mutate_at}{\code{hash_df$mutate_at()}}
 \item \href{#method-select}{\code{hash_df$select()}}
+\item \href{#method-select_if}{\code{hash_df$select_if()}}
+\item \href{#method-select_at}{\code{hash_df$select_at()}}
 \item \href{#method-clone}{\code{hash_df$clone()}}
 }
 }
@@ -300,8 +322,8 @@ df$print()
 \if{html}{\out{<a id="method-mutate_if"></a>}}
 \if{latex}{\out{\hypertarget{method-mutate_if}{}}}
 \subsection{Method \code{mutate_if()}}{
-think \code{dplyr::mutate_if} or \code{mutate(across(where(...)))},
-but only takes one function, not a list.
+Think \code{dplyr::mutate_if} or \code{mutate(across(where(...)))},
+but only taking one function, not a list.
 For all the scoped mutates in \code{{dplyr}}, functions can be functions/lambdas, formulas, or
 certain syntactic sugar expressions like \code{mean} --> \code{~mean(.x)}.
 See \code{purrr::as_mapper} for more information about function conversions.
@@ -333,8 +355,8 @@ df$print()
 \if{html}{\out{<a id="method-mutate_all"></a>}}
 \if{latex}{\out{\hypertarget{method-mutate_all}{}}}
 \subsection{Method \code{mutate_all()}}{
-think \code{dplyr::mutate_all} or \code{mutate(across(everything, ...))},
-but again only takes one function, not a list.
+Think \code{dplyr::mutate_all} or \code{mutate(across(everything, ...))},
+but again only taking one function, not a list.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hash_df$mutate_all(fun)}\if{html}{\out{</div>}}
 }
@@ -361,7 +383,7 @@ df$print()
 \if{html}{\out{<a id="method-mutate_at"></a>}}
 \if{latex}{\out{\hypertarget{method-mutate_at}{}}}
 \subsection{Method \code{mutate_at()}}{
-think \code{dplyr::mutate_at}, but again only takes one function, not a list.
+Think \code{dplyr::mutate_at}, but again only taking one function, not a list.
 Also does not understand \code{tidyselect} syntax, so \code{regex} must be a regular expression
 that is understood by \code{base::grepl}.
 \subsection{Usage}{
@@ -394,7 +416,7 @@ df$print()
 \if{html}{\out{<a id="method-select"></a>}}
 \if{latex}{\out{\hypertarget{method-select}{}}}
 \subsection{Method \code{select()}}{
-a bare-bones \code{dplyr::select} that takes advantage of the hashed data structure
+A bare-bones \code{dplyr::select} that takes advantage of the hashed data structure
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{hash_df$select(...)}\if{html}{\out{</div>}}
 }
@@ -410,6 +432,64 @@ a bare-bones \code{dplyr::select} that takes advantage of the hashed data struct
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{df <- hash_df$new(iris)
 df$select(Sepal.Length, Species)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-select_if"></a>}}
+\if{latex}{\out{\hypertarget{method-select_if}{}}}
+\subsection{Method \code{select_if()}}{
+Think \code{dplyr::select_if}. Note that \code{peruse::hash_df$select_if()}
+does not take advantage of the particular hashed data type and is only included for completeness.
+There is no reason to think that this will be more efficient than \code{dplyr::select_if},
+and it may be less efficient.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$select_if(test)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{test}}{a predicate function to subset data}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$select_if(is.numeric)
+df$print()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-select_at"></a>}}
+\if{latex}{\out{\hypertarget{method-select_at}{}}}
+\subsection{Method \code{select_at()}}{
+Think \code{dplyr::select_at}, but again without \code{tidyselect}
+specification, so \code{regex} must be understood by \code{grepl}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$select_at(regex)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{regex}}{a regular expression to subset the data}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{df <- hash_df$new(iris)
+df$select_at("Sepal*")
 df$print()
 }
 \if{html}{\out{</div>}}

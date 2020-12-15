@@ -1,12 +1,12 @@
 Package: peruse
-Title: Set Comprehension, Lazy Iteration, and Reference Semantics Data Tools
-Version: 1.0.0
+Title: Set Comprehension, Sequence Iteration, and Reference Semantics Data Tools
+Version: 0.1.0
 Authors@R: 
     person(given = "Jacob",
            family = "Goldsmith",
            role = c("aut", "cre"),
            email = "jacobg314@hotmail.com")
-Description: A friendly API for iteration and set comprehension, and 
+Description: A friendly API for sequence iteration and set comprehension, and 
     a tool for constructing and manipulating hash-table based data sets.
 License: GPL-2
 Encoding: UTF-8

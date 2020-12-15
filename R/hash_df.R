@@ -1,7 +1,7 @@
 #'@name hash_df
 #'
 #'
-#'@title  `data.frame`s with hash table internals
+#'@title  Data with hash table internals
 #'
 #'@description Create a `data.frame` built on the `environment`
 #'`S3` class and embedded in an `R6` object. The primary advantage
@@ -21,7 +21,7 @@
 #' preview of the data. In addition, {dplyr} functions `select`
 #' and `mutate` (as well as its scoped versions) have implementations for
 #' `hash_df`'s (that do not depend on `{dplyr}`). Note that in `{dplyr}`,
-#' `across()` and `tidyselect()` have superceded scoped verbs. However,
+#' `across()` and `tidyselect()` have superseded scoped verbs. However,
 #' `hash_df`s do not understand `tidyselect`, so we must rely on the
 #' scoped versions (`mutate_*`) when wrangling these objects.
 #' Data wrangling and analysis functions not implemented in `hash_df`
@@ -138,6 +138,7 @@ hash_df <- R6::R6Class("hash_df",
   #'See `purrr::as_mapper` for more information about function conversions.
   #'@param test a predicate function
   #'@param fun a function to apply when `test` is `TRUE`
+  #'@seealso [dplyr::mutate_if()], [purrr::as_mapper()]
   #'@examples
   #'df <- hash_df$new(iris)
   #'df$mutate_if(is.numeric, log)
@@ -180,7 +181,7 @@ hash_df <- R6::R6Class("hash_df",
        }
       }
   },
-  #'@description a bare-bones `dplyr::select` that takes advantage of the hashed data structure
+  #'@description A bare-bones `dplyr::select` that takes advantage of the hashed data structure
   #'@param ... variables to select, separated by a comma
   #'@examples
   #'df <- hash_df$new(iris)
@@ -193,7 +194,34 @@ hash_df <- R6::R6Class("hash_df",
         expr = {self$data <- list2env(rlang::env_get_list(self$data, vars))},
         error = function(e) stop("Error: attempt to select columns that don't exist")
       )
-    }
+    },
+  #'@description Think \code{dplyr::select_if}. Note that \code{peruse::hash_df$select_if()}
+  #'does not take advantage of the particular hashed data type and is only included for completeness.
+  #'There is no reason to think that this will be more efficient than \code{dplyr::select_if},
+  #'and it may be less efficient.
+  #'@param test a predicate function to subset data
+  #'@seealso [dplyr::select_if()]
+  #'@examples
+  #'df <- hash_df$new(iris)
+  #'df$select_if(is.numeric)
+  #'df$print()
+  select_if = function(test) {
+    test <- purrr::as_mapper(test)
+    data <- as.data.frame(as.list(self$data))
+    true_cols <- unlist(lapply(data, test))
+    self$data <- list2env(data[, true_cols])
+  },
+  #'@description Think \code{dplyr::select_at}, but again without \code{tidyselect}
+  #'specification, so \code{regex} must be understood by \code{grepl}.
+  #'@param regex a regular expression to subset the data
+  #'@examples
+  #'df <- hash_df$new(iris)
+  #'df$select_at("Sepal*")
+  #'df$print()
+  select_at = function(regex) {
+    true_names <- self$vars[which(grepl(regex, self$vars))]
+    self$data <- rlang::env_get_list(self$data, true_names)
+  }
   ),
   active = list(
     #' @field nrow the number of rows of the `data.frame`

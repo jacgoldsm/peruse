@@ -6,7 +6,7 @@
 #'
 #' @description Set comprehension with the Magrittr Pipe.
 #' Always use the syntax:
-#' `.x %>% that_for_all(.y) %>% we_have(f(.x, .y))`.
+#' `.x %>% that_for_all(.y) %>% we_have_*(f(.x, .y))`.
 #'
 #' @note if .y is an numeric vector, you probably want a value obtained from
 #' `peruse::range(start, end)` rather than `start:end` or `seq(start,end)`, as when
@@ -20,14 +20,14 @@
 
 #' @param that_for A list passed to `we_have`--can be ignored with proper syntax
 
-#' @details This function is designed to be used with \code{magrittr::`%>%`}.
+#' @details This function is designed to be used with \code{%>%} from \code{magrittr}.
 #' Essentially, this function evaluates \code{f %>% g()} as
 #' \code{eval(g(f), envir = new.env(parent = parent.frame())}. Any pipe or pipe-like
 #' function that works similarly should work with \code{that_for_*}. In particular,
 #' the R Core Team is expected to implement a base R pipe in the near future with
 #' the syntax \code{|>}. While these functions will likely work properly with the new
-#' \code{base::`|>`}, as of right now the only pipe that is guaranteed to work is
-#' \code{magrittr::`%>%`}.
+#' \code{|>}, as of right now the only pipe that is guaranteed to work is
+#' \code{%>%}.
 #'
 #' @examples
 #' library(magrittr)
@@ -39,7 +39,7 @@
 
 #' {c("I", "Don't", "wan't", "chicken") %>%
 #'              that_for_all("\'") %>%
-#'              we_have(~grepl(.x, .y))}
+#'              we_have(~grepl(.y, .x))}
 
 #' #Twin primes 1 through 100
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
