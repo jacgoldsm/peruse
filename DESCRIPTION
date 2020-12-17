@@ -1,5 +1,5 @@
 Package: peruse
-Title: Set Comprehension, Sequence Iteration, and Reference Semantics Data Tools
+Title: Sequence and Wide Data Iteration
 Version: 0.1.0
 Authors@R: 
     person(given = "Jacob",

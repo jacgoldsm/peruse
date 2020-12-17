@@ -7,3 +7,7 @@
 ^peruse\.Rproj$
 
 
+^CRAN-RELEASE$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
