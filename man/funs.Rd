@@ -61,9 +61,11 @@ yield_next(primes)
              that_for_all("\'") \%>\%
              we_have(~grepl(.y, .x))}
 #Twin primes 1 through 100
+\dontrun{
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
 #Prime numbers 1 through 100 that are two away from a square number
+}
 (2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
     that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
