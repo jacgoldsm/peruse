@@ -11,7 +11,7 @@
 #' @note if .y is an numeric vector, you probably want a value obtained from
 #' `peruse::range(start, end)` rather than `start:end` or `seq(start,end)`, as when
 #' start is greater than end you want an empty vector rather than counting backwards.
-#' Note that `itertools::range` views end as a supremum, not a maximum, thus `range(a,b)`
+#' Note that `peruse::range` views end as a supremum, not a maximum, thus `range(a,b)`
 #' is equivalent to the set `[`a,b) when a < b or `{}` when b >= a.
 #' @param .x A set, represented as either an atomic vector or a list
 #' @param .y A set to compare to `.x`
