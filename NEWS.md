@@ -1,9 +1,6 @@
-## {peruse} Version 0.1.0: First CRAN Release!
+# Version 0.1.0
 
-### See [https://jacgoldsm.github.io/peruse/]()
+* Initial Release
 
-Future release notes will be  made here.
+* Added a `NEWS.md` file to track changes to the package.</li>
 
-__________________________________________________________________________________
-
-## Development: Version 0.1.0.9000
