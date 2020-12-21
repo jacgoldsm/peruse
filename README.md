@@ -102,7 +102,7 @@ while (i != 1L) {
 ### Random Walk with Drift
 
 Random Walks, with or without drift, are one of the most commonly used
-type of stochastic processes. How can we simulate one with ?
+type of stochastic processes. How can we simulate one with {peruse}?
 
 ``` r
 set.seed(1)
