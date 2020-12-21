@@ -47,7 +47,7 @@ the syntax \code{|>}. While these functions will likely work properly with the n
 if .y is an numeric vector, you probably want a value obtained from
 \code{peruse::range(start, end)} rather than \code{start:end} or \code{seq(start,end)}, as when
 start is greater than end you want an empty vector rather than counting backwards.
-Note that \code{itertools::range} views end as a supremum, not a maximum, thus \code{range(a,b)}
+Note that \code{peruse::range} views end as a supremum, not a maximum, thus \code{range(a,b)}
 is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
 }
 \examples{
