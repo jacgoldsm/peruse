@@ -74,7 +74,7 @@ Always use the syntax:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -174,7 +174,7 @@ the syntax <code>|&gt;</code>. While these functions will likely work properly w
     <p>if .y is an numeric vector, you probably want a value obtained from
 <code><a href='range.html'>peruse::range(start, end)</a></code> rather than <code>start:end</code> or <code><a href='https://rdrr.io/r/base/seq.html'>seq(start,end)</a></code>, as when
 start is greater than end you want an empty vector rather than counting backwards.
-Note that <code><a href='https://rdrr.io/pkg/itertools/man/range.html'>itertools::range</a></code> views end as a supremum, not a maximum, thus <code><a href='range.html'>range(a,b)</a></code>
+Note that <code><a href='range.html'>peruse::range</a></code> views end as a supremum, not a maximum, thus <code><a href='range.html'>range(a,b)</a></code>
 is equivalent to the set <code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code>a,b) when a &lt; b or <code>{}</code> when b &gt;= a.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
