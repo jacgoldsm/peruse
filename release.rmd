@@ -1,0 +1,204 @@
+---
+title: "peruse 0.8.0"
+author: "Jacob Goldsmith"
+date: '2020-12-21'
+slug: peruse-0-8-0
+description: Introducing the peruse package, sequences and hashed data frames in R.
+categories: package
+tags: package
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(peruse)
+```
+
+<html>
+<style>
+h2 code {
+    font-size: 1em;
+}
+</style>
+</html>
+
+I'm excited to announce that [peruse 0.8.0](https://jacgoldsm.github.io/peruse/) is now
+available on CRAN!
+
+`peruse` has two main distinct capabilities, related by the idea that they 'peruse' a data structure:
+
+* `Iterator`s that make it easier to generate irregular sequences and sets that are difficult to generate with existing tools
+
+* `hash_df`s to modify data in place, especially useful for wide data
+
+Install `peruse` with:
+
+```{r, eval = FALSE}
+install.packages("peruse")
+```
+
+## Iterator
+
+In R, sequences are normally represented as atomic vectors. For example, here is how we might represent a weighted sequence of 50 1s and -1s, with 1 having 75% probability and -1 having 25% probability:
+```{r}
+sample(c(-1L, 1L), size = 50L, prob = c(0.25, 0.75), replace = T)
+```
+From the perspective of the R user, all these values are generated at once. This brings up two issues:
+
+* How do we generate a recursive sequence, that is, a sequence in which each value determines subsequent values?
+
+* How do we generate a sequence that only generates until a condition is met if we do not know how long that will take in advance?
+
+The `Iterator` object in `peruse` is made to solve these problem. For example, suppose we want to simulate a random walk with drift that has two end conditions: success is if/when it reaches 50, and failure is if/when it reaches -50. To be efficient, we want to stop the simulation when the sequence reaches either of the end conditions.
+
+
+```{r}
+set.seed(1)
+expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
+rwd <- Iterator(result = expr,
+                initial = c(n = 0),
+                yield = n)
+
+
+Value <- integer()
+reach <- 0L
+while (reach != 50L & reach != -50L) {
+  reach <- yield_next(rwd)
+  Value <- c(Value, reach)
+}
+
+plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
+```
+
+
+This scenario illustrates the capabilities of the `Iterator`:
+
+* We defined the R expression for generating a new element in advance of the simulation
+
+* We defined initial values for all of the variables involved (in this case just `n`)
+
+* We defined a variable to return each time `yield_next` was called
+
+* We generated the sequence recursively, modifying the value of `n` each time we computed a new one
+
+* We made the process stop whenever `n` reached 50 or -50
+
+## Set Building
+`peruse` develops a simple API for set comprehension. R already makes it easy to develop simple sets, like getting all the even numbers from 1 to 100:
+```{r}
+(1:100)[which(1:100 %% 2 == 0)]
+```
+But more complex sets require comparing a set of elements to another set and only including an element if it matches a condition. For example, a prime number is defined as $i \in \mathbb{N} | \forall m \in \mathbb{N} \setminus \{1,i \}, i \equiv 0 \mod m$. How do we represent that in R? The set-builder API can help!
+
+Here, we use set comprehension to generate prime numbers 1-100:
+```{r}
+2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
+```
+This doesn't, however, help us if we want to generate a certain *number* of prime numbers, regardless of what interval they are in. Of course, we could generate a vector and then subset it, but that would be inefficient! We want to only generate what we need.
+
+We can bring together the set-builder and Iterator capabilities to do that, for example with the first 100 primes:
+
+```{r}
+# 10,000 is just a number that we can be pretty sure is sufficiently high
+primes <- 2:10000 %>%
+            that_for_all(range(2, .x)) %>% 
+            we_have(~.x %% .y != 0, "Iterator")
+
+sequence <- c()
+while (length(sequence) <= 100) {
+  sequence <- c(sequence, yield_next(primes))
+}
+
+cat(sequence)
+```
+This illustrates a few things:
+
+* We can generate an `Iterator` from a set by including the "Iterator" argument in `we_have()`
+
+* We can then generate a sequence that would normally be generated all at once one-by-one
+
+* We can then only generate the numbers we want and stop once we reach the hundredth element
+
+
+## hash_df
+
+### Theory
+`peruse` introduces the `hash_df`, which can be thought of as a `data.frame` with reference semantics. That means that the columns can be repeatedly modified in place, rather than than making a shallow copy on every iteration of an algorithm.
+
+Internally, R lists are stored as `VECSXP` objects -- essentially vectors of pointers, where each pointer addresses an element of the list. When a list element is modified, the entire `VECSXP` object is copied and modified, and the old one deleted. However, the R objects that are referenced by the `VECSXP` object are untouched, making it a shallow copy, not a deep copy.
+
+A `hash_df` has a different structure. In a `hash_df`, the data is stored in an R object called an environment, represented as an `ENVSXP` object. `ENVSXP` objects look like a [hash table](https://en.wikipedia.org/wiki/Hash_table). Unlike all other R objects, `ENVSXP` tables are modified in place. In addition, looking up an element in an environment can be done in [constant amortized time](https://stackoverflow.com/questions/200384/constant-amortized-time#:~:text=Essentially%20amortised%20time%20means%20%22average,you%20repeatedly%20add%20new%20items.) instead of linear time.
+
+### Practice
+What does this mean in practice? The main advantage of using a `hash_df` is when you want to modify a bunch of columns of a wide data set. The internal structure of the `hash_df` means that this process will be much faster than it would be with a `data.frame`.
+
+Here is an example of a wide data set representing the reviews of a great variety of wines. Each column represents a token, and the values represent the raw count of the number of times the word appears in a given review.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+wide_descriptions <- readRDS("/home/storeddocumentsonline/wide_descriptions.rds")
+cat(paste0("Dimensions: ", nrow(wide_descriptions), " by ", ncol(wide_descriptions)))
+wide_descriptions[1:5, 1:5]
+```
+What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all 15,578 columns. However, it is very fast with a `hash_df`:
+```{r}
+library(peruse)
+hash_frequencies <- hash_df$new(wide_descriptions)
+
+transform <- function(x) {
+  if (is.numeric(x)) x / sum(x) else x
+}
+hash_frequencies$data <- lapply(hash_frequencies$data,
+                            transform)
+
+(hash_frequencies$return_df())[1:5, 1:5]
+```
+```{r include=FALSE}
+rm(hash_frequencies)
+```
+(Note that the column order gets scrambled, as environments have no element order.)
+
+Even easier, we can use implementations of `dplyr`-esque `mutate_*` functions on the objects:
+
+```{r}
+hash_frequencies <- hash_df$new(wide_descriptions)
+
+hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
+(hash_frequencies$return_df())[1:5, 1:5]
+```
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+rm(hash_frequencies)
+```
+
+I tried to benchmark this process against `dplyr::mutate_if`, but the dplyr version would not actually run (!!) on my 8GB DDR4 RAM computer. That should be an indication of how much more efficient the `hash_df` version is, but for a more quantitative comparison I reduced the data set to 2,000 columns and benchmarked that with the `bench` package:
+
+```{r}
+df_small <- wide_descriptions[,1:2000]
+hash_small <- hash_df$new(df_small)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+rm(wide_descriptions)
+```
+
+```{r}
+suppressWarnings(
+timer <- bench::mark(
+  hash_small$mutate_if(is.numeric, ~.x / sum(.x)),
+  wide_mutated <- dplyr::mutate_if(df_small, is.numeric, ~.x / sum(.x)),
+  check = F
+)
+)
+
+timer$median
+timer$mem_alloc
+```
+We can see that the `hash_df` takes less than a thirtieth as much time as the `dplyr`/`data.frame` version and allocates less than half as much memory!
+
+## Feedback welcome!
+
+`peruse` is a new package and needs help! If you do run into a bug or think of a new feature that would work well in `peruse` please [open an issue.](https://github.com/jacgoldsm/peruse/issues)
+
+## Acknowledgments
+Big thank you to Hadley Wickham, from whose book [Advanced R](https://adv-r.hadley.nz/index.html) I learned to do the stuff I did in the package, and whose book [R Packages](https://r-pkgs.org/index.html) was invaluable in getting `peruse` published on CRAN. Also, the piped set builder workflow was made possible by the [magrittr](https://magrittr.tidyverse.org/) pipe, and the `hash_df` API borrows heavily from [dplyr](https://dplyr.tidyverse.org/articles/dplyr.html), so thank you to all the developers of those packages: Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and Stefan Milton Bache.
+
+
