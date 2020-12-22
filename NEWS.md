@@ -2,5 +2,5 @@
 
 * Initial Release
 
-* Added a `NEWS.md` file to track changes to the package.</li>
+* Added a `NEWS.md` file to track changes to the package.
 
