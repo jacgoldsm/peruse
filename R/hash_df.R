@@ -100,7 +100,10 @@ hash_df <- R6::R6Class("hash_df",
   },
   #' @description print a preview of the `data.frame`
   print = function() {
-    print(self$return_df()[1:20,])
+    max_rows <- ifelse(nrow(self$return_df()) > 20L, 20L, nrow(self$return_df()))
+    max_cols <- ifelse(ncol(self$return_df()) > 20L, 20L, ncol(self$return_df()))
+
+    print(self$return_df()[1:max_rows,1:max_cols])
   },
   #' @description create a new `hash_df` from a `data.frame`
   #' @param df a `data.frame`
@@ -238,6 +241,8 @@ hash_df <- R6::R6Class("hash_df",
     }
   ),
  private = list(
+   # TODO: make these reliable: right now, they are immutable and thus unreliable
+   # if the data changes
    .nrow = NA,
    .ncol = NA,
    .vars = NA

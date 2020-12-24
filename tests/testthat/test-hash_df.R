@@ -95,6 +95,7 @@ test_that("select_at", {
 test_that("prime_iter", {
  expect_equal({
    .e1 <- new.env(parent = emptyenv())
+   .e1$iter_num <- 0L
    primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
    yield_next(primes)},
    2L)
@@ -106,4 +107,32 @@ test_that("grepl_set", {
                                that_for_all("\'") %>%
                                we_have(~grepl(.y, .x))},
     c("Don't", "wan't"))
+})
+
+test_that("is_Iterator", { .yieldenv <- new.env(parent = emptyenv())
+expect_true({expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
+collatz <- Iterator(result = expr,
+                    initial = c(n = 50),
+                    yield = n);
+is_Iterator(collatz)})
+})
+
+test_that("range",{
+          expect_equal(
+            range(0, 100, by = 2L),
+            seq(0,99, by = 2L)
+          )
+  })
+
+test_that("range_empty",{
+  expect_equal(
+    range(100, 100, by = 2L),
+    numeric()
+  )
+})
+
+test_that("print_narrow", {
+  expect_output({
+    df <- hash_df$new(iris)
+    df$print()})
 })

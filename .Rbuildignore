@@ -12,3 +12,5 @@
 ^docs$
 ^pkgdown$
 ^release\.rmd
+^release\.html
+^version_prelims$

@@ -3,5 +3,5 @@
 #' @export
 
 is_Iterator <- function(list) {
-  class(list) == "Iterator"
+  inherits(list, "Iterator")
 }

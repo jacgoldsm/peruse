@@ -108,22 +108,21 @@ we_have <- function(that_for, formula, result = "vector") {
   }
 
   if (result == "Iterator") {
-    assign(".x", that_for$.x, pos = .e1)
-    assign(".y", that_for$.y, pos = .e1)
-    assign(".formula", formula, pos = .e1)
+
+
   if (that_for$quant == "all") {
     expr <- "
     repeat {
-    ex <- new.env()
-    assign('.x', .e1$.x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.e1$.x[i], eval(.e1$.y, envir = ex), .e1$.formula)
+    bool_vec <- purrr::map2_lgl(x_name[i],
+                                rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
+                                formula_name)
 
     if (all(bool_vec)) {
-          .nth <- .e1$.x[i]
-          i <- i + 1
+          .nth <- x_name[i]
+          i <- i + 1L
           break
     } else {
-          i <- i + 1
+          i <- i + 1L
     }
     }
 
@@ -131,23 +130,25 @@ we_have <- function(that_for, formula, result = "vector") {
   } else {
     expr <- "
     repeat {
-    ex <- new.env()
-    assign('.x', .e1$.x[i], pos = ex)
-    bool_vec <- purrr::map2_lgl(.e1$.x[i], eval(.e1$.y, envir = ex), .e1$.formula)
+    bool_vec <- purrr::map2_lgl(x_name[i],
+                                rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
+                                formula_name)
 
     if (any(bool_vec)) {
-          .nth <- .e1$.x[i]
-          i <- i + 1
+          .nth <- x_name[i]
+          i <- i + 1L
           break
     } else {
-          i <- i + 1
+          i <- i + 1L
     }
     }
-
     "
   }
+
+    initial <- rlang::env(i = 1, .nth = 0, x_name = that_for$.x, y_name = that_for$.y, formula_name = formula)
+
     return(
-      Iterator(result = expr, initial = c(i = 1, .nth = 0), yield = .nth)
+      Iterator(result = expr, initial = initial, yield = .nth)
     )
   }
 }
