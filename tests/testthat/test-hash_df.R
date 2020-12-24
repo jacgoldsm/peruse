@@ -94,8 +94,6 @@ test_that("select_at", {
 
 test_that("prime_iter", {
  expect_equal({
-   .e1 <- new.env(parent = emptyenv())
-   .e1$iter_num <- 0L
    primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
    yield_next(primes)},
    2L)
