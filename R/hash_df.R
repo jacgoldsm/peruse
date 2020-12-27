@@ -150,8 +150,7 @@ hash_df <- R6::R6Class("hash_df",
     test <- purrr::as_mapper(test)
     fun <- purrr::as_mapper(fun)
     for (name in self$vars) {
-      if (test(self$data[[name]]))
-         self$data[[name]] <- fun(self$data[[name]])
+      if (test(self$data[[name]])) self$data[[name]] <- fun(self$data[[name]])
       }
   },
   #'@description Think `dplyr::mutate_all` or `mutate(across(everything, ...))`,
