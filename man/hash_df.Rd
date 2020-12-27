@@ -397,7 +397,7 @@ that is understood by \code{base::grepl}.
 
 \item{\code{fun}}{a function to apply to variables whose names match \code{regex}}
 
-\item{\code{...}}{additional arguments passed to \code{regex}}
+\item{\code{...}}{additional arguments passed to \code{base::grepl()}}
 }
 \if{html}{\out{</div>}}
 }
@@ -476,13 +476,15 @@ df$print()
 Think \code{dplyr::select_at}, but again without \code{tidyselect}
 specification, so \code{regex} must be understood by \code{grepl}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{hash_df$select_at(regex)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{hash_df$select_at(regex, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{regex}}{a regular expression to subset the data}
+
+\item{\code{...}}{additional arguments passed to \code{base::grepl()}}
 }
 \if{html}{\out{</div>}}
 }

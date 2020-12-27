@@ -131,7 +131,7 @@ hash_df <- R6::R6Class("hash_df",
     cols <- names(exprs)
 
     for (key in cols){
-      self$data[[key]] <- eval(exprs[[key]], envir = self$data)
+      self$data[[key]] <- rlang::eval_bare(exprs[[key]], env = self$data)
     }
   },
   #'@description Think `dplyr::mutate_if` or `mutate(across(where(...)))`,
@@ -168,7 +168,7 @@ hash_df <- R6::R6Class("hash_df",
   #'Also does not understand `tidyselect` syntax, so `regex` must be a regular expression
   #'that is understood by `base::grepl`.
   #'@param regex a regular expression
-  #'@param... additional arguments passed to `regex`
+  #'@param... additional arguments passed to `base::grepl()`
   #'@param fun a function to apply to variables whose names match `regex`
   #'@seealso [base::grepl()]
   #'@examples
@@ -216,13 +216,14 @@ hash_df <- R6::R6Class("hash_df",
   #'@description Think \code{dplyr::select_at}, but again without \code{tidyselect}
   #'specification, so \code{regex} must be understood by \code{grepl}.
   #'@param regex a regular expression to subset the data
+  #'@param ... additional arguments passed to `base::grepl()`
   #'@examples
   #'df <- hash_df$new(iris)
   #'df$select_at("Sepal*")
   #'df$print()
-  select_at = function(regex) {
-    true_names <- self$vars[which(grepl(regex, self$vars))]
-    self$data <- rlang::env_get_list(self$data, true_names)
+  select_at = function(regex, ...) {
+    true_names <- self$vars[which(grepl(regex, self$vars, ...))]
+    self$data <- list2env(rlang::env_get_list(self$data, true_names))
   }
   ),
   active = list(
