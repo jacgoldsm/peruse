@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -134,6 +134,21 @@
 <ul>
 <li><p>Initial Release</p></li>
 <li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
+</ul>
+</div>
+    <div id="version-0109000" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0.9000">
+<a href="#version-0109000" class="anchor"></a>Version 0.1.0.9000</h1>
+<ul>
+<li><p>Will be released soon as Version 0.2.0</p></li>
+<li><p>Removed <code>as_Iterator()</code></p></li>
+<li><p>Changes <code><a href="../reference/is_Iterator.html">is_Iterator()</a></code> to use <code><a href="https://rdrr.io/r/base/class.html">inherits()</a></code> instead of <code>class() ==</code></p></li>
+<li><p>Fixed bug in <code><a href="../reference/sets.html">we_have()</a></code> that wrote over an old set-created <code>Iterator</code> when a new one was made, even with a different name</p></li>
+<li><p>Removed <code>hash_df</code> data structure</p></li>
+<li><p>Removed dependency on {R6}</p></li>
+<li><p>Added <code><a href="../reference/yield.html">yield_more()</a></code></p></li>
+<li><p>Added <code><a href="../reference/move.html">move_next()</a></code> and <code><a href="../reference/move.html">move_more()</a></code></p></li>
+<li><p>Added <code><a href="../reference/current.html">current()</a></code></p></li>
 </ul>
 </div>
   </div>

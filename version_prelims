@@ -1,7 +1,5 @@
 Version 0.1.1 -- preliminary
 
-* Fixed `hash_df$print()` to only show 20 columns and display correctly for small data sets
-
 * Removed `as_Iterator()`
 
 * Changes `is_Iterator()` to use `inherits()` instead of `class() ==`

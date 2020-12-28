@@ -387,20 +387,20 @@ h2 code {
 }
 </style>
 </html>
-<p>I’m excited to announce that <a href="https://jacgoldsm.github.io/peruse/">peruse 0.2.0</a> is now available on CRAN!</p>
+<p>I’m excited to announce that <a href="https://jacgoldsm.github.io/peruse/">peruse 0.1.0</a> is now available on CRAN!</p>
+<p>NOTE: {peruse} is undergoing major changes. Install the development version for the most recent version with</p>
+<pre class="r"><code>devtools::install_github(&quot;jacgoldsm/peruse&quot;)</code></pre>
 <p><code>peruse</code> has two main distinct capabilities, related by the idea that they ‘peruse’ a sequence:</p>
 <ul>
 <li><p>Set or list comprehension, aimed at capturing sets that meet complex conditions</p></li>
 <li><p><code>Iterator</code>s that make it easier to generate irregular sequences and sets that are difficult to generate with existing tools</p></li>
 </ul>
-<p>Install <code>peruse</code> with:</p>
-<pre class="r"><code>install.packages(&quot;peruse&quot;)</code></pre>
 <div id="iterator" class="section level2">
 <h2>Iterator</h2>
 <p>In R, sequences are normally represented as atomic vectors. For example, here is how we might represent a weighted sequence of 50 1s and -1s, with 1 having 75% probability and -1 having 25% probability:</p>
 <pre class="r"><code>sample(c(-1L, 1L), size = 50L, prob = c(0.25, 0.75), replace = T)
-#&gt;  [1]  1  1  1  1  1 -1  1  1  1 -1 -1  1 -1 -1  1  1  1  1  1 -1  1  1  1  1  1
-#&gt; [26]  1  1  1  1 -1  1  1  1 -1 -1 -1  1 -1  1  1  1 -1 -1  1  1 -1  1  1 -1 -1</code></pre>
+#&gt;  [1]  1  1  1  1  1  1  1 -1  1  1  1  1 -1  1  1  1  1  1  1 -1  1 -1  1  1  1
+#&gt; [26]  1  1  1 -1  1  1 -1  1  1  1  1  1  1 -1 -1  1  1  1  1 -1  1 -1 -1 -1  1</code></pre>
 <p>From the perspective of the R user, all these values are generated at once. This brings up two issues:</p>
 <ul>
 <li><p>How do we generate a recursive sequence, that is, a sequence in which each value determines subsequent values?</p></li>
