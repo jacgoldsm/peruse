@@ -65,8 +65,9 @@ collatz <- Iterator(result = expr,
 i <- 0
 while (i != 1L) {
   i <- yield_next(collatz)
-  paste0(i, "\n")
+  cat(paste0(i, " "))
 }
+#> 25 76 38 19 58 29 88 44 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
 ```
 
 ### Random Walk with Drift
@@ -117,10 +118,7 @@ primes <- 2:10000 %>%
             that_for_all(range(2, .x)) %>% 
             we_have(~.x %% .y != 0, "Iterator")
 
-sequence <- c()
-while (length(sequence) <= 100) {
-  sequence <- c(sequence, yield_next(primes))
-}
+sequence <- yield_more(primes, 100)
 
 sequence
 #>   [1]   2   3   5   7  11  13  17  19  23  29  31  37  41  43  47  53  59  61
@@ -128,21 +126,5 @@ sequence
 #>  [37] 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251
 #>  [55] 257 263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359
 #>  [73] 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463
-#>  [91] 467 479 487 491 499 503 509 521 523 541 547
+#>  [91] 467 479 487 491 499 503 509 521 523 541
 ```
-
-## Functions
-
-### Iterators:
-
-  - as\_Iterator()
-  - is\_Iterator()
-  - Iterator()
-  - yield\_next()
-
-### Sets
-
-  - that\_for\_all()
-  - that\_for\_any()
-  - we\_have()
-  - range()

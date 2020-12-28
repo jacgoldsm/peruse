@@ -57,7 +57,7 @@ collatz <- Iterator(result = expr,
 i <- 0
 while (i != 1L) {
   i <- yield_next(collatz)
-  paste0(i, "\n")
+  cat(paste0(i, " "))
 }
 ```
 ### Random Walk with Drift
@@ -94,25 +94,7 @@ primes <- 2:10000 %>%
             that_for_all(range(2, .x)) %>% 
             we_have(~.x %% .y != 0, "Iterator")
 
-sequence <- c()
-while (length(sequence) <= 100) {
-  sequence <- c(sequence, yield_next(primes))
-}
+sequence <- yield_more(primes, 100)
 
 sequence
 ```
-
-## Functions
-
-### Iterators:
-- as_Iterator()
-- is_Iterator()
-- Iterator()
-- yield_next()
-
-### Sets
-- that_for_all()
-- that_for_any()
-- we_have()
-- range()
-

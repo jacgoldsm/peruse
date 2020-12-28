@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Making an Irregular Sequence Iterator — Iterator • peruse</title>
+<title>Increment an Iterator and Return the Next Value(s) — yield • peruse</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,9 @@
 
 
 
-<meta property="og:title" content="Making an Irregular Sequence Iterator — Iterator" />
-<meta property="og:description" content="Create an Iterator object, where the user defines a sequence and a
-set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence." />
+<meta property="og:title" content="Increment an Iterator and Return the Next Value(s) — yield" />
+<meta property="og:description" content="Finds the value of the next iteration(s) of an Iterator object
+and increments the Iterator to the next value(s)." />
 
 
 
@@ -127,50 +126,38 @@ next element of the sequence." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Making an Irregular Sequence Iterator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/Iterator.R'><code>R/Iterator.R</code></a></small>
-    <div class="hidden name"><code>Iterator.Rd</code></div>
+    <h1>Increment an Iterator and Return the Next Value(s)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/yield_next.R'><code>R/yield_next.R</code></a></small>
+    <div class="hidden name"><code>yields.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create an Iterator object, where the user defines a sequence and a
-set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence.</p>
+    <p>Finds the value of the next iteration(s) of an Iterator object
+and increments the Iterator to the next value(s).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>Iterator</span><span class='op'>(</span><span class='va'>result</span>, <span class='va'>initial</span>, <span class='va'>yield</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>yield_next</span><span class='op'>(</span><span class='va'>iter</span><span class='op'>)</span>
+
+<span class='fu'>yield_more</span><span class='op'>(</span><span class='va'>iter</span>, more <span class='op'>=</span> <span class='fl'>1L</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>result</th>
-      <td><p>R expression to run each time 'yield_next' is called</p></td>
+      <th>iter</th>
+      <td><p>An Iterator object</p></td>
     </tr>
     <tr>
-      <th>initial</th>
-      <td><p>declare and initialize every variable that appears in 'result'</p></td>
-    </tr>
-    <tr>
-      <th>yield</th>
-      <td><p>variable to yield when 'yield_next' is called</p></td>
+      <th>more</th>
+      <td><p>How many values to yield</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of S3 type Iterator</p>
+    <p>An object of whatever type <code>result</code> evaluates to from the Iterator, or
+a vector of that type in the case of <code>yield_more(iter, more &gt; 1L)</code>.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>#Create the Collatz sequence starting with 50 and print out the first 30 elements</span>
-<span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"if (n %% 2 == 0) n &lt;- n / 2 else n &lt;- n*3 + 1"</span>
-<span class='va'>collatz</span> <span class='op'>&lt;-</span> <span class='fu'>Iterator</span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
-                    initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>,
-                    yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
-
-<span class='va'>seq</span> <span class='op'>&lt;-</span> <span class='fu'><a href='yield.html'>yield_more</a></span><span class='op'>(</span><span class='va'>collatz</span>, <span class='fl'>30</span><span class='op'>)</span>
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

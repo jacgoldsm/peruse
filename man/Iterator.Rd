@@ -27,9 +27,7 @@ expr <- "if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1"
 collatz <- Iterator(result = expr,
                     initial = c(n = 50),
                     yield = n)
-a <- numeric(length = 30)
-for (i in 1:30) {
-  a[i] <- yield_next(collatz)
-}
+
+seq <- yield_more(collatz, 30)
 
 }

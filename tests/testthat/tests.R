@@ -54,3 +54,37 @@ test_that("range_empty",{
     numeric()
   )
 })
+
+test_that("yield_more",  {
+               expect_equal({expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
+               .yieldenv <- new.env(parent = emptyenv())
+               collatz <- Iterator(result = expr,
+                                   initial = c(n = 50),
+                                   yield = n)
+               yield_more(collatz, 10)},
+               c(25,76,38,19,58,29,88,44,22,11))
+})
+
+test_that("current",  {
+  expect_equal({
+  .yieldenv <- new.env(parent = emptyenv());
+  expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
+  collatz <- Iterator(result = expr,
+                      initial = c(n = 50),
+                      yield = n);
+  current(collatz)},
+  50L)
+})
+
+
+
+test_that("move_more", { .yieldenv <- new.env(parent = emptyenv())
+expect_equal({expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
+collatz <- Iterator(result = expr,
+                    initial = c(n = 50),
+                    yield = n);
+move_more(collatz, 10);
+current(collatz)},
+11L)
+})
+

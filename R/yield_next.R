@@ -1,12 +1,19 @@
-#' Increment an Iterator and Return the Next Value
+#'@name yield
+#'@rdname yields
 #'
-#' Finds the value of the next iteration of an Iterator object
-#' and increments the Iterator to the next value.
-#' @param iter An Iterator object object
-#' @return An object of whatever type 'result' evaluates to from the Iterator
-#' @export
+#'@title Increment an Iterator and Return the Next Value(s)
+#'
+#'@description Finds the value of the next iteration(s) of an Iterator object
+#' and increments the Iterator to the next value(s).
+#' @param iter An Iterator object
+#' @param more How many values to yield
+#' @return An object of whatever type `result` evaluates to from the Iterator, or
+#' a vector of that type in the case of `yield_more(iter, more > 1L)`.
+NULL
 
 
+#'@rdname yields
+#'@export
 yield_next <- function(iter) {
   stopifnot(is_Iterator(iter))
   iter_name <- deparse(substitute(iter))
@@ -21,4 +28,14 @@ yield_next <- function(iter) {
   }
   assign(iter_name, iter, pos = .yieldenv)
   return(iter$initial[[yield_name]])
+}
+
+#'@rdname yields
+#'@export
+yield_more <- function(iter, more = 1L) {
+  vec <- vector(length = more)
+  for (i in seq_len(more)) {
+    vec[[i]] <- yield_next(iter)
+  }
+  vec
 }

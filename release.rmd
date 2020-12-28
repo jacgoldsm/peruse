@@ -1,8 +1,8 @@
 ---
-title: "peruse 0.8.0"
+title: "peruse 0.2.0"
 author: "Jacob Goldsmith"
 date: '2020-12-21'
-slug: peruse-0-1-0
+slug: peruse-0-2-0
 description: Introducing the peruse package, sequences and set comprehension in R.
 categories: package
 tags: package
@@ -21,7 +21,7 @@ h2 code {
 </style>
 </html>
 
-I'm excited to announce that [peruse 0.1.0](https://jacgoldsm.github.io/peruse/) is now
+I'm excited to announce that [peruse 0.2.0](https://jacgoldsm.github.io/peruse/) is now
 available on CRAN!
 
 `peruse` has two main distinct capabilities, related by the idea that they 'peruse' a sequence:
@@ -104,10 +104,8 @@ primes <- 2:10000 %>%
             that_for_all(range(2, .x)) %>% 
             we_have(~.x %% .y != 0, "Iterator")
 
-sequence <- c()
-while (length(sequence) <= 100) {
-  sequence <- c(sequence, yield_next(primes))
-}
+
+sequence <- yield_more(primes, 100)
 
 sequence
 ```
@@ -119,12 +117,14 @@ This illustrates a few things:
 
 * We can then only generate the numbers we want and stop once we reach the hundredth element
 
+* We can use the helper function `yield_more()` to automate what would require a `for` loop
+
 
 ## Feedback welcome!
 
 `peruse` is a new package and needs help! If you do run into a bug or think of a new feature that would work well in `peruse` please [open an issue.](https://github.com/jacgoldsm/peruse/issues)
 
 ## Acknowledgments
-Big thank you to Hadley Wickham, from whose book [Advanced R](https://adv-r.hadley.nz/index.html) I learned to do the stuff I did in the package, and whose book [R Packages](https://r-pkgs.org/index.html) was invaluable in getting `peruse` published on CRAN. Also, the piped set builder workflow was made possible by the [magrittr](https://magrittr.tidyverse.org/) pipe, so thank you to all the developers of those packages: Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and Stefan Milton Bache.
+Big thank you to Hadley Wickham, from whose book [Advanced R](https://adv-r.hadley.nz/index.html) I learned to do the stuff I did in the package, and whose book [R Packages](https://r-pkgs.org/index.html) was invaluable in getting `peruse` published on CRAN. Also, the piped set builder workflow was made possible by the [magrittr](https://magrittr.tidyverse.org/) pipe, so thank you to the developers: Stefan Milton Bache and Hadley Wickham.
 
 
