@@ -127,32 +127,8 @@
 <span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">0</span>
 <span class="kw">while</span> <span class="op">(</span><span class="va">i</span> <span class="op">!=</span> <span class="fl">1L</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield_next.html">yield_next</a></span><span class="op">(</span><span class="va">collatz</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">i</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="co">#&gt; 25</span>
-<span class="co">#&gt; 76</span>
-<span class="co">#&gt; 38</span>
-<span class="co">#&gt; 19</span>
-<span class="co">#&gt; 58</span>
-<span class="co">#&gt; 29</span>
-<span class="co">#&gt; 88</span>
-<span class="co">#&gt; 44</span>
-<span class="co">#&gt; 22</span>
-<span class="co">#&gt; 11</span>
-<span class="co">#&gt; 34</span>
-<span class="co">#&gt; 17</span>
-<span class="co">#&gt; 52</span>
-<span class="co">#&gt; 26</span>
-<span class="co">#&gt; 13</span>
-<span class="co">#&gt; 40</span>
-<span class="co">#&gt; 20</span>
-<span class="co">#&gt; 10</span>
-<span class="co">#&gt; 5</span>
-<span class="co">#&gt; 16</span>
-<span class="co">#&gt; 8</span>
-<span class="co">#&gt; 4</span>
-<span class="co">#&gt; 2</span>
-<span class="co">#&gt; 1</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">i</span>, <span class="st">"\n"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
 </div>
 <div id="random-walk-with-drift" class="section level3">
 <h3 class="hasAnchor">
@@ -182,8 +158,8 @@
 <a href="#primes" class="anchor"></a>Primes</h3>
 <p>How about generating all the prime numbers between <code>1</code> and <code>100</code>? We can easily do that with the set-builder API:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
+<code class="sourceCode R"><span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
 <p>But how about if we want to generate the first <span class="math inline">100</span> prime numbers? We don’t know the range of values this should fall in (well, mathematicians do), so we can use laziness to our advantage:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">primes</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">10000</span> <span class="op">%&gt;%</span>
@@ -195,8 +171,13 @@
   <span class="va">sequence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sequence</span>, <span class="fu"><a href="reference/yield_next.html">yield_next</a></span><span class="op">(</span><span class="va">primes</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="va">sequence</span><span class="op">)</span>
-<span class="co">#&gt; 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 257 263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463 467 479 487 491 499 503 509 521 523 541 547</span></code></pre></div>
+<span class="va">sequence</span>
+<span class="co">#&gt;   [1]   2   3   5   7  11  13  17  19  23  29  31  37  41  43  47  53  59  61</span>
+<span class="co">#&gt;  [19]  67  71  73  79  83  89  97 101 103 107 109 113 127 131 137 139 149 151</span>
+<span class="co">#&gt;  [37] 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251</span>
+<span class="co">#&gt;  [55] 257 263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359</span>
+<span class="co">#&gt;  [73] 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463</span>
+<span class="co">#&gt;  [91] 467 479 487 491 499 503 509 521 523 541 547</span></code></pre></div>
 </div>
 </div>
 <div id="functions" class="section level2">

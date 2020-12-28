@@ -57,7 +57,7 @@ collatz <- Iterator(result = expr,
 i <- 0
 while (i != 1L) {
   i <- yield_next(collatz)
-  cat(paste0(i, "\n"))
+  paste0(i, "\n")
 }
 ```
 ### Random Walk with Drift
@@ -86,7 +86,7 @@ Here, we can see that `seq` gets to `50` after about `100` iterations when it is
 ### Primes
 How about generating all the prime numbers between `1` and `100`? We can easily do that with the set-builder API:
 ```{r}
-cat(2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0))
+2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
 ```
 But how about if we want to generate the first $100$ prime numbers? We don't know the range of values this should fall in (well, mathematicians do), so we can use laziness to our advantage:
 ```{r}
@@ -99,7 +99,7 @@ while (length(sequence) <= 100) {
   sequence <- c(sequence, yield_next(primes))
 }
 
-cat(sequence)
+sequence
 ```
 
 ## Functions

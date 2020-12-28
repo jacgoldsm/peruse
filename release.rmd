@@ -109,7 +109,7 @@ while (length(sequence) <= 100) {
   sequence <- c(sequence, yield_next(primes))
 }
 
-cat(sequence)
+sequence
 ```
 This illustrates a few things:
 
