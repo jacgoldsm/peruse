@@ -21,12 +21,6 @@ meet specific criteria. This can either return a vector consisting of
 all the chosen elements or it can return an `Iterator` that lazily
 generates the chosen elements.
 
-Finally, {peruse} also provides a new data structure stores a
-`data.frame` as an object with reference semantics and `O(1)` access to
-columns. This is useful when iterating over `data.frame`s with many
-columns, because the object is modified in place, rather than making a
-shallow copy on every iteration.
-
 ## Installation
 
 You can install the released version of peruse from
@@ -156,65 +150,6 @@ cat(sequence)
 #> 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 257 263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463 467 479 487 491 499 503 509 521 523 541 547
 ```
 
-### hash\_df
-
-When dealing with text data, it is common to run models on a very wide
-data set, with thousands of variables representing each token. Doing
-transformations on a wide data set can be very expensive, as every time
-a column is transformed, a shallow copy is made of the `data.frame`.
-
-Here is an example of a wide data set representing the reviews of a
-great variety of wines. Each column represents a token, and the values
-represent the raw count of the number of times the word appears in a
-given review.
-
-    #> Dimensions: 20000 by 15578
-    #> # A tibble: 5 x 5
-    #>   ident word_100 word_2022 word_2030 word_a
-    #>   <chr>    <int>     <int>     <int>  <int>
-    #> 1 1            1         1         1      2
-    #> 2 10           0         0         0      1
-    #> 3 100          0         0         0      2
-    #> 4 1000         0         0         0      2
-    #> 5 10000        0         0         0      2
-
-What if we want to normalize all these columns by the absolute frequency
-of the word in the data set? Normally, it would take a very long time to
-iterate over all \(15,578\) columns. However, it is very fast with a
-`hash_df`:
-
-``` r
-hash_frequencies <- hash_df$new(wide_descriptions)
-
-transform <- function(x) {
-  if (is.numeric(x)) x / sum(x) else x
-}
-hash_frequencies$data <- lapply(hash_frequencies$data,
-                            transform)
-
-(hash_frequencies$return_df())[1:5, 1:5]
-#>   word_frail word_pineapples word_clarion word_joey word_pineappley
-#> 1          0               0            0         0               0
-#> 2          0               0            0         0               0
-#> 3          0               0            0         0               0
-#> 4          0               0            0         0               0
-#> 5          0               0            0         0               0
-```
-
-(Note that the column order gets scrambled, as environments have no
-element order).
-
-Even easier, we can use implementations of `dplyr`-esque `mutate_*`
-functions on the objects:
-
-``` r
-hash_frequencies <- hash_df$new(wide_descriptions)
-
-hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
-```
-
-Any such task is quick and easy with the `hash_df`\!
-
 ## Functions
 
 ### Iterators:
@@ -230,19 +165,3 @@ Any such task is quick and easy with the `hash_df`\!
   - that\_for\_any()
   - we\_have()
   - range()
-
-### hash\_df
-
-  - $bind()
-  - $unbind()
-  - $return\_df()
-  - $print()
-  - $new()
-  - $View()
-  - $mutate()
-  - $mutate\_if()
-  - $mutate\_all()
-  - $select()
-  - $select\_if()
-  - $select\_at()
-  - $clone()

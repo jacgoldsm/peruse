@@ -26,8 +26,6 @@ element of a sequence of R objects. It then saves the state of the `Iterator`, m
 
 The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an `Iterator` that lazily generates the chosen elements.
 
-Finally, {peruse} also provides a new data structure stores a `data.frame` as an object with reference semantics and `O(1)` access to columns. This is useful when iterating over `data.frame`s with many columns, because the object is modified in place, rather than making a shallow copy on every iteration.
-
 ## Installation
 
 You can install the released version of peruse from [CRAN](https://CRAN.R-project.org) with:
@@ -103,59 +101,6 @@ while (length(sequence) <= 100) {
 
 cat(sequence)
 ```
-### hash_df
-When dealing with text data, it is common to run models on a very wide data set, with thousands of variables representing each token. Doing transformations on a wide data set can be very expensive, as every time a column is transformed, a shallow copy is made of the `data.frame`.
-
-Here is an example of a wide data set representing the reviews of a great variety of wines. Each column represents a token, and the values represent the raw count of the number of times the word appears in a given review.
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-library(tidytext)
-library(tidyverse)
-
-desc <- read_csv("/home/storeddocumentsonline/data/winemag-data_first150k.csv")
-desc <- desc[1:20000,]
-tidy_descriptions <- desc %>%
-  mutate(ident = as.character(1:nrow(desc))) %>%
-  unnest_tokens(word, description) %>%
-  count(ident, word) %>%
-  bind_tf_idf(word, ident, n)
-
-rm(desc)
-
-wide_descriptions <- tidy_descriptions %>%
-  select(ident, word, n) %>%
-  pivot_wider(names_from = word, 
-              names_prefix = "word_",
-              values_from = n, 
-              values_fill = 0) %>%
-  as_tibble()
-
-rm(tidy_descriptions)
-cat(paste0("Dimensions: ", nrow(wide_descriptions), " by ", ncol(wide_descriptions)))
-wide_descriptions[1:5, 1:5]
-```
-What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all $15,578$ columns. However, it is very fast with a `hash_df`:
-```{r}
-hash_frequencies <- hash_df$new(wide_descriptions)
-
-transform <- function(x) {
-  if (is.numeric(x)) x / sum(x) else x
-}
-hash_frequencies$data <- lapply(hash_frequencies$data,
-                            transform)
-
-(hash_frequencies$return_df())[1:5, 1:5]
-```
-(Note that the column order gets scrambled, as environments have no element order).
-
-Even easier, we can use implementations of `dplyr`-esque `mutate_*` functions on the objects:
-
-```{r}
-hash_frequencies <- hash_df$new(wide_descriptions)
-
-hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
-```
-
-Any such task is quick and easy with the `hash_df`!
 
 ## Functions
 
@@ -170,19 +115,4 @@ Any such task is quick and easy with the `hash_df`!
 - that_for_any()
 - we_have()
 - range()
-
-### hash_df
-- $bind()
-- $unbind()
-- $return_df()
-- $print()
-- $new()
-- $View()
-- $mutate()
-- $mutate_if()
-- $mutate_all()
-- $select()
-- $select_if()
-- $select_at()
-- $clone()
 

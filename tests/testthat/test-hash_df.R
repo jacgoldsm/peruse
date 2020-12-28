@@ -18,80 +18,6 @@ test_that("collatz", { .yieldenv <- new.env(parent = emptyenv())
           25L)
 })
 
-test_that("mutate", {
-          expect_equal({df <- hash_df$new(iris);
-          df$mutate(Sepal.Size = Sepal.Length * Sepal.Width);
-          (df$return_df())[1,1]},
-          17.85)
-})
-
-test_that("lapply", {
-          expect_equal({hash_mtcars <- hash_df$new(mtcars);
-          hash_mtcars$data <- lapply(hash_mtcars$data, function(x) log(x + 1));
-          (hash_mtcars$return_df())[1,1]},
-          1.609438,
-          tolerance = 8e-7)
-})
-
-test_that("mutate", {
-  expect_equal({df <- hash_df$new(iris)
-                df$mutate(Sepal.Size = Sepal.Length * Sepal.Width)
-                df$data$Sepal.Size[1]},
-                17.85)
-})
-
-test_that("mutate_if", {
-    expect_equal({
-      df <- hash_df$new(iris)
-      df$mutate_if(is.numeric, log)
-      df$data$Sepal.Length[1]
-    },
-    1.629241,
-    tolerance = 5e-7)
-})
-
-test_that("mutate_at", {
-  expect_equal({
-    df <- hash_df$new(iris)
-    df$mutate_at("Sepal*", log)
-    df$data$Sepal.Length[1]
-  },
-  1.629241,
-  tolerance = 5e-7)
-})
-
-test_that("mutate_all", {
-  expect_equal({
-    df <- hash_df$new(mtcars)
-    df$mutate_all(~.x - mean(.x))
-    df$data$am[1]},
-    0.59375)
-})
-
-test_that("select", {
-  expect_equal({
-    df <- hash_df$new(iris)
-    df$select(Sepal.Length, Sepal.Width)
-    df$vars[1]},
-    "Sepal.Width")
-})
-
-test_that("select_if", {
-  expect_equal({
-    df <- hash_df$new(iris)
-    df$select_if(is.numeric)
-    length(df$vars)},
-    4L)
-})
-
-test_that("select_at", {
-  expect_equal({
-    df <- hash_df$new(iris)
-    df$select_at("Sepal*")
-    length(df$vars)},
-    2L)
-})
-
 test_that("prime_iter", {
  expect_equal({
    primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
@@ -127,10 +53,4 @@ test_that("range_empty",{
     range(100, 100, by = 2L),
     numeric()
   )
-})
-
-test_that("print_narrow", {
-  expect_output({
-    df <- hash_df$new(iris)
-    df$print()})
 })

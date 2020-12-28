@@ -387,11 +387,11 @@ h2 code {
 }
 </style>
 </html>
-<p>I’m excited to announce that <a href="https://jacgoldsm.github.io/peruse/">peruse 0.8.0</a> is now available on CRAN!</p>
-<p><code>peruse</code> has two main distinct capabilities, related by the idea that they ‘peruse’ a data structure:</p>
+<p>I’m excited to announce that <a href="https://jacgoldsm.github.io/peruse/">peruse 0.1.0</a> is now available on CRAN!</p>
+<p><code>peruse</code> has two main distinct capabilities, related by the idea that they ‘peruse’ a sequence:</p>
 <ul>
+<li><p>Set or list comprehension, aimed at capturing sets that meet complex conditions</p></li>
 <li><p><code>Iterator</code>s that make it easier to generate irregular sequences and sets that are difficult to generate with existing tools</p></li>
-<li><p><code>hash_df</code>s to modify data in place, especially useful for wide data</p></li>
 </ul>
 <p>Install <code>peruse</code> with:</p>
 <pre class="r"><code>install.packages(&quot;peruse&quot;)</code></pre>
@@ -399,8 +399,8 @@ h2 code {
 <h2>Iterator</h2>
 <p>In R, sequences are normally represented as atomic vectors. For example, here is how we might represent a weighted sequence of 50 1s and -1s, with 1 having 75% probability and -1 having 25% probability:</p>
 <pre class="r"><code>sample(c(-1L, 1L), size = 50L, prob = c(0.25, 0.75), replace = T)
-#&gt;  [1]  1  1  1 -1  1 -1  1  1  1 -1  1  1  1  1  1  1  1 -1 -1  1 -1  1  1  1  1
-#&gt; [26]  1  1  1 -1  1  1 -1  1 -1  1  1 -1  1  1 -1 -1  1  1 -1  1 -1  1  1  1 -1</code></pre>
+#&gt;  [1]  1  1 -1  1 -1  1  1  1  1  1  1 -1  1  1  1 -1  1  1  1 -1 -1  1 -1  1 -1
+#&gt; [26] -1  1  1  1  1 -1  1  1 -1  1  1 -1  1  1  1  1 -1  1 -1  1  1 -1 -1  1  1</code></pre>
 <p>From the perspective of the R user, all these values are generated at once. This brings up two issues:</p>
 <ul>
 <li><p>How do we generate a recursive sequence, that is, a sequence in which each value determines subsequent values?</p></li>
@@ -464,79 +464,13 @@ cat(sequence)
 <li><p>We can then only generate the numbers we want and stop once we reach the hundredth element</p></li>
 </ul>
 </div>
-<div id="hash_df" class="section level2">
-<h2>hash_df</h2>
-<div id="theory" class="section level3">
-<h3>Theory</h3>
-<p><code>peruse</code> introduces the <code>hash_df</code>, which can be thought of as a <code>data.frame</code> with reference semantics. That means that the columns can be repeatedly modified in place, rather than than making a shallow copy on every iteration of an algorithm.</p>
-<p>Internally, R lists are stored as <code>VECSXP</code> objects – essentially vectors of pointers, where each pointer addresses an element of the list. When a list element is modified, the entire <code>VECSXP</code> object is copied and modified, and the old one deleted. However, the R objects that are referenced by the <code>VECSXP</code> object are untouched, making it a shallow copy, not a deep copy.</p>
-<p>A <code>hash_df</code> has a different structure. In a <code>hash_df</code>, the data is stored in an R object called an environment, represented as an <code>ENVSXP</code> object. <code>ENVSXP</code> objects look like a <a href="https://en.wikipedia.org/wiki/Hash_table">hash table</a>. Unlike all other R objects, <code>ENVSXP</code> tables are modified in place. In addition, looking up an element in an environment can be done in <a href="https://stackoverflow.com/questions/200384/constant-amortized-time#:~:text=Essentially%20amortised%20time%20means%20%22average,you%20repeatedly%20add%20new%20items.">constant amortized time</a> instead of linear time.</p>
-</div>
-<div id="practice" class="section level3">
-<h3>Practice</h3>
-<p>What does this mean in practice? The main advantage of using a <code>hash_df</code> is when you want to modify a bunch of columns of a wide data set. The internal structure of the <code>hash_df</code> means that this process will be much faster than it would be with a <code>data.frame</code>.</p>
-<p>Here is an example of a wide data set representing the reviews of a great variety of wines. Each column represents a token, and the values represent the raw count of the number of times the word appears in a given review.</p>
-<pre><code>#&gt; Dimensions: 20000 by 15578
-#&gt;   ident word_100 word_2022 word_2030 word_a
-#&gt; 1     1        1         1         1      2
-#&gt; 2    10        0         0         0      1
-#&gt; 3   100        0         0         0      2
-#&gt; 4  1000        0         0         0      2
-#&gt; 5 10000        0         0         0      2</code></pre>
-<p>What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all 15,578 columns. However, it is very fast with a <code>hash_df</code>:</p>
-<pre class="r"><code>library(peruse)
-hash_frequencies &lt;- hash_df$new(wide_descriptions)
-
-transform &lt;- function(x) {
-  if (is.numeric(x)) x / sum(x) else x
-}
-hash_frequencies$data &lt;- lapply(hash_frequencies$data,
-                            transform)
-
-(hash_frequencies$return_df())[1:5, 1:5]
-#&gt;   word_frail word_pineapples word_clarion word_joey word_pineappley
-#&gt; 1          0               0            0         0               0
-#&gt; 2          0               0            0         0               0
-#&gt; 3          0               0            0         0               0
-#&gt; 4          0               0            0         0               0
-#&gt; 5          0               0            0         0               0</code></pre>
-<p>(Note that the column order gets scrambled, as environments have no element order.)</p>
-<p>Even easier, we can use implementations of <code>dplyr</code>-esque <code>mutate_*</code> functions on the objects:</p>
-<pre class="r"><code>hash_frequencies &lt;- hash_df$new(wide_descriptions)
-
-hash_frequencies$mutate_if(is.numeric, ~.x / sum(.x))
-(hash_frequencies$return_df())[1:5, 1:5]
-#&gt;   word_frail word_pineapples word_clarion word_joey word_pineappley
-#&gt; 1          0               0            0         0               0
-#&gt; 2          0               0            0         0               0
-#&gt; 3          0               0            0         0               0
-#&gt; 4          0               0            0         0               0
-#&gt; 5          0               0            0         0               0</code></pre>
-<p>I tried to benchmark this process against <code>dplyr::mutate_if</code>, but the dplyr version would not actually run (!!) on my 8GB DDR4 RAM computer. That should be an indication of how much more efficient the <code>hash_df</code> version is, but for a more quantitative comparison I reduced the data set to 2,000 columns and benchmarked that with the <code>bench</code> package:</p>
-<pre class="r"><code>df_small &lt;- wide_descriptions[,1:2000]
-hash_small &lt;- hash_df$new(df_small)</code></pre>
-<pre class="r"><code>suppressWarnings(
-timer &lt;- bench::mark(
-  hash_small$mutate_if(is.numeric, ~.x / sum(.x)),
-  wide_mutated &lt;- dplyr::mutate_if(df_small, is.numeric, ~.x / sum(.x)),
-  check = F
-)
-)
-
-timer$median
-#&gt; [1] 112.47ms   4.01s
-timer$mem_alloc
-#&gt; [1] 305MB 657MB</code></pre>
-<p>We can see that the <code>hash_df</code> takes less than a thirtieth as much time as the <code>dplyr</code>/<code>data.frame</code> version and allocates less than half as much memory!</p>
-</div>
-</div>
 <div id="feedback-welcome" class="section level2">
 <h2>Feedback welcome!</h2>
 <p><code>peruse</code> is a new package and needs help! If you do run into a bug or think of a new feature that would work well in <code>peruse</code> please <a href="https://github.com/jacgoldsm/peruse/issues">open an issue.</a></p>
 </div>
 <div id="acknowledgments" class="section level2">
 <h2>Acknowledgments</h2>
-<p>Big thank you to Hadley Wickham, from whose book <a href="https://adv-r.hadley.nz/index.html">Advanced R</a> I learned to do the stuff I did in the package, and whose book <a href="https://r-pkgs.org/index.html">R Packages</a> was invaluable in getting <code>peruse</code> published on CRAN. Also, the piped set builder workflow was made possible by the <a href="https://magrittr.tidyverse.org/">magrittr</a> pipe, and the <code>hash_df</code> API borrows heavily from <a href="https://dplyr.tidyverse.org/articles/dplyr.html">dplyr</a>, so thank you to all the developers of those packages: Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and Stefan Milton Bache.</p>
+<p>Big thank you to Hadley Wickham, from whose book <a href="https://adv-r.hadley.nz/index.html">Advanced R</a> I learned to do the stuff I did in the package, and whose book <a href="https://r-pkgs.org/index.html">R Packages</a> was invaluable in getting <code>peruse</code> published on CRAN. Also, the piped set builder workflow was made possible by the <a href="https://magrittr.tidyverse.org/">magrittr</a> pipe, so thank you to all the developers of those packages: Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and Stefan Milton Bache.</p>
 </div>
 
 

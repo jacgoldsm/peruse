@@ -91,7 +91,6 @@
 <!-- badges: end -->
 <p>The {peruse} package is aimed at making it easier to generate irregular sequences that are difficult to generate with existing tools. The heart of {peruse} is the <code>S3</code> class <code>Iterator</code>. An <code>Iterator</code> allows the user to write an arbitrary R expression that returns the next element of a sequence of R objects. It then saves the state of the <code>Iterator</code>, meaning the next time <code>yield_next</code> is called, the subsequent element of the sequence will be returned.</p>
 <p>The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an <code>Iterator</code> that lazily generates the chosen elements.</p>
-<p>Finally, {peruse} also provides a new data structure stores a <code>data.frame</code> as an object with reference semantics and <code>O(1)</code> access to columns. This is useful when iterating over <code>data.frame</code>s with many columns, because the object is modified in place, rather than making a shallow copy on every iteration.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -199,45 +198,6 @@
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="va">sequence</span><span class="op">)</span>
 <span class="co">#&gt; 2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 257 263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463 467 479 487 491 499 503 509 521 523 541 547</span></code></pre></div>
 </div>
-<div id="hash_df" class="section level3">
-<h3 class="hasAnchor">
-<a href="#hash_df" class="anchor"></a>hash_df</h3>
-<p>When dealing with text data, it is common to run models on a very wide data set, with thousands of variables representing each token. Doing transformations on a wide data set can be very expensive, as every time a column is transformed, a shallow copy is made of the <code>data.frame</code>.</p>
-<p>Here is an example of a wide data set representing the reviews of a great variety of wines. Each column represents a token, and the values represent the raw count of the number of times the word appears in a given review.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">#&gt; Dimensions: 20000 by 15578</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; # A tibble: 5 x 5</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;   ident word_100 word_2022 word_2030 word_a</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;int&gt;     &lt;int&gt;     &lt;int&gt;  &lt;int&gt;</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; 1 1            1         1         1      2</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; 2 10           0         0         0      1</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; 3 100          0         0         0      2</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; 4 1000         0         0         0      2</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; 5 10000        0         0         0      2</span></span></code></pre></div>
-<p>What if we want to normalize all these columns by the absolute frequency of the word in the data set? Normally, it would take a very long time to iterate over all <span class="math inline">15, 578</span> columns. However, it is very fast with a <code>hash_df</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">hash_frequencies</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/hash_df.html">hash_df</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">wide_descriptions</span><span class="op">)</span>
-
-<span class="va">transform</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="va">x</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw">else</span> <span class="va">x</span>
-<span class="op">}</span>
-<span class="va">hash_frequencies</span><span class="op">$</span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">hash_frequencies</span><span class="op">$</span><span class="va">data</span>,
-                            <span class="va">transform</span><span class="op">)</span>
-
-<span class="op">(</span><span class="va">hash_frequencies</span><span class="op">$</span><span class="fu">return_df</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>
-<span class="co">#&gt;   word_frail word_pineapples word_clarion word_joey word_pineappley</span>
-<span class="co">#&gt; 1          0               0            0         0               0</span>
-<span class="co">#&gt; 2          0               0            0         0               0</span>
-<span class="co">#&gt; 3          0               0            0         0               0</span>
-<span class="co">#&gt; 4          0               0            0         0               0</span>
-<span class="co">#&gt; 5          0               0            0         0               0</span></code></pre></div>
-<p>(Note that the column order gets scrambled, as environments have no element order).</p>
-<p>Even easier, we can use implementations of <code>dplyr</code>-esque <code>mutate_*</code> functions on the objects:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">hash_frequencies</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/hash_df.html">hash_df</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">wide_descriptions</span><span class="op">)</span>
-
-<span class="va">hash_frequencies</span><span class="op">$</span><span class="fu">mutate_if</span><span class="op">(</span><span class="va">is.numeric</span>, <span class="op">~</span><span class="va">.x</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Any such task is quick and easy with the <code>hash_df</code>!</p>
-</div>
 </div>
 <div id="functions" class="section level2">
 <h2 class="hasAnchor">
@@ -260,25 +220,6 @@
 <li>that_for_any()</li>
 <li>we_have()</li>
 <li>range()</li>
-</ul>
-</div>
-<div id="hash_df-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#hash_df-1" class="anchor"></a>hash_df</h3>
-<ul>
-<li>$bind()</li>
-<li>$unbind()</li>
-<li>$return_df()</li>
-<li>$print()</li>
-<li>$new()</li>
-<li>$View()</li>
-<li>$mutate()</li>
-<li>$mutate_if()</li>
-<li>$mutate_all()</li>
-<li>$select()</li>
-<li>$select_if()</li>
-<li>$select_at()</li>
-<li>$clone()</li>
 </ul>
 </div>
 </div>
