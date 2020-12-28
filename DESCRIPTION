@@ -12,7 +12,7 @@ License: GPL-2
 URL: https://github.com/jacgoldsm/peruse, https://jacgoldsm.github.io/peruse/
 BugReports: https://github.com/jacgoldsm/peruse/issues
 Encoding: UTF-8
-Imports: rlang, purrr, R6
+Imports: rlang, purrr
 Depends: magrittr
 LazyData: true
 Roxygen: list(markdown = TRUE)
