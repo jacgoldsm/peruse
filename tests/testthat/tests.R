@@ -88,3 +88,14 @@ current(collatz)},
 11L)
 })
 
+test_that("yield_while", { .yieldenv <- new.env(parent = emptyenv())
+expect_equal({expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
+collatz <- Iterator(result = expr,
+                    initial = c(n = 50),
+                    yield = n);
+yield_while(collatz, "n != 1L")},
+c(25, 76, 38, 19, 58, 29, 88, 44, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10,  5, 16,  8,  4,  2,  1))
+})
+
+
+

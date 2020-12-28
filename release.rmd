@@ -1,8 +1,8 @@
 ---
-title: "peruse 0.2.0"
+title: "peruse 0.1.0"
 author: "Jacob Goldsmith"
 date: '2020-12-21'
-slug: peruse-0-2-0
+slug: peruse-0-1-0
 description: Introducing the peruse package, sequences and set comprehension in R.
 categories: package
 tags: package
@@ -28,6 +28,8 @@ NOTE: {peruse} is undergoing major changes. Install the development version for 
 ```{r, eval = FALSE} 
 devtools::install_github("jacgoldsm/peruse")
 ```
+
+Those changes should be added to CRAN some time during January 2021 under the name `peruse 0.2.0`.
 
 `peruse` has two main distinct capabilities, related by the idea that they 'peruse' a sequence:
 

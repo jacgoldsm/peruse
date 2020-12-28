@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • peruse</title>
+<title>yield_while — yield_while • peruse</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,9 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="yield_while — yield_while" />
+<meta property="og:description" content="Keep yielding the next element of an Iterator while a condition is met.
+A condition is some function involving any variable(s) in the Iterator environment" />
 
 
 
@@ -58,7 +60,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -124,42 +126,47 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>yield_while</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/yield_while.R'><code>R/yield_while.R</code></a></small>
+    <div class="hidden name"><code>yield_while.Rd</code></div>
     </div>
 
-    <div id="version-010" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0">
-<a href="#version-010" class="anchor"></a>Version 0.1.0</h1>
-<ul>
-<li><p>Initial Release</p></li>
-<li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
-</ul>
-</div>
-    <div id="version-0109000" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0.9000">
-<a href="#version-0109000" class="anchor"></a>Version 0.1.0.9000</h1>
-<ul>
-<li><p>Will be released soon as Version 0.2.0</p></li>
-<li><p>Removed <code>as_Iterator()</code></p></li>
-<li><p>Changes <code><a href="../reference/is_Iterator.html">is_Iterator()</a></code> to use <code><a href="https://rdrr.io/r/base/class.html">inherits()</a></code> instead of <code>class() ==</code></p></li>
-<li><p>Fixed bug in <code><a href="../reference/sets.html">we_have()</a></code> that wrote over an old set-created <code>Iterator</code> when a new one was made, even with a different name</p></li>
-<li><p>Removed <code>hash_df</code> data structure</p></li>
-<li><p>Removed dependency on {R6}</p></li>
-<li><p>Added <code><a href="../reference/yield.html">yield_more()</a></code></p></li>
-<li><p>Added <code><a href="../reference/move.html">move_next()</a></code> and <code><a href="../reference/move.html">move_more()</a></code></p></li>
-<li><p>Added <code><a href="../reference/current.html">current()</a></code></p></li>
-<li><p>Added <code><a href="../reference/yield_while.html">yield_while()</a></code></p></li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Keep yielding the next element of an <code>Iterator</code> while a condition is met.
+A condition is some function involving any variable(s) in the <code>Iterator</code> environment</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>iter</span>, <span class='va'>cond</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>iter</th>
+      <td><p>An <code>Iterator</code> object</p></td>
+    </tr>
+    <tr>
+      <th>cond</th>
+      <td><p>A quoted logical expression involving some variable(s) in <code>iter$initial</code>, so that <code><a href='yield.html'>yield_next()</a></code>
+continues being called while the expression returns TRUE</p></td>
+    </tr>
+    </table>
+
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"if (n %% 2 == 0) n &lt;- n / 2 else n &lt;- n*3 + 1"</span>
+<span class='va'>collatz</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
+                    initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>,
+                    yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+<span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>collatz</span>, <span class='st'>"n != 1L"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] 25 76 38 19 58 29 88 44 22 11 34 17 52 26 13 40 20 10  5 16  8  4  2  1</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

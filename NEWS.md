@@ -23,3 +23,5 @@
 * Added `move_next()` and `move_more()`
 
 * Added `current()`
+
+* Added `yield_while()`

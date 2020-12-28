@@ -22,7 +22,7 @@ The {peruse} package is aimed at making it easier to generate irregular
 sequences that are difficult to generate with existing tools. The heart
 of {peruse} is the `S3` class `Iterator`. An `Iterator` allows the
 user to write an arbitrary R expression that returns the next
-element of a sequence of R objects. It then saves the state of the `Iterator`, meaning the next time `yield_next` is called, the subsequent element of the sequence will be returned.
+element of a sequence of R objects. It then saves the state of the `Iterator`, meaning the next time `yield_next` is called, the subsequent element of the sequence will be returned. The `Iterator` also has helper functions `yield_more()`, `move_next()`, `move_more()`, and `yield_while()` that provide variations on `yield_next()`.
 
 The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an `Iterator` that lazily generates the chosen elements.
 
@@ -33,6 +33,7 @@ You can install the released version of peruse from [CRAN](https://CRAN.R-projec
 ``` r
 install.packages("peruse")
 ```
+**Note: {peruse} is currently undergoing major updates. For the latest API, please use the development version until they can be added to CRAN.**
 
 And the development version from [GitHub](https://github.com/) with:
 
@@ -54,11 +55,7 @@ collatz <- Iterator(result = expr,
                     initial = c(n = 50),
                     yield = n)
 
-i <- 0
-while (i != 1L) {
-  i <- yield_next(collatz)
-  cat(paste0(i, " "))
-}
+yield_while(collatz, cond = "n != 1L")
 ```
 ### Random Walk with Drift
 Random Walks, with or without drift, are one of the most commonly used type of stochastic processes. How can we simulate one with {peruse}?
@@ -71,12 +68,7 @@ rwd <- Iterator(result = expr,
                 yield = n)
 
 
-Value <- integer()
-reach <- 0L
-while (reach != 50L & reach != -50L) {
-  reach <- yield_next(rwd)
-  Value <- c(Value, reach)
-}
+Value <- yield_while(rwd, "n != 50L & n != -50L")
 
 plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
 ```
