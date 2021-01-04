@@ -61,12 +61,7 @@ rwd <- Iterator(result = expr,
                 yield = n)
 
 
-Value <- integer()
-reach <- 0L
-while (reach != 50L & reach != -50L) {
-  reach <- yield_next(rwd)
-  Value <- c(Value, reach)
-}
+Value <- yield_while(rwd, "n != 50L & n != -50L")
 
 plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
 ```
