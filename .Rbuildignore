@@ -16,3 +16,5 @@
 ^version_prelims$
 ^benchmarks\.R$
 ^\.github$
+^release_0.2\.html$
+^release_0.2\.rmd$
