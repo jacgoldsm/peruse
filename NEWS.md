@@ -4,7 +4,7 @@
 
 * Added a `NEWS.md` file to track changes to the package.
 
-# Version 0.1.0.9000
+# Version 0.2.0
 
 * Will be released soon as Version 0.2.0
 

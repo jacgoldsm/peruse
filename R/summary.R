@@ -1,19 +1,24 @@
 
-
+#'@export
 print.Iterator <- function(x, ...) {
   cat(" Expression: ",
       as.character(x$result[[1]]),
       "\n",
-      "Initial Value(s): ",
-      unlist(names(x$initial)),
-      " = ",
-      unlist(x$initial),
-      "\n",
       "Variable to Yield:",
-      as.character(x$yield))
+      as.character(x$yield),
+      "\n")
+
+  cat("\n")
+  cat("Current Variable Values:")
+  print(mget(ls(x$initial), envir = x$initial))
+
+
+  invisible(NULL)
 }
 
+#'@export
 summary.Iterator <- function(object, ...) {
   print(object)
+  invisible(NULL)
 }
 

@@ -32,10 +32,6 @@ You can install the released version of peruse from
 install.packages("peruse")
 ```
 
-**Note: {peruse} is currently undergoing major updates. For the latest
-API, please use the development version until they can be added to
-CRAN.**
-
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
@@ -106,9 +102,9 @@ easily do that with the set-builder API:
 #>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
 ```
 
-But how about if we want to generate the first \(100\) prime numbers? We
-don’t know the range of values this should fall in (well, mathematicians
-do), so we can use laziness to our advantage:
+But how about if we want to generate the first 100 prime numbers? We
+don’t know the range of values this should fall in (well,
+mathematicians do), so we can use laziness to our advantage:
 
 ``` r
 primes <- 2:10000 %>%

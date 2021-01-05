@@ -24,6 +24,7 @@ move_next <- function(iter) {
     iter$initial[[key]] <- eval(rlang::parse_expr(key), envir = iter$initial)
   }
   assign(iter_name, iter, pos = .yieldenv)
+  invisible(NULL)
 }
 
 #'@rdname moves
@@ -33,4 +34,5 @@ move_more <- function(iter, more = 1L) {
   for (i in seq_len(more)) {
     vec[[i]] <- yield_next(iter)
   }
+  invisible(NULL)
 }
