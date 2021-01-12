@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • peruse</title>
+<title>Simple wrapper to aid in iterating iterstrings — char_along • peruse</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Simple wrapper to aid in iterating iterstrings — char_along" />
+<meta property="og:description" content="char_along(string) simply means seq_len(nchar(string))" />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,114 +123,30 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Simple wrapper to aid in iterating <code>iterstring</code>s</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/char_along.R'><code>R/char_along.R</code></a></small>
+    <div class="hidden name"><code>char_along.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>char_along(string)</code> simply means <code><a href='https://rdrr.io/r/base/seq.html'>seq_len(nchar(string))</a></code></p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>char_along</span><span class='op'>(</span><span class='va'>string</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="Iterator.html">Iterator()</a></code> </p>
-        </td>
-        <td><p>Making an Irregular Sequence Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="char_along.html">char_along()</a></code> </p>
-        </td>
-        <td><p>Simple wrapper to aid in iterating <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combines.html">insert()</a></code> <code><a href="combines.html">c(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Combine <code>iterstring</code>s easily</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="current.html">current()</a></code> </p>
-        </td>
-        <td><p>Get the current value of an Iterator without changing its state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="funs.html">that_for_all()</a></code> <code><a href="funs.html">that_for_any()</a></code> <code><a href="funs.html">we_have()</a></code> </p>
-        </td>
-        <td><p>R Set Comprehension</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="is_Iterator.html">is_Iterator()</a></code> </p>
-        </td>
-        <td><p>Test if an object is an Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="islists.html">as.character(<i>&lt;islist&gt;</i>)</a></code> <code><a href="islists.html">as_islist()</a></code> </p>
-        </td>
-        <td><p>Functions to create and manipulate <code>islist</code>s, lists of <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iterstring.html">iterstring()</a></code> </p>
-        </td>
-        <td><p>Making an iterable string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="moves.html">move_next()</a></code> <code><a href="moves.html">move_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator without returning the Value(s)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="range.html">range()</a></code> </p>
-        </td>
-        <td><p>Python-style range function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="subset.html">`[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Get and set elements of an <code>iterstring</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yield_while.html">yield_while()</a></code> </p>
-        </td>
-        <td><p>yield_while</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yields.html">yield_next()</a></code> <code><a href="yields.html">yield_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator and Return the Next Value(s)</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>string</th>
+      <td><p>a string to create an integer sequence from</p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

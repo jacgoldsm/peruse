@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • peruse</title>
+<title>Combine iterstrings easily — combine • peruse</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,13 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Combine iterstrings easily — combine" />
+<meta property="og:description" content="c.iterstring() does exactly what you would expect it to, concatenating two
+iterstrings and stripping their attributes (except class). insert() inserts
+an iterstring after pos (remember, R-style indices starting with 1).
+Negative indices work the same as with [[.iterstring]—inserting a string at pos of
+-1 means putting it at the end of the string, i.e. after str[-1], the last character
+of str." />
 
 
 
@@ -58,7 +64,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,114 +128,54 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Combine <code>iterstring</code>s easily</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/combine.R'><code>R/combine.R</code></a></small>
+    <div class="hidden name"><code>combines.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><code>c.iterstring()</code> does exactly what you would expect it to, concatenating two
+<code>iterstring</code>s and stripping their attributes (except <code>class</code>). <code>insert()</code> inserts
+an <code>iterstring</code> <em>after</em> <code>pos</code> (remember, R-style indices starting with 1).</p>
+<p>Negative indices work the same as with [<code>[.iterstring</code>]—inserting a string at <code>pos</code> of
+<code>-1</code> means putting it at the <em>end</em> of the string, i.e. after <code>str[-1]</code>, the last character
+of <code>str</code>.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>insert</span><span class='op'>(</span><span class='va'>string</span>, <span class='va'>newstring</span>, <span class='va'>pos</span><span class='op'>)</span>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="Iterator.html">Iterator()</a></code> </p>
-        </td>
-        <td><p>Making an Irregular Sequence Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="char_along.html">char_along()</a></code> </p>
-        </td>
-        <td><p>Simple wrapper to aid in iterating <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combines.html">insert()</a></code> <code><a href="combines.html">c(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Combine <code>iterstring</code>s easily</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="current.html">current()</a></code> </p>
-        </td>
-        <td><p>Get the current value of an Iterator without changing its state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="funs.html">that_for_all()</a></code> <code><a href="funs.html">that_for_any()</a></code> <code><a href="funs.html">we_have()</a></code> </p>
-        </td>
-        <td><p>R Set Comprehension</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="is_Iterator.html">is_Iterator()</a></code> </p>
-        </td>
-        <td><p>Test if an object is an Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="islists.html">as.character(<i>&lt;islist&gt;</i>)</a></code> <code><a href="islists.html">as_islist()</a></code> </p>
-        </td>
-        <td><p>Functions to create and manipulate <code>islist</code>s, lists of <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iterstring.html">iterstring()</a></code> </p>
-        </td>
-        <td><p>Making an iterable string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="moves.html">move_next()</a></code> <code><a href="moves.html">move_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator without returning the Value(s)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="range.html">range()</a></code> </p>
-        </td>
-        <td><p>Python-style range function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="subset.html">`[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Get and set elements of an <code>iterstring</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yield_while.html">yield_while()</a></code> </p>
-        </td>
-        <td><p>yield_while</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yields.html">yield_next()</a></code> <code><a href="yields.html">yield_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator and Return the Next Value(s)</p></td>
-      </tr>
-    </tbody>
+<span class='co'># S3 method for iterstring</span>
+<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>string1</span>, <span class='va'>string2</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>string</th>
+      <td><p>the starting <code>iterstring</code> (or <code>character</code> vec of length 1, coerced)</p></td>
+    </tr>
+    <tr>
+      <th>newstring</th>
+      <td><p>an <code>iterstring</code> (or <code>character</code> vec. of length 1, coerced) to insert</p></td>
+    </tr>
+    <tr>
+      <th>pos</th>
+      <td><p>the position <em>after which</em> <code>newstring</code> will be inserted</p></td>
+    </tr>
+    <tr>
+      <th>string1</th>
+      <td><p>the first <code>iterstring</code> in <code>c.iterstring()</code></p></td>
+    </tr>
+    <tr>
+      <th>string2</th>
+      <td><p>the second <code>iterstring</code> in <code>c.iterstring()</code></p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

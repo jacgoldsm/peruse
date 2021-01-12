@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • peruse</title>
+<title>Get and set elements of an iterstring — Extract • peruse</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,16 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Get and set elements of an iterstring — Extract" />
+<meta property="og:description" content="Get and set elements of a string, similar to an R vector or a Python string.
+Note that indices start at 1 like R vectors, not Python strings.
+Includes slice-ing vectors with positive or negative indices, like in Python.
+Follows R convention of [ single-bracket subsetting multiple elements and preserving
+attributes, and [[ double bracket subsetting a single element (in this case a single character)
+and stripping attributes.
+Note how negative indices work—the last character of a string str is str[-1],
+the second to last is str[-2], etc. str[[0]] will throw an error, as will str[[-0]].
+str[0] and str[-0] will return an empty string." />
 
 
 
@@ -58,7 +67,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,114 +131,60 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Get and set elements of an <code>iterstring</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/extract.R'><code>R/extract.R</code></a></small>
+    <div class="hidden name"><code>subset.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Get and set elements of a string, similar to an R vector or a Python string.
+Note that indices start at 1 like R vectors, not Python strings.
+Includes <code>slice</code>-ing vectors with positive or negative indices, like in Python.
+Follows R convention of <code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code> single-bracket subsetting multiple elements and preserving
+attributes, and <code><a href='https://rdrr.io/r/base/Extract.html'>[[</a></code> double bracket subsetting a single element (in this case a single character)
+and stripping attributes.</p>
+<p>Note how negative indices work—the last character of a string <code>str</code> is <code>str[-1]</code>,
+the second to last is <code>str[-2]</code>, etc. <code>str[[0]]</code> will throw an error, as will <code>str[[-0]]</code>.
+<code>str[0]</code> and <code>str[-0]</code> will return an empty string.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"># S3 method for iterstring
+[(string, range)
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="Iterator.html">Iterator()</a></code> </p>
-        </td>
-        <td><p>Making an Irregular Sequence Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="char_along.html">char_along()</a></code> </p>
-        </td>
-        <td><p>Simple wrapper to aid in iterating <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="combines.html">insert()</a></code> <code><a href="combines.html">c(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Combine <code>iterstring</code>s easily</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="current.html">current()</a></code> </p>
-        </td>
-        <td><p>Get the current value of an Iterator without changing its state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="funs.html">that_for_all()</a></code> <code><a href="funs.html">that_for_any()</a></code> <code><a href="funs.html">we_have()</a></code> </p>
-        </td>
-        <td><p>R Set Comprehension</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="is_Iterator.html">is_Iterator()</a></code> </p>
-        </td>
-        <td><p>Test if an object is an Iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="islists.html">as.character(<i>&lt;islist&gt;</i>)</a></code> <code><a href="islists.html">as_islist()</a></code> </p>
-        </td>
-        <td><p>Functions to create and manipulate <code>islist</code>s, lists of <code>iterstring</code>s</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iterstring.html">iterstring()</a></code> </p>
-        </td>
-        <td><p>Making an iterable string</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="moves.html">move_next()</a></code> <code><a href="moves.html">move_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator without returning the Value(s)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="range.html">range()</a></code> </p>
-        </td>
-        <td><p>Python-style range function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="subset.html">`[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> <code><a href="subset.html">`[[&lt;-`(<i>&lt;iterstring&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Get and set elements of an <code>iterstring</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yield_while.html">yield_while()</a></code> </p>
-        </td>
-        <td><p>yield_while</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="yields.html">yield_next()</a></code> <code><a href="yields.html">yield_more()</a></code> </p>
-        </td>
-        <td><p>Increment an Iterator and Return the Next Value(s)</p></td>
-      </tr>
-    </tbody>
+# S3 method for iterstring
+[[(string, index)
+
+# S3 method for iterstring
+[(string, range) &lt;- value
+
+# S3 method for iterstring
+[[(string, index) &lt;- value</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>string</th>
+      <td><p>an <code>iterstring</code> to subset</p></td>
+    </tr>
+    <tr>
+      <th>range</th>
+      <td><p>a range of indices to extract with <code><a href='https://rdrr.io/r/base/Extract.html'>[</a></code></p></td>
+    </tr>
+    <tr>
+      <th>index</th>
+      <td><p>an index to extract with <code><a href='https://rdrr.io/r/base/Extract.html'>[[</a></code></p></td>
+    </tr>
+    <tr>
+      <th>value</th>
+      <td><p>a suibable replacement value, must be a single character with <code><a href='https://rdrr.io/r/base/Extract.html'>[[</a></code></p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
