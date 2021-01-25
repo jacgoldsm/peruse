@@ -42,7 +42,9 @@
 <meta property="og:title" content="Making an Irregular Sequence Iterator — Iterator" />
 <meta property="og:description" content="Create an Iterator object, where the user defines a sequence and a
 set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence." />
+next element of the sequence. Iterators are R environments, which means
+they are modified in place. To make a copy of an Iterator that can be modified
+separately, see clone()." />
 
 
 
@@ -135,7 +137,9 @@ next element of the sequence." />
     <div class="ref-description">
     <p>Create an Iterator object, where the user defines a sequence and a
 set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence.</p>
+next element of the sequence. <code>Iterator</code>s are R environments, which means
+they are modified in place. To make a copy of an Iterator that can be modified
+separately, see <code><a href='clone.html'>clone()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>Iterator</span><span class='op'>(</span><span class='va'>result</span>, <span class='va'>initial</span>, <span class='va'>yield</span><span class='op'>)</span></pre>
@@ -149,17 +153,28 @@ next element of the sequence.</p>
     </tr>
     <tr>
       <th>initial</th>
-      <td><p>declare and initialize every variable that appears in 'result'</p></td>
+      <td><p>named list or vector; declare and initialize every variable that appears in 'result'</p></td>
     </tr>
     <tr>
       <th>yield</th>
-      <td><p>variable to yield when 'yield_next' is called</p></td>
+      <td><p>variable to yield when 'yield_next()' is called</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of S3 type Iterator</p>
+    <p>An environment object of S3 type Iterator</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>The expression to be evaluated can include constant values not defined in
+<code>$initial</code> as long as they are defined in the search path of the environment
+where <code>yield_*</code> is called from. These values will not vary from iteration to
+iteration. Notably, <code>$initial</code> is a list, not an environment. As such, the environment
+in which the <code>Iterator</code> is created does not matter at all for how the expression is
+evaluated—all that matters is the environment where <code>yield_*</code> is called from.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='yield.html'>yield_next()</a></code>, <code><a href='yield_while.html'>yield_while()</a></code>, <code><a href='current.html'>current()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>#Create the Collatz sequence starting with 50 and print out the first 30 elements</span>
@@ -170,6 +185,23 @@ next element of the sequence.</p>
 
 <span class='va'>seq</span> <span class='op'>&lt;-</span> <span class='fu'><a href='yield.html'>yield_more</a></span><span class='op'>(</span><span class='va'>collatz</span>, <span class='fl'>30</span><span class='op'>)</span>
 
+<span class='co'># using objects defined outside `$initial`:</span>
+<span class='co'># Note that `n` in `$initial` overrides `n` in the search path</span>
+<span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
+<span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>
+<span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"out &lt;- n + m"</span>
+<span class='va'>it</span> <span class='op'>&lt;-</span> <span class='fu'>Iterator</span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
+               initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='op'>-</span><span class='fl'>10</span><span class='op'>)</span>,
+               yield <span class='op'>=</span> <span class='va'>out</span><span class='op'>)</span>
+
+<span class='fu'><a href='yield.html'>yield_next</a></span><span class='op'>(</span><span class='va'>it</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 90</div><div class='input'>
+<span class='co'># environments are modified in place, so be aware:</span>
+<span class='va'>it</span> <span class='op'>&lt;-</span> <span class='fu'>Iterator</span><span class='op'>(</span><span class='st'>'m &lt;- m + 1'</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>m <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>, <span class='va'>m</span><span class='op'>)</span>
+<span class='va'>other</span> <span class='op'>&lt;-</span> <span class='va'>it</span>
+<span class='fu'><a href='yield.html'>yield_next</a></span><span class='op'>(</span><span class='va'>it</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='fu'><a href='current.html'>current</a></span><span class='op'>(</span><span class='va'>other</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
