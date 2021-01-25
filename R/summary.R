@@ -2,7 +2,7 @@
 #'@export
 print.Iterator <- function(x, ...) {
   cat(" Expression: ",
-      as.character(x$result[[1]]),
+      as.character(unlist(x$result)),
       "\n",
       "Variable to Yield:",
       as.character(x$yield),
@@ -10,7 +10,7 @@ print.Iterator <- function(x, ...) {
 
   cat("\n")
   cat("Current Variable Values:")
-  print(mget(ls(x$initial), envir = x$initial))
+  print(mget(ls(list2env(x$initial)), envir = list2env(x$initial)))
 
 
   invisible(NULL)

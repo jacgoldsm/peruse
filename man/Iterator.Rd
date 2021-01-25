@@ -9,17 +9,27 @@ Iterator(result, initial, yield)
 \arguments{
 \item{result}{R expression to run each time 'yield_next' is called}
 
-\item{initial}{declare and initialize every variable that appears in 'result'}
+\item{initial}{named list or vector; declare and initialize every variable that appears in 'result'}
 
-\item{yield}{variable to yield when 'yield_next' is called}
+\item{yield}{variable to yield when 'yield_next()' is called}
 }
 \value{
-An object of S3 type Iterator
+An environment object of S3 type Iterator
 }
 \description{
 Create an Iterator object, where the user defines a sequence and a
 set of initial values, and then calls 'yield_next' to generate the
-next element of the sequence.
+next element of the sequence. \code{Iterator}s are R environments, which means
+they are modified in place. To make a copy of an Iterator that can be modified
+separately, see \code{\link[=clone]{clone()}}.
+}
+\note{
+The expression to be evaluated can include constant values not defined in
+\verb{$initial} as long as they are defined in the search path of the environment
+where \verb{yield_*} is called from. These values will not vary from iteration to
+iteration. Notably, \verb{$initial} is a list, not an environment. As such, the environment
+in which the \code{Iterator} is created does not matter at all for how the expression is
+evaluated—all that matters is the environment where \verb{yield_*} is called from.
 }
 \examples{
 #Create the Collatz sequence starting with 50 and print out the first 30 elements
@@ -30,4 +40,24 @@ collatz <- Iterator(result = expr,
 
 seq <- yield_more(collatz, 30)
 
+# using objects defined outside `$initial`:
+# Note that `n` in `$initial` overrides `n` in the search path
+m <- 100
+n <- 10
+expr <- "out <- n + m"
+it <- Iterator(result = expr,
+               initial = c(n = -10),
+               yield = out)
+
+yield_next(it)
+
+# environments are modified in place, so be aware:
+it <- Iterator('m <- m + 1', c(m = 0), m)
+other <- it
+yield_next(it)
+current(other)
+
+}
+\seealso{
+\code{\link[=yield_next]{yield_next()}}, \code{\link[=yield_while]{yield_while()}}, \code{\link[=current]{current()}}
 }

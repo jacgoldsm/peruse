@@ -16,17 +16,15 @@ NULL
 #'@export
 yield_next <- function(iter) {
   stopifnot(is_Iterator(iter))
-  iter_name <- deparse(substitute(iter))
+  env <- rlang::env(parent.frame(), !!! iter$initial)
   yield_name <- as.character(iter$yield)
 
   for (j in seq_along(iter$result)) {
-    eval(iter$result[[j]], envir = iter$initial)
+    eval(iter$result[[j]], envir = env)
   }
 
-  for (key in names(iter$initial)) {
-    iter$initial[[key]] <- eval(rlang::parse_expr(key), envir = iter$initial)
-  }
-  assign(iter_name, iter, pos = .yieldenv)
+  iter$initial <- as.list(env, all.names = TRUE)
+
   return(iter$initial[[yield_name]])
 }
 

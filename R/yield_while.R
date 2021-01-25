@@ -17,9 +17,11 @@
 #'
 
 yield_while <- function(iter, cond) {
+  # Since objects in the enclosing environment can't vary from iteration to iteration,
+  # the condition can just be evaluated in the list-environment of `iter$initial`
   ret <- vector()
   cond <- rlang::parse_expr(cond)
-  while (rlang::eval_bare(cond, env = iter$initial)) {
+  while (eval(cond, envir = iter$initial)) {
     ret <- c(ret, yield_next(iter))
   }
   ret

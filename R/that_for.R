@@ -60,8 +60,7 @@ that_for_all <- function(.x, .y) {
   .y <- rlang::enexpr(.y)
   structure(list(.x = .x,
                  .y = .y,
-                 quant = 'all',
-                 type = class(.x)))
+                 quant = 'all'))
 }
 
 #' @rdname funs
@@ -70,8 +69,7 @@ that_for_any <- function(.x, .y) {
   .y <- rlang::enexpr(.y)
   structure(list(.x = .x,
                  .y = .y,
-                 quant = 'any',
-                 type = class(.x)))
+                 quant = 'any'))
 }
 
 
@@ -81,28 +79,17 @@ that_for_any <- function(.x, .y) {
 we_have <- function(that_for, formula, result = "vector") {
 
   if (result == "vector") {
-    base <- rep(NA, length(that_for$.x))
 
-    ret <- as.vector(mode = that_for$type,
-                     x = base)
-
-    if (that_for$quant == 'all') {
-      for (i in seq_along(that_for$.x)) {
-        bool_vec <- purrr::map2_lgl(that_for$.x[i],
-                                    rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])),
-                                    formula)
-        if (all(bool_vec)) ret[i] <- that_for$.x[i]
+    quant <- match.fun(that_for$quant) # either `all()` or `any()`
+    ret <- rep(NA, length(that_for$.x)) # defaults to logical, will be coerced
+                                        # if it gets any other values
+    for (i in seq_along(that_for$.x)) {
+      bool_vec <- purrr::map2_lgl(that_for$.x[i],
+                                  rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])),
+                                  formula)
+      if (quant(bool_vec)) ret[i] <- that_for$.x[i]
       }
-    }
 
-    if (that_for$quant == 'any') {
-      for (i in seq_along(that_for$.x)) {
-        bool_vec <- purrr::map2_lgl(that_for$.x[i],
-                                    rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])),
-                                    formula)
-        if (any(bool_vec)) ret[i] <- that_for$.x[i]
-      }
-    }
     return(ret[which(!is.na(ret))])
 
   }
@@ -127,7 +114,7 @@ we_have <- function(that_for, formula, result = "vector") {
     }
 
     "
-  } else {
+  } else if (that_for$quant == "any") {
     expr <- "
     repeat {
     bool_vec <- purrr::map2_lgl(x_name[i],
@@ -143,9 +130,13 @@ we_have <- function(that_for, formula, result = "vector") {
     }
     }
     "
-  }
+  } else rlang::abort("Invalid quantifier")
 
-    initial <- rlang::env(i = 1, .nth = 0, x_name = that_for$.x, y_name = that_for$.y, formula_name = formula)
+    initial <- rlang::env(i = 1,
+                          .nth = 0,
+                          x_name = that_for$.x,
+                          y_name = that_for$.y,
+                          formula_name = formula)
 
     return(
       Iterator(result = expr, initial = initial, yield = .nth)
