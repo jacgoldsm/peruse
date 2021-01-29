@@ -13,7 +13,9 @@ NULL
 #'@export
 move_next <- function(iter) {
   stopifnot(is_Iterator(iter))
-  env <- rlang::env(parent.frame(), !!! iter$initial)
+  #env <- rlang::env(parent.frame(), !!! iter$initial)
+  env <- list2env(iter$initial, parent = parent.frame())
+
   yield_name <- as.character(iter$yield)
 
   for (j in seq_along(iter$result)) {

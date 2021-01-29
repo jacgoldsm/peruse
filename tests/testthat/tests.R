@@ -20,7 +20,7 @@ test_that("collatz", {
 
 test_that("prime_iter", {
   primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
-  expect_equal(yield_next(primes), 2L)
+  expect_equal(yield_more(primes, 2), c(2L, 3L))
  })
 
 test_that("grepl_set", {
