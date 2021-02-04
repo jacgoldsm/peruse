@@ -18,15 +18,14 @@ An environment object of S3 type Iterator
 }
 \description{
 Create an Iterator object, where the user defines a sequence and a
-set of initial values, and then calls 'yield_next' to generate the
+set of initial values, and then calls \code{yield_next()} to generate the
 next element of the sequence. \code{Iterator}s are R environments, which means
-they are modified in place. To make a copy of an Iterator that can be modified
-separately, see \code{\link[=clone]{clone()}}.
+they are modified in place, even when passed as arguments to functions.
+To make a copy of an Iterator that can be modified separately, see \code{\link[=clone]{clone()}}.
 }
 \note{
 The expression to be evaluated can include constant values not defined in
-\verb{$initial} as long as they are defined in the search path of the environment
-where \verb{yield_*} is called from. These values will not vary from iteration to
+\verb{$initial} as long as they are defined globally. These values will not vary from iteration to
 iteration. Notably, \verb{$initial} is a list, not an environment. As such, the environment
 in which the \code{Iterator} is created does not matter at all for how the expression is
 evaluated—all that matters is the environment where \verb{yield_*} is called from.

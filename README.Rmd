@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+library(peruse)
 ```
 
 # peruse
@@ -19,10 +20,9 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The {peruse} package is aimed at making it easier to generate irregular
-sequences that are difficult to generate with existing tools. The heart
-of {peruse} is the `S3` class `Iterator`. An `Iterator` allows the
-user to write an arbitrary R expression that returns the next
-element of a sequence of R objects. It then saves the state of the `Iterator`, meaning the next time `yield_next` is called, the subsequent element of the sequence will be returned. The `Iterator` also has helper functions `yield_more()`, `move_next()`, `move_more()`, and `yield_while()` that provide variations on `yield_next()`.
+sequences that are difficult to generate with existing tools. 
+
+The heart of {peruse} is the `S3` class `Iterator`. An `Iterator` allows the user to write an arbitrary R expression that returns the next element of a sequence of R objects. It then saves the state of the `Iterator`, meaning the next time evaluation is invoked, the initial state will be the result of the previous iteration. This is most useful for generating recursive sequences, those where each iteration depends on previous ones.
 
 The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an `Iterator` that lazily generates the chosen elements.
 
@@ -42,9 +42,69 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("jacgoldsm/peruse")
 ```
 ## Example
+
+### Negative Binomial Investigation
+
+Suppose we want to investigate the question of how many trials it takes for a random walk with drift to reach a given threshold. We know that this would follow a Negative Binomial distribution, but how could we use the Iterator to look at this empirically in a way that easily allows us to adjust the drift term and see how the result changes? We might do something like this:
+
+```{r}
+p_success <- 0.5
+threshold <- 100
+
+expr <- "
+          set.seed(seeds[.iter])
+          n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
+        "
+iter <- Iterator(expr, list(n = 0, seeds = 1000:1e6), n)
+sequence <- yield_while(iter, "n <= threshold")
+
+plot(sequence, main = "How many iterations does it take to get to 100?")
+
+```
+
+How would we apply this same function to a grid of probabilities? We could do something like this:
+```{r}
+probs <- seq(0.5,0.95, by = 0.01)
+exprs <- rep(NA, length(probs))
+num_iter <- rep(NA, length(probs))
+threshold <- 20
+seeds <- 1000:1e6
+
+
+for (i in seq_along(probs)) {
+  exprs[i] <- glue::glue(
+    "
+      set.seed(seeds[.iter])
+      n <- n + sample(c(1,-1), 1, prob = c({probs[i]}, 1 - {probs[i]}))
+    "
+    )
+
+  iter <- Iterator(exprs[i], 
+                   list(n = 0),
+                   yield = n)
+  num_iter[i] <- length(yield_while(iter, "n <= threshold"))
+}
+
+plot(x = probs,
+     y = log(num_iter),
+     main = "Probability of Success vs How long it takes to get to 20 (Log Scale)",
+     xlab = "Probability of Success",
+     ylab = "Log Number of Iterations")
+```
+
+This illustrates a few useful features of Iterators:
+
+* We can use environment variables in either our expression or our `while` condition to represent constants. In this case, `threshold` doesn't change between iterations or between parameters. If you are creating many `Iterator`s, it can be faster to use
+environment variables, since you don't have to make a new object for each new `Iterator`.
+
+* We can use `glue::glue()` to generate a range of expressions that we can then fill in to create an `Iterator` with a range of parameters.
+
+* We can refer to the current iteration number in `yield_while()`, `yield_more()`, or their silent variants with the variable `.iter`.
+
+
 ### Collatz Sequence
 
-A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches `1` at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches `1`:
+A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches 1 at some point, no matter the starting point. We can't prove that one way or the other, but we can create an `Iterator` that lazily generates a Collatz sequence until it reaches 1:
 
 ```{r example}
 library(peruse)
@@ -52,19 +112,20 @@ expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
   
 # Collatz generator starting at 50
 collatz <- Iterator(result = expr,
-                    initial = c(n = 50),
+                    initial = list(n = 50),
                     yield = n)
 
 yield_while(collatz, cond = "n != 1L")
 ```
+
 ### Random Walk with Drift
+
 Random Walks, with or without drift, are one of the most commonly used type of stochastic processes. How can we simulate one with {peruse}?
 
 ```{r}
-set.seed(1)
 expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
 rwd <- Iterator(result = expr,
-                initial = c(n = 0),
+                initial = list(n = 0),
                 yield = n)
 
 
@@ -78,15 +139,33 @@ Here, we can see that `seq` gets to `50` after about `100` iterations when it is
 ### Primes
 How about generating all the prime numbers between `1` and `100`? We can easily do that with the set-builder API:
 ```{r}
-2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
+2:100 %>% 
+  that_for_all(range(2, .x)) %>% 
+  we_have(~.x %% .y != 0)
 ```
+
+In the equation, we can reference the left-hand side of the equation with the positional variable `.x`, and the right-hand side (that is, the argument in `that_for_all()`) with `.y`. The equation can be anything recognized as a function by `purrr::as_mapper()`.
+
 But how about if we want to generate the first 100 prime numbers? We don't know the range of values this should fall in (well, mathematicians do), so we can use laziness to our advantage:
 ```{r}
 primes <- 2:10000 %>%
             that_for_all(range(2, .x)) %>% 
             we_have(~.x %% .y != 0, "Iterator")
 
-sequence <- yield_more(primes, 100)
+primes_2 <- clone(primes)
+```
 
+
+The first prime number is
+```{r}
+yield_next(primes_2)
+```
+
+And the first 100 are:
+
+```{r}
+sequence <- yield_more(primes, 100)
 sequence
 ```
+
+Here, we use `clone()` to create an identical `Iterator` to `primes` that can be modified separately.

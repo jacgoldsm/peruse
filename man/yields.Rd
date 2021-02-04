@@ -21,5 +21,24 @@ a vector of that type in the case of \code{yield_more(iter, more > 1L)}.
 }
 \description{
 Finds the value of the next iteration(s) of an Iterator object
-and increments the Iterator to the next value(s).
+and increments the Iterator to the next value(s). \code{yield_more()} repeats
+\code{yield_next()} a specified number of times.
+Refer to the number of the current iteration in \code{yield_more()} with \code{.iter}.
+}
+\examples{
+primes <- 2:10000 \%>\%
+         that_for_all(range(2, .x)) \%>\%
+         we_have(~.x \%\% .y != 0, "Iterator")
+
+sequence <- yield_more(primes, 100)
+
+# use `.iter` to reference the current iteration
+expr <- "
+        set.seed(seeds[.iter])
+        n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
+       "
+rwd <- Iterator(result = expr,
+               initial = list(n = 0, seeds = 1:100),
+               yield = n)
+yield_more(rwd, 100)
 }

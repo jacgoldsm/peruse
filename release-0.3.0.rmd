@@ -46,6 +46,8 @@ Release 0.3.0 has significant changes to the way that Iterators are implemented,
 
 -   Iterators now have a formally defined search path, so you can reliably use environment variables with them.
 
+- You can now refer to the current iteration of `yield_more()`, `yield_while()`, `move_more()`, or `move_while()` with the `.iter` variable.
+
 ### Example of New Functionality
 
 Suppose we want to investigate the question of how many trials it takes for a random walk with drift to reach a given threshold. We know that this would follow a Negative Binomial distribution, but how could we use the Iterator to look at this empirically in a way that easily allows us to adjust the drift term and see how the result changes? We might do something like this:
@@ -55,9 +57,10 @@ p_success <- 0.5
 threshold <- 100
 
 expr <- "
+          set.seed(seeds[.iter])
           n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
         "
-iter <- Iterator(expr, c(n = 0), n)
+iter <- Iterator(expr, list(n = 0, seeds = 1000:1e6), n)
 sequence <- yield_while(iter, "n <= threshold")
 
 plot(sequence, main = "How many iterations does it take to get to 100?")
@@ -65,33 +68,43 @@ plot(sequence, main = "How many iterations does it take to get to 100?")
 ```
 
 How would we apply this same function to a grid of probabilities? We could do something like this:
+
 ```{r}
 probs <- seq(0.5,0.95, by = 0.01)
-exprs <- rep(NA, 46)
-num_iter <- rep(NA, 46)
+exprs <- rep(NA, length(probs))
+num_iter <- rep(NA, length(probs))
 threshold <- 20
+seeds <- 1000:1e6
 
-for (i in 1:46) {
+for (i in seq_along(probs)) {
   exprs[i] <- glue::glue(
-      'n <- n + sample(c(1,-1), 1, prob = c({probs[i]}, 1 - {probs[i]}))'
+    "
+      set.seed(seeds[.iter])
+      n <- n + sample(c(1,-1), 1, prob = c({probs[i]}, 1 - {probs[i]}))
+    "
     )
-  
-  iter <- Iterator(exprs[i], c(n = 0), n)
+
+  iter <- Iterator(exprs[i],
+                   list(n = 0),
+                   yield = n)
   num_iter[i] <- length(yield_while(iter, "n <= threshold"))
 }
 
-plot(x = probs, 
-     y = log(num_iter), 
+plot(x = probs,
+     y = log(num_iter),
      main = "Probability of Success vs How long it takes to get to 20 (Log Scale)",
      xlab = "Probability of Success",
      ylab = "Log Number of Iterations")
 ```
 
-This illustrates a two useful features of Iterators:
+This illustrates a few useful features of Iterators:
 
-* We can use environment variables in either our expression or our `while` condition to represent constants. In this case, `threshold` doesn't change between iterations or between parameters.
+* We can use environment variables in either our expression or our `while` condition to represent constants. In this case, `threshold` doesn't change between iterations or between parameters. If you are creating many `Iterator`s, it can be faster to use
+environment variables, since you don't have to make a new object for each new `Iterator`.
 
-* We can use `glue::glue()` to generate a range of expressions that we can then fill in to create an `Iterator` with a range of parameters. 
+* We can use `glue::glue()` to generate a range of expressions that we can then fill in to create an `Iterator` with a range of parameters.
+
+* We can refer to the current iteration number in `yield_while()`, `yield_more()`, or their silent variants with the environment variable `.iter`.
 
 
 ## Basic Introduction
@@ -119,10 +132,12 @@ From the perspective of the R user, all these values are generated at once. This
 The `Iterator` object in `peruse` is made to solve these problem. For example, suppose we want to simulate a random walk with drift that has two end conditions: success is if/when it reaches 50, and failure is if/when it reaches -50. To be efficient, we want to stop the simulation when the sequence reaches either of the end conditions.
 
 ```{r}
-set.seed(1)
-expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
+expr <-  "
+           set.seed(seeds[.iter])
+           n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
+         "
 rwd <- Iterator(result = expr,
-                initial = c(n = 0),
+                initial = list(n = 0, seeds = 1:1e3),
                 yield = n)
 
 
@@ -156,7 +171,9 @@ But more complex sets require comparing a set of elements to another set and onl
 Here, we use set comprehension to generate prime numbers 1-100:
 
 ```{r}
-2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
+2:100 %>%
+    that_for_all(range(2, .x)) %>%
+    we_have(~.x %% .y != 0)
 ```
 
 This doesn't, however, help us if we want to generate a certain *number* of prime numbers, regardless of what interval they are in. Of course, we could generate a vector and then subset it, but that would be inefficient! We want to only generate what we need.
@@ -166,8 +183,8 @@ We can bring together the set-builder and Iterator capabilities to do that, for 
 ```{r}
 # 10,000 is just a number that we can be pretty sure is sufficiently high
 primes <- 2:10000 %>%
-            that_for_all(range(2, .x)) %>%
-            we_have(~.x %% .y != 0, "Iterator")
+          that_for_all(range(2, .x)) %>%
+          we_have(~.x %% .y != 0, "Iterator")
 
 
 sequence <- yield_more(primes, 100)

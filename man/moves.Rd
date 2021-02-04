@@ -4,17 +4,35 @@
 \alias{move}
 \alias{move_next}
 \alias{move_more}
+\alias{move_while}
 \title{Increment an Iterator without returning the Value(s)}
 \usage{
 move_next(iter)
 
 move_more(iter, more = 1L)
+
+move_while(iter, cond)
 }
 \arguments{
 \item{iter}{An Iterator object object}
 
 \item{more}{How many times to iterate}
+
+\item{cond}{A quoted logical expression involving some variable(s) in \code{iter$initial}, so that \code{move_next()}
+continues being called while the expression returns TRUE}
 }
 \description{
 Increments the Iterator without returning anything.
+\code{move_more()} repeats \code{move_next()} a specified number of times. \code{move_while()}
+repeates \code{move_next()} until a condition is met. Refer to the number of the current
+iteration with \code{.iter}.
+}
+\examples{
+primes <- 2:10000 \%>\%
+            that_for_all(range(2, .x)) \%>\%
+            we_have(~.x \%\% .y != 0, "Iterator")
+current(primes)
+move_more(primes, 100)
+current(primes)
+
 }

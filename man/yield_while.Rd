@@ -9,18 +9,30 @@ yield_while(iter, cond)
 \arguments{
 \item{iter}{An \code{Iterator} object}
 
-\item{cond}{A quoted logical expression involving some variable(s) in \code{iter$initial}, so that \code{yield_next()}
-continues being called while the expression returns TRUE}
+\item{cond}{A quoted logical expression involving some variable(s) in \code{iter$initial}
+or globally defined, so that \code{yield_next()} continues being called
+while the expression returns TRUE}
 }
 \description{
 Keep yielding the next element of an \code{Iterator} while a condition is met.
-A condition is some function involving any variable(s) in the \code{Iterator} environment
+A condition is a logical expression involving variables in \code{iter$initial} or variables
+that are defined globally. Refer to the number of the current iteration with \code{.iter}.
 }
 \examples{
 expr <- "if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1"
 collatz <- Iterator(result = expr,
-                    initial = c(n = 50),
+                    initial = list(n = 50),
                     yield = n)
 yield_while(collatz, "n != 1L")
+
+p_success <- 0.5
+threshold <- 100
+seeds <- 1000:1e6
+expr <- "
+         set.seed(seeds[.iter])
+         n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
+       "
+iter <- Iterator(expr, list(n = 0), n)
+sequence <- yield_while(iter, "n <= threshold")
 
 }

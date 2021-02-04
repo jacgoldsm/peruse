@@ -18,7 +18,7 @@ we_have(that_for, formula, result = "vector")
 
 \item{.y}{A set to compare to \code{.x}}
 
-\item{that_for}{A list passed to \code{we_have}--can be ignored with proper syntax}
+\item{that_for}{A list passed to \code{\link[=we_have]{we_have()}}—can be ignored with proper syntax}
 
 \item{formula}{A boolean-valued function, lambda, or formula}
 
@@ -30,28 +30,29 @@ For we_have, a vector of the same type as \code{.x} if \code{return == 'vector'}
 }
 \description{
 Set comprehension with the Magrittr Pipe.
-Always use the syntax:
-\code{.x \%>\% that_for_all(.y) \%>\% we_have_*(f(.x, .y))}.
-}
-\details{
-This function is designed to be used with \code{\%>\%} from \code{magrittr}.
-Essentially, this function evaluates \code{f \%>\% g()} as
-\code{eval(g(f), envir = new.env(parent = parent.frame())}. Any pipe or pipe-like
-function that works similarly should work with \code{that_for_*}. In particular,
-the R Core Team is expected to implement a base R pipe in the near future with
-the syntax \code{|>}. While these functions will likely work properly with the new
-\code{|>}, as of right now the only pipe that is guaranteed to work is
-\code{\%>\%}.
+Always use the basic syntax:
+
+\code{.x \%>\% that_for_all(.y) \%>\% we_have_*(f(.x, .y))},
+but see the examples for more detail.
+
+\code{formula} can be anything that is recognized as a function by \code{\link[purrr:as_mapper]{purrr::as_mapper()}}
 }
 \note{
-if .y is an numeric vector, you probably want a value obtained from
-\code{peruse::range(start, end)} rather than \code{start:end} or \code{seq(start,end)}, as when
-start is greater than end you want an empty vector rather than counting backwards.
-Note that \code{peruse::range} views end as a supremum, not a maximum, thus \code{range(a,b)}
-is equivalent to the set \code{[}a,b) when a < b or \code{{}} when b >= a.
+if \code{.y} is an numeric vector, you probably want a value obtained from
+\code{range(start, end)} rather than \code{start:end} or \code{seq.int(start,end)},
+as when start is greater than end you want an empty vector rather than counting backwards.
+Note that \code{\link[=range]{range()}} views end as a supremum, not a maximum, thus \code{range(a,b)}
+is equivalent to the set \code{[}a,b) when a < b or the empty set when b >= a.
+
+Also note that there is some indirection in the way that \code{.x} and \code{.y} are referenced
+in the formula. In the function \code{we_have()}, the actual name of the two sets is \code{.x}
+and \code{.y}. That is what makes the function interface work,
+e.g. \code{function(.x, .y) .x - .y}. On the other hand, \code{purrr}-style lambda expressions,
+e.g. \code{~.x - .y}, use positional arguments, where \code{.x} is the first argument and \code{.y}
+is the second argument, no matter their names. Because those are actually their names,
+this difference should never matter.
 }
 \examples{
-library(magrittr)
 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(function(.x, .y) .x \%\% .y != 0) #is the same as
 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 #c.f.
@@ -61,11 +62,9 @@ yield_next(primes)
              that_for_all("\'") \%>\%
              we_have(~grepl(.y, .x))}
 #Twin primes 1 through 100
-\dontrun{
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
 #Prime numbers 1 through 100 that are two away from a square number
-}
 (2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
     that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
