@@ -41,7 +41,8 @@
 
 <meta property="og:title" content="yield_while — yield_while" />
 <meta property="og:description" content="Keep yielding the next element of an Iterator while a condition is met.
-A condition is some function involving any variable(s) in the Iterator environment" />
+A condition is a logical expression involving variables in iter$initial or variables
+that are defined globally. Refer to the number of the current iteration with .iter." />
 
 
 
@@ -73,7 +74,7 @@ A condition is some function involving any variable(s) in the Iterator environme
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -133,7 +134,8 @@ A condition is some function involving any variable(s) in the Iterator environme
 
     <div class="ref-description">
     <p>Keep yielding the next element of an <code>Iterator</code> while a condition is met.
-A condition is some function involving any variable(s) in the <code>Iterator</code> environment</p>
+A condition is a logical expression involving variables in <code>iter$initial</code> or variables
+that are defined globally. Refer to the number of the current iteration with <code>.iter</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>iter</span>, <span class='va'>cond</span><span class='op'>)</span></pre>
@@ -147,8 +149,9 @@ A condition is some function involving any variable(s) in the <code>Iterator</co
     </tr>
     <tr>
       <th>cond</th>
-      <td><p>A quoted logical expression involving some variable(s) in <code>iter$initial</code>, so that <code><a href='yield.html'>yield_next()</a></code>
-continues being called while the expression returns TRUE</p></td>
+      <td><p>A quoted logical expression involving some variable(s) in <code>iter$initial</code>
+or globally defined, so that <code><a href='yield.html'>yield_next()</a></code> continues being called
+while the expression returns TRUE</p></td>
     </tr>
     </table>
 
@@ -156,10 +159,20 @@ continues being called while the expression returns TRUE</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"if (n %% 2 == 0) n &lt;- n / 2 else n &lt;- n*3 + 1"</span>
 <span class='va'>collatz</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
-                    initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>,
+                    initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>,
                     yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
 <span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>collatz</span>, <span class='st'>"n != 1L"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1] 25 76 38 19 58 29 88 44 22 11 34 17 52 26 13 40 20 10  5 16  8  4  2  1</div><div class='input'>
+<span class='va'>p_success</span> <span class='op'>&lt;-</span> <span class='fl'>0.5</span>
+<span class='va'>threshold</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
+<span class='va'>seeds</span> <span class='op'>&lt;-</span> <span class='fl'>1000</span><span class='op'>:</span><span class='fl'>1e6</span>
+<span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"
+         set.seed(seeds[.iter])
+         n &lt;- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
+       "</span>
+<span class='va'>iter</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span><span class='va'>expr</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>, <span class='va'>n</span><span class='op'>)</span>
+<span class='va'>sequence</span> <span class='op'>&lt;-</span> <span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>iter</span>, <span class='st'>"n &lt;= threshold"</span><span class='op'>)</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

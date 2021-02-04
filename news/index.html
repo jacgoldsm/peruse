@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -144,7 +144,7 @@
 <ul>
 <li><p>Will be released soon as Version 0.2.0</p></li>
 <li><p>Removed <code>as_Iterator()</code></p></li>
-<li><p>Changes <code><a href="../reference/is_Iterator.html">is_Iterator()</a></code> to use <code><a href="https://rdrr.io/r/base/class.html">inherits()</a></code> instead of <code>class() ==</code></p></li>
+<li><p>Changed <code><a href="../reference/is_Iterator.html">is_Iterator()</a></code> to use <code><a href="https://rdrr.io/r/base/class.html">inherits()</a></code> instead of <code>class() ==</code></p></li>
 <li><p>Fixed bug in <code><a href="../reference/sets.html">we_have()</a></code> that wrote over an old set-created <code>Iterator</code> when a new one was made, even with a different name</p></li>
 <li><p>Removed <code>hash_df</code> data structure</p></li>
 <li><p>Removed dependency on {R6}</p></li>
@@ -152,6 +152,20 @@
 <li><p>Added <code><a href="../reference/move.html">move_next()</a></code> and <code><a href="../reference/move.html">move_more()</a></code></p></li>
 <li><p>Added <code><a href="../reference/current.html">current()</a></code></p></li>
 <li><p>Added <code><a href="../reference/yield_while.html">yield_while()</a></code></p></li>
+</ul>
+</div>
+    <div id="version-030" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.0">
+<a href="#version-030" class="anchor"></a>Version 0.3.0<small> Unreleased </small>
+</h1>
+<ul>
+<li><p>Changed the <code>Iterator</code> to use an <code>environment</code> as a backend instead of a <code>list</code>, and added <code><a href="../reference/clone.html">clone()</a></code></p></li>
+<li><p>Added a well-defined search path for <code>Iterator</code>s</p></li>
+<li><p>Added seed arguments for reproducibility to <code><a href="../reference/yield.html">yield_more()</a></code>, <code><a href="../reference/yield_while.html">yield_while()</a></code>, and <code><a href="../reference/move.html">move_more()</a></code></p></li>
+<li><p>Made error messages more clear for <code>Iterator</code></p></li>
+<li><p>Added <code><a href="../reference/move.html">move_while()</a></code></p></li>
+<li><p>Added access to the current iteration number with <code>.iter</code></p></li>
+<li><p>Completely changed the <code>move_*()</code> backend to use <code>yield_*()</code></p></li>
 </ul>
 </div>
   </div>

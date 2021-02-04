@@ -41,7 +41,9 @@
 
 <meta property="og:title" content="Increment an Iterator and Return the Next Value(s) — yield" />
 <meta property="og:description" content="Finds the value of the next iteration(s) of an Iterator object
-and increments the Iterator to the next value(s)." />
+and increments the Iterator to the next value(s). yield_more() repeats
+yield_next() a specified number of times.
+Refer to the number of the current iteration in yield_more() with .iter." />
 
 
 
@@ -73,7 +75,7 @@ and increments the Iterator to the next value(s)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -133,7 +135,9 @@ and increments the Iterator to the next value(s)." />
 
     <div class="ref-description">
     <p>Finds the value of the next iteration(s) of an Iterator object
-and increments the Iterator to the next value(s).</p>
+and increments the Iterator to the next value(s). <code>yield_more()</code> repeats
+<code>yield_next()</code> a specified number of times.
+Refer to the number of the current iteration in <code>yield_more()</code> with <code>.iter</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>yield_next</span><span class='op'>(</span><span class='va'>iter</span><span class='op'>)</span>
@@ -158,6 +162,26 @@ and increments the Iterator to the next value(s).</p>
     <p>An object of whatever type <code>result</code> evaluates to from the Iterator, or
 a vector of that type in the case of <code>yield_more(iter, more &gt; 1L)</code>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>10000</span> <span class='op'>%&gt;%</span>
+         <span class='fu'><a href='sets.html'>that_for_all</a></span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+         <span class='fu'><a href='sets.html'>we_have</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span>, <span class='st'>"Iterator"</span><span class='op'>)</span>
+
+<span class='va'>sequence</span> <span class='op'>&lt;-</span> <span class='fu'>yield_more</span><span class='op'>(</span><span class='va'>primes</span>, <span class='fl'>100</span><span class='op'>)</span>
+
+<span class='co'># use `.iter` to reference the current iteration</span>
+<span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"
+        set.seed(seeds[.iter])
+        n &lt;- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
+       "</span>
+<span class='va'>rwd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
+               initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>0</span>, seeds <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span><span class='op'>)</span>,
+               yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+<span class='fu'>yield_more</span><span class='op'>(</span><span class='va'>rwd</span>, <span class='fl'>100</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   [1]  1  2  3  4  5  6  5  6  7  8  9 10 11 12 13 14 15 14 15 14 13 14 15 16 17
+#&gt;  [26] 18 17 18 19 20 21 22 23 24 23 24 25 26 27 28 29 28 29 30 31 32 31 32 33 34
+#&gt;  [51] 33 34 35 34 35 36 37 38 39 38 39 38 37 38 39 38 37 36 37 38 39 38 39 40 41
+#&gt;  [76] 42 43 42 41 42 43 44 45 44 45 44 45 46 47 48 49 50 51 50 51 52 53 54 55 56</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
