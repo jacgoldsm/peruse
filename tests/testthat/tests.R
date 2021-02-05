@@ -3,6 +3,11 @@ test_that("prime_numbers", {
                17L)
 })
 
+test_that("prime numbers with logical coercion", {
+  expect_equal((2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y))[7],
+               17L)
+})
+
 test_that("prime_within_two", {
   expect_equal(((2:100 %>% that_for_all(range(2,.x)) %>% we_have(~.x %% .y != 0)) %>%
                                that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y))[2],
@@ -108,7 +113,7 @@ test_that("stochastic functions work properly", {
   expr <- "
           set.seed(seeds[.iter])
           n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
-        "
+         "
   iter <- Iterator(expr, list(n = 0, seeds = 1000:1e6), n)
   sequence <- yield_while(iter, "n <= threshold")
   expect_equal(sequence[1:4], c(1,0,1,2))
@@ -118,5 +123,13 @@ test_that("yield_while() can see `.iter`", {
   expr <- "m <- m + 1"
   it <- Iterator(expr, list(m = 0), m)
   sequence <- yield_while(it, ".iter < 5")
+  expect_equal(sequence, c(1,2,3,4))
+})
+
+test_that("yield_while() can see environment variables", {
+  expr <- "m <- m + 1"
+  r <- 5
+  it <- Iterator(expr, list(m = 0), m)
+  sequence <- yield_while(it, ".iter < r")
   expect_equal(sequence, c(1,2,3,4))
 })

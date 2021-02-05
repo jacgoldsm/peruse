@@ -42,3 +42,5 @@ added `clone()`
 * Added access to the current iteration number with `.iter`
 
 * Completely changed the `move_*()` backend to use `yield_*()`
+
+* Use `map2_int()` instead of `map2_lgl()` to get more general formulas

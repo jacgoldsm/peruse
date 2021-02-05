@@ -20,22 +20,28 @@ we_have(that_for, formula, result = "vector")
 
 \item{that_for}{A list passed to \code{\link[=we_have]{we_have()}}—can be ignored with proper syntax}
 
-\item{formula}{A boolean-valued function, lambda, or formula}
+\item{formula}{A function, lambda, or formula. Must produce something understood by
+\code{\link[purrr:map2]{purrr::map2_int()}}}
 
 \item{result}{Should the expression return a \code{vector} or an \code{Iterator}?}
 }
 \value{
-For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
-For we_have, a vector of the same type as \code{.x} if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
+For \code{that_for_all()} and \code{that_for_any()}, an object of S3 class that_for_all or that_for_any.
+For \code{we_have()}, a vector of the same type as \code{.x} if \code{return == 'vector'} and an Iterator object if \code{return == 'Iterator'}.
 }
 \description{
-Set comprehension with the Magrittr Pipe.
+Set comprehension with the magrittr Pipe.
 Always use the basic syntax:
 
 \code{.x \%>\% that_for_all(.y) \%>\% we_have_*(f(.x, .y))},
 but see the examples for more detail.
-
-\code{formula} can be anything that is recognized as a function by \code{\link[purrr:as_mapper]{purrr::as_mapper()}}
+}
+\details{
+\code{formula} can be anything that is recognized as a function by \code{\link[purrr:as_mapper]{purrr::as_mapper()}}.
+Although \code{\link[purrr:map2]{purrr::map2_lgl()}} would seem the obvious choice, the formula is actually
+evaluated with \code{\link[purrr:map2]{purrr::map2_int()}}, where 0 represents FALSE and everything else
+represents TRUE. This allows formulas like \code{~ .x \%\% .y}, which produce integers,
+to be used in \code{we_have()}.
 }
 \note{
 if \code{.y} is an numeric vector, you probably want a value obtained from
@@ -54,18 +60,18 @@ this difference should never matter.
 }
 \examples{
 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(function(.x, .y) .x \%\% .y != 0) #is the same as
-2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
+2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y) # 0 = F, (not 0) = T
 #c.f.
-primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0, "Iterator")
+primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y, "Iterator")
 yield_next(primes)
 {c("I", "Don't", "wan't", "chicken") \%>\%
              that_for_all("\'") \%>\%
              we_have(~grepl(.y, .x))}
 #Twin primes 1 through 100
-primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)
+primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y)
 primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
 #Prime numbers 1 through 100 that are two away from a square number
-(2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y != 0)) \%>\%
+(2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y)) \%>\%
     that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
 }

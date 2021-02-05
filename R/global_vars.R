@@ -1,2 +1,2 @@
-utils::globalVariables(c(".nth"), "peruse", add = TRUE)
+utils::globalVariables(c(".nth", ".iter"), "peruse", add = TRUE)
 

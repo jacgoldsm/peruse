@@ -13,10 +13,10 @@
 #' @return An environment object of S3 type Iterator
 #'
 #' @note The expression to be evaluated can include constant values not defined in
-#' `$initial` as long as they are defined globally. These values will not vary from iteration to
-#' iteration. Notably, `$initial` is a list, not an environment. As such, the environment
-#' in which the `Iterator` is created does not matter at all for how the expression is
-#' evaluated—all that matters is the environment where `yield_*` is called from.
+#' `$initial` as long as they are defined in the enclosure *of where yield_next() is called*,
+#' not where the Iterator is created.
+#' These values will not vary from iteration to
+#' iteration (unless you do something strange in the code, like including [<<-] in `$result`.)
 #'
 #' @examples
 #' #Create the Collatz sequence starting with 50 and print out the first 30 elements

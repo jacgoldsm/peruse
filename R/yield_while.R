@@ -2,11 +2,11 @@
 #'
 #' @description Keep yielding the next element of an `Iterator` while a condition is met.
 #' A condition is a logical expression involving variables in `iter$initial` or variables
-#' that are defined globally. Refer to the number of the current iteration with `.iter`.
+#' that are defined in the enclosure. Refer to the number of the current iteration with `.iter`.
 #'
 #' @param iter An `Iterator` object
 #' @param cond A quoted logical expression involving some variable(s) in `iter$initial`
-#' or globally defined, so that `yield_next()` continues being called
+#' or in the enclosure, so that `yield_next()` continues being called
 #' while the expression returns TRUE
 #'
 #' @examples

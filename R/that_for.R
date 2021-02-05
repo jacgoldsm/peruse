@@ -4,13 +4,17 @@
 #' @import magrittr
 #' @title R Set Comprehension
 #'
-#' @description Set comprehension with the Magrittr Pipe.
+#' @description Set comprehension with the magrittr Pipe.
 #' Always use the basic syntax:
 #'
 #' `.x %>% that_for_all(.y) %>% we_have_*(f(.x, .y))`,
 #' but see the examples for more detail.
 #'
-#' `formula` can be anything that is recognized as a function by [purrr::as_mapper()]
+#' @details `formula` can be anything that is recognized as a function by [purrr::as_mapper()].
+#' Although [purrr::map2_lgl()] would seem the obvious choice, the formula is actually
+#' evaluated with [purrr::map2_int()], where 0 represents FALSE and everything else
+#' represents TRUE. This allows formulas like `~ .x %% .y`, which produce integers,
+#' to be used in `we_have()`.
 #'
 #' @note if `.y` is an numeric vector, you probably want a value obtained from
 #' `range(start, end)` rather than `start:end` or `seq.int(start,end)`,
@@ -28,29 +32,30 @@
 #'
 #' @param .x A set, represented as either an atomic vector or a list
 #' @param .y A set to compare to `.x`
-#' @param formula A boolean-valued function, lambda, or formula
+#' @param formula A function, lambda, or formula. Must produce something understood by
+#' [purrr::map2_int()]
 #' @param result Should the expression return a `vector` or an `Iterator`?
 #' @param that_for A list passed to [we_have()]—can be ignored with proper syntax
 #'
 #' @examples
 #' 2:100 %>% that_for_all(range(2, .x)) %>% we_have(function(.x, .y) .x %% .y != 0) #is the same as
-#' 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
+#' 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y) # 0 = F, (not 0) = T
 #' #c.f.
-#' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0, "Iterator")
+#' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y, "Iterator")
 #' yield_next(primes)
 
 #' {c("I", "Don't", "wan't", "chicken") %>%
 #'              that_for_all("\'") %>%
 #'              we_have(~grepl(.y, .x))}
 #' #Twin primes 1 through 100
-#' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)
+#' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y)
 #' primes %>% that_for_any(primes) %>% we_have(~abs(.x - .y) == 2)
 #' #Prime numbers 1 through 100 that are two away from a square number
-#' (2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y != 0)) %>%
+#' (2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y)) %>%
 #'     that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 #'
-#' @return For \code{that_for_all} and \code{that_for_any}, an object of S3 class that_for_all or that_for_any.
-#' For we_have, a vector of the same type as `.x` if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
+#' @return For \code{that_for_all()} and \code{that_for_any()}, an object of S3 class that_for_all or that_for_any.
+#' For `we_have()`, a vector of the same type as `.x` if `return == 'vector'` and an Iterator object if `return == 'Iterator'`.
 NULL
 
 #' @rdname funs
@@ -83,7 +88,7 @@ we_have <- function(that_for, formula, result = "vector") {
     ret <- rep(NA, length(that_for$.x)) # defaults to logical, will be coerced
                                         # if it gets any other values
     for (i in seq_along(that_for$.x)) {
-      bool_vec <- purrr::map2_lgl(that_for$.x[i],
+      bool_vec <- purrr::map2_int(that_for$.x[i],
                                   rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])),
                                   formula)
       if (quant(bool_vec)) ret[i] <- that_for$.x[i]
@@ -99,7 +104,7 @@ we_have <- function(that_for, formula, result = "vector") {
   if (that_for$quant == "all") {
     expr <- "
     repeat {
-    bool_vec <- purrr::map2_lgl(x_name[i],
+    bool_vec <- purrr::map2_int(x_name[i],
                                 rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
                                 formula_name)
 
@@ -116,7 +121,7 @@ we_have <- function(that_for, formula, result = "vector") {
   } else if (that_for$quant == "any") {
     expr <- "
     repeat {
-    bool_vec <- purrr::map2_lgl(x_name[i],
+    bool_vec <- purrr::map2_int(x_name[i],
                                 rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
                                 formula_name)
 

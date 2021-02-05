@@ -5,7 +5,7 @@
 \alias{move_next}
 \alias{move_more}
 \alias{move_while}
-\title{Increment an Iterator without returning the Value(s)}
+\title{Increment an Iterator Without Returning the Value(s)}
 \usage{
 move_next(iter)
 
@@ -24,7 +24,7 @@ continues being called while the expression returns TRUE}
 \description{
 Increments the Iterator without returning anything.
 \code{move_more()} repeats \code{move_next()} a specified number of times. \code{move_while()}
-repeates \code{move_next()} until a condition is met. Refer to the number of the current
+repeats \code{move_next()} until a condition is met. Refer to the number of the current
 iteration with \code{.iter}.
 }
 \examples{

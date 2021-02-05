@@ -25,10 +25,10 @@ To make a copy of an Iterator that can be modified separately, see \code{\link[=
 }
 \note{
 The expression to be evaluated can include constant values not defined in
-\verb{$initial} as long as they are defined globally. These values will not vary from iteration to
-iteration. Notably, \verb{$initial} is a list, not an environment. As such, the environment
-in which the \code{Iterator} is created does not matter at all for how the expression is
-evaluated—all that matters is the environment where \verb{yield_*} is called from.
+\verb{$initial} as long as they are defined in the enclosure \emph{of where yield_next() is called},
+not where the Iterator is created.
+These values will not vary from iteration to
+iteration (unless you do something strange in the code, like including \link{<<-} in \verb{$result}.)
 }
 \examples{
 #Create the Collatz sequence starting with 50 and print out the first 30 elements
@@ -40,7 +40,7 @@ collatz <- Iterator(result = expr,
 seq <- yield_more(collatz, 30)
 
 # using objects defined outside `$initial`:
-# Note that `n` in `$initial` overrides `n` in the search path
+# Note that `n` in `$initial` overrides the global `n`
 m <- 100
 n <- 10
 expr <- "out <- n + m"

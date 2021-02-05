@@ -1,11 +1,11 @@
 #'@name move
 #'@rdname moves
 #'
-#'@title Increment an Iterator without returning the Value(s)
+#'@title Increment an Iterator Without Returning the Value(s)
 #'
 #' @description Increments the Iterator without returning anything.
 #' `move_more()` repeats `move_next()` a specified number of times. `move_while()`
-#' repeates `move_next()` until a condition is met. Refer to the number of the current
+#' repeats `move_next()` until a condition is met. Refer to the number of the current
 #' iteration with `.iter`.
 #'
 #' @param iter An Iterator object object

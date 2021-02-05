@@ -10,13 +10,13 @@ yield_while(iter, cond)
 \item{iter}{An \code{Iterator} object}
 
 \item{cond}{A quoted logical expression involving some variable(s) in \code{iter$initial}
-or globally defined, so that \code{yield_next()} continues being called
+or in the enclosure, so that \code{yield_next()} continues being called
 while the expression returns TRUE}
 }
 \description{
 Keep yielding the next element of an \code{Iterator} while a condition is met.
 A condition is a logical expression involving variables in \code{iter$initial} or variables
-that are defined globally. Refer to the number of the current iteration with \code{.iter}.
+that are defined in the enclosure. Refer to the number of the current iteration with \code{.iter}.
 }
 \examples{
 expr <- "if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1"
