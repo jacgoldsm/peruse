@@ -183,7 +183,7 @@ do), so we can use laziness to our advantage:
 ``` r
 primes <- 2:10000 %>%
             that_for_all(range(2, .x)) %>% 
-            we_have(~.x %% .y != 0, "Iterator")
+            we_have(~.x %% .y, "Iterator")
 
 primes_2 <- clone(primes)
 ```
