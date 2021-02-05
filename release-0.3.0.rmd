@@ -48,6 +48,8 @@ Release 0.3.0 has significant changes to the way that Iterators are implemented,
 
 - You can now refer to the current iteration of `yield_more()`, `yield_while()`, `move_more()`, or `move_while()` with the `.iter` variable.
 
+- Formulas in set comprehension now work with any integer, not explicitly booleans, so `f(x)` works the same as `f(x) != 0` in `we_have()`.
+
 ### Example of New Functionality
 
 Suppose we want to investigate the question of how many trials it takes for a random walk with drift to reach a given threshold. We know that this would follow a Negative Binomial distribution, but how could we use the Iterator to look at this empirically in a way that easily allows us to adjust the drift term and see how the result changes? We might do something like this:

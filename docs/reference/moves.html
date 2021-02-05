@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Increment an Iterator without returning the Value(s) — move • peruse</title>
+<title>Increment an Iterator Without Returning the Value(s) — move • peruse</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,11 @@
 
 
 
-<meta property="og:title" content="Increment an Iterator without returning the Value(s) — move" />
-<meta property="og:description" content="Increments the Iterator without returning anything." />
+<meta property="og:title" content="Increment an Iterator Without Returning the Value(s) — move" />
+<meta property="og:description" content="Increments the Iterator without returning anything.
+move_more() repeats move_next() a specified number of times. move_while()
+repeats move_next() until a condition is met. Refer to the number of the current
+iteration with .iter." />
 
 
 
@@ -72,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -97,6 +100,9 @@
     <li class="dropdown-header">Releases</li>
     <li>
       <a href="https://jacgoldsm.github.io/">peruse 0.2.0</a>
+    </li>
+    <li>
+      <a href="https://jacgoldsm.github.io/">peruse 0.3.0</a>
     </li>
     <li class="divider"></li>
     <li>
@@ -125,18 +131,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Increment an Iterator without returning the Value(s)</h1>
+    <h1>Increment an Iterator Without Returning the Value(s)</h1>
     <small class="dont-index">Source: <a href='https://github.com/jacgoldsm/peruse/blob/master/R/move.R'><code>R/move.R</code></a></small>
     <div class="hidden name"><code>moves.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Increments the Iterator without returning anything.</p>
+    <p>Increments the Iterator without returning anything.
+<code>move_more()</code> repeats <code>move_next()</code> a specified number of times. <code>move_while()</code>
+repeats <code>move_next()</code> until a condition is met. Refer to the number of the current
+iteration with <code>.iter</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>move_next</span><span class='op'>(</span><span class='va'>iter</span><span class='op'>)</span>
 
-<span class='fu'>move_more</span><span class='op'>(</span><span class='va'>iter</span>, more <span class='op'>=</span> <span class='fl'>1L</span><span class='op'>)</span></pre>
+<span class='fu'>move_more</span><span class='op'>(</span><span class='va'>iter</span>, more <span class='op'>=</span> <span class='fl'>1L</span><span class='op'>)</span>
+
+<span class='fu'>move_while</span><span class='op'>(</span><span class='va'>iter</span>, <span class='va'>cond</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,9 +160,23 @@
       <th>more</th>
       <td><p>How many times to iterate</p></td>
     </tr>
+    <tr>
+      <th>cond</th>
+      <td><p>A quoted logical expression involving some variable(s) in <code>iter$initial</code>, so that <code>move_next()</code>
+continues being called while the expression returns TRUE</p></td>
+    </tr>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>10000</span> <span class='op'>%&gt;%</span>
+            <span class='fu'><a href='sets.html'>that_for_all</a></span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+            <span class='fu'><a href='sets.html'>we_have</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span>, <span class='st'>"Iterator"</span><span class='op'>)</span>
+<span class='fu'><a href='current.html'>current</a></span><span class='op'>(</span><span class='va'>primes</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; NULL</div><div class='input'><span class='fu'>move_more</span><span class='op'>(</span><span class='va'>primes</span>, <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'><a href='current.html'>current</a></span><span class='op'>(</span><span class='va'>primes</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 541</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
