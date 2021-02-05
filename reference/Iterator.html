@@ -167,10 +167,10 @@ To make a copy of an Iterator that can be modified separately, see <code><a href
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The expression to be evaluated can include constant values not defined in
-<code>$initial</code> as long as they are defined globally. These values will not vary from iteration to
-iteration. Notably, <code>$initial</code> is a list, not an environment. As such, the environment
-in which the <code>Iterator</code> is created does not matter at all for how the expression is
-evaluated—all that matters is the environment where <code>yield_*</code> is called from.</p>
+<code>$initial</code> as long as they are defined in the enclosure <em>of where yield_next() is called</em>,
+not where the Iterator is created.
+These values will not vary from iteration to
+iteration (unless you do something strange in the code, like including &lt;&lt;- in <code>$result</code>.)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='yield.html'>yield_next()</a></code>, <code><a href='yield_while.html'>yield_while()</a></code>, <code><a href='current.html'>current()</a></code></p></div>
@@ -185,7 +185,7 @@ evaluated—all that matters is the environment where <code>yield_*</code> is ca
 <span class='va'>seq</span> <span class='op'>&lt;-</span> <span class='fu'><a href='yield.html'>yield_more</a></span><span class='op'>(</span><span class='va'>collatz</span>, <span class='fl'>30</span><span class='op'>)</span>
 
 <span class='co'># using objects defined outside `$initial`:</span>
-<span class='co'># Note that `n` in `$initial` overrides `n` in the search path</span>
+<span class='co'># Note that `n` in `$initial` overrides the global `n`</span>
 <span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
 <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>
 <span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"out &lt;- n + m"</span>

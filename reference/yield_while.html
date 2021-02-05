@@ -42,7 +42,7 @@
 <meta property="og:title" content="yield_while — yield_while" />
 <meta property="og:description" content="Keep yielding the next element of an Iterator while a condition is met.
 A condition is a logical expression involving variables in iter$initial or variables
-that are defined globally. Refer to the number of the current iteration with .iter." />
+that are defined in the enclosure. Refer to the number of the current iteration with .iter." />
 
 
 
@@ -135,7 +135,7 @@ that are defined globally. Refer to the number of the current iteration with .it
     <div class="ref-description">
     <p>Keep yielding the next element of an <code>Iterator</code> while a condition is met.
 A condition is a logical expression involving variables in <code>iter$initial</code> or variables
-that are defined globally. Refer to the number of the current iteration with <code>.iter</code>.</p>
+that are defined in the enclosure. Refer to the number of the current iteration with <code>.iter</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>yield_while</span><span class='op'>(</span><span class='va'>iter</span>, <span class='va'>cond</span><span class='op'>)</span></pre>
@@ -150,7 +150,7 @@ that are defined globally. Refer to the number of the current iteration with <co
     <tr>
       <th>cond</th>
       <td><p>A quoted logical expression involving some variable(s) in <code>iter$initial</code>
-or globally defined, so that <code><a href='yield.html'>yield_next()</a></code> continues being called
+or in the enclosure, so that <code><a href='yield.html'>yield_next()</a></code> continues being called
 while the expression returns TRUE</p></td>
     </tr>
     </table>

@@ -40,11 +40,10 @@
 
 
 <meta property="og:title" content="R Set Comprehension — sets" />
-<meta property="og:description" content="Set comprehension with the Magrittr Pipe.
+<meta property="og:description" content="Set comprehension with the magrittr Pipe.
 Always use the basic syntax:
 .x %&amp;gt;% that_for_all(.y) %&amp;gt;% we_have_*(f(.x, .y)),
-but see the examples for more detail.
-formula can be anything that is recognized as a function by purrr::as_mapper()" />
+but see the examples for more detail." />
 
 
 
@@ -135,11 +134,10 @@ formula can be anything that is recognized as a function by purrr::as_mapper()" 
     </div>
 
     <div class="ref-description">
-    <p>Set comprehension with the Magrittr Pipe.
+    <p>Set comprehension with the magrittr Pipe.
 Always use the basic syntax:</p>
 <p><code>.x %&gt;% that_for_all(.y) %&gt;% we_have_*(f(.x, .y))</code>,
 but see the examples for more detail.</p>
-<p><code>formula</code> can be anything that is recognized as a function by <code><a href='https://purrr.tidyverse.org/reference/as_mapper.html'>purrr::as_mapper()</a></code></p>
     </div>
 
     <pre class="usage"><span class='fu'>that_for_all</span><span class='op'>(</span><span class='va'>.x</span>, <span class='va'>.y</span><span class='op'>)</span>
@@ -165,7 +163,8 @@ but see the examples for more detail.</p>
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>A boolean-valued function, lambda, or formula</p></td>
+      <td><p>A function, lambda, or formula. Must produce something understood by
+<code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2_int()</a></code></p></td>
     </tr>
     <tr>
       <th>result</th>
@@ -175,8 +174,15 @@ but see the examples for more detail.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>For <code>that_for_all</code> and <code>that_for_any</code>, an object of S3 class that_for_all or that_for_any.
-For we_have, a vector of the same type as <code>.x</code> if <code>return == 'vector'</code> and an Iterator object if <code>return == 'Iterator'</code>.</p>
+    <p>For <code>that_for_all()</code> and <code>that_for_any()</code>, an object of S3 class that_for_all or that_for_any.
+For <code>we_have()</code>, a vector of the same type as <code>.x</code> if <code>return == 'vector'</code> and an Iterator object if <code>return == 'Iterator'</code>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>formula</code> can be anything that is recognized as a function by <code><a href='https://purrr.tidyverse.org/reference/as_mapper.html'>purrr::as_mapper()</a></code>.
+Although <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2_lgl()</a></code> would seem the obvious choice, the formula is actually
+evaluated with <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2_int()</a></code>, where 0 represents FALSE and everything else
+represents TRUE. This allows formulas like <code>~ .x %% .y</code>, which produce integers,
+to be used in <code>we_have()</code>.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>if <code>.y</code> is an numeric vector, you probably want a value obtained from
@@ -194,18 +200,18 @@ this difference should never matter.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>.x</span>, <span class='va'>.y</span><span class='op'>)</span> <span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='co'>#is the same as</span>
-</div><div class='output co'>#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</div><div class='input'><span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</div><div class='input'><span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span><span class='op'>)</span> <span class='co'># 0 = F, (not 0) = T</span>
 </div><div class='output co'>#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</div><div class='input'><span class='co'>#c.f.</span>
-<span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span>, <span class='st'>"Iterator"</span><span class='op'>)</span>
+<span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span>, <span class='st'>"Iterator"</span><span class='op'>)</span>
 <span class='fu'><a href='yield.html'>yield_next</a></span><span class='op'>(</span><span class='va'>primes</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 2</div><div class='input'><span class='op'>{</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"I"</span>, <span class='st'>"Don't"</span>, <span class='st'>"wan't"</span>, <span class='st'>"chicken"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
              <span class='fu'>that_for_all</span><span class='op'>(</span><span class='st'>"\'"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
              <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grepl</a></span><span class='op'>(</span><span class='va'>.y</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span><span class='op'>}</span>
 </div><div class='output co'>#&gt; [1] "Don't" "wan't"</div><div class='input'><span class='co'>#Twin primes 1 through 100</span>
-<span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>primes</span> <span class='op'>&lt;-</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span><span class='op'>)</span>
 <span class='va'>primes</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_any</span><span class='op'>(</span><span class='va'>primes</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>.x</span> <span class='op'>-</span> <span class='va'>.y</span><span class='op'>)</span> <span class='op'>==</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])): object 'primes' not found</span></div><div class='input'><span class='co'>#Prime numbers 1 through 100 that are two away from a square number</span>
-<span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+<span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>100</span> <span class='op'>%&gt;%</span> <span class='fu'>that_for_all</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='va'>.x</span> <span class='op'>%%</span> <span class='va'>.y</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='fu'>that_for_any</span><span class='op'>(</span><span class='fu'><a href='range.html'>range</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>.x</span> <span class='op'>+</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>.y</span> <span class='op'>|</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>.x</span> <span class='op'>-</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>.y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1]  7 11 23 47 79 83</div><div class='input'>
 </div></pre>
