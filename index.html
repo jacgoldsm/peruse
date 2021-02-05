@@ -208,7 +208,7 @@
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">primes</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">10000</span> <span class="op">%&gt;%</span>
             <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-            <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span> <span class="op">!=</span> <span class="fl">0</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+            <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
 
 <span class="va">primes_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/clone.html">clone</a></span><span class="op">(</span><span class="va">primes</span><span class="op">)</span></code></pre></div>
 <p>The first prime number is</p>
