@@ -173,13 +173,13 @@ a vector of that type in the case of <code>yield_more(iter, more &gt; 1L)</code>
 <span class='va'>sequence</span> <span class='op'>&lt;-</span> <span class='fu'>yield_more</span><span class='op'>(</span><span class='va'>primes</span>, <span class='fl'>100</span><span class='op'>)</span>
 
 <span class='co'># use `.iter` to reference the current iteration</span>
-<span class='va'>expr</span> <span class='op'>&lt;-</span> <span class='st'>"
-        set.seed(seeds[.iter])
-        n &lt;- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
-       "</span>
-<span class='va'>rwd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span>result <span class='op'>=</span> <span class='va'>expr</span>,
-               initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>0</span>, seeds <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span><span class='op'>)</span>,
-               yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+<span class='va'>rwd</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span><span class='op'>{</span>
+        <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='va'>seeds</span><span class='op'>[</span><span class='va'>.iter</span><span class='op'>]</span><span class='op'>)</span>
+        <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1L</span>, <span class='fl'>1L</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='fl'>1L</span>, prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span><span class='op'>)</span>
+       <span class='op'>}</span>,
+       initial <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>0</span>, seeds <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span><span class='op'>)</span>,
+       yield <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span>
+
 <span class='fu'>yield_more</span><span class='op'>(</span><span class='va'>rwd</span>, <span class='fl'>100</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   [1]  1  2  3  4  5  6  5  6  7  8  9 10 11 12 13 14 15 14 15 14 13 14 15 16 17
 #&gt;  [26] 18 17 18 19 20 21 22 23 24 23 24 25 26 27 28 29 28 29 30 31 32 31 32 33 34
