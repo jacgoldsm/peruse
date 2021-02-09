@@ -33,12 +33,12 @@ primes <- 2:10000 \%>\%
 sequence <- yield_more(primes, 100)
 
 # use `.iter` to reference the current iteration
-expr <- "
+rwd <- Iterator({
         set.seed(seeds[.iter])
         n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
-       "
-rwd <- Iterator(result = expr,
-               initial = list(n = 0, seeds = 1:100),
-               yield = n)
+       },
+       initial = list(n = 0, seeds = 1:100),
+       yield = n)
+
 yield_more(rwd, 100)
 }

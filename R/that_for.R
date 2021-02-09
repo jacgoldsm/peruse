@@ -102,7 +102,7 @@ we_have <- function(that_for, formula, result = "vector") {
 
 
   if (that_for$quant == "all") {
-    expr <- "
+    expr <- quote({
     repeat {
     bool_vec <- purrr::map2_int(x_name[i],
                                 rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
@@ -117,9 +117,9 @@ we_have <- function(that_for, formula, result = "vector") {
     }
     }
 
-    "
+    })
   } else if (that_for$quant == "any") {
-    expr <- "
+    expr <- quote({
     repeat {
     bool_vec <- purrr::map2_int(x_name[i],
                                 rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
@@ -133,7 +133,7 @@ we_have <- function(that_for, formula, result = "vector") {
           i <- i + 1L
     }
     }
-    "
+    })
   } else rlang::abort("Invalid quantifier")
 
     initial <- rlang::env(i = 1,
@@ -142,8 +142,10 @@ we_have <- function(that_for, formula, result = "vector") {
                           y_name = that_for$.y,
                           formula_name = formula)
 
+    # Note: since `expr` is already quoted, forcing just creates the expression,
+    # unevaluated
     return(
-      Iterator(result = expr, initial = initial, yield = .nth)
+      Iterator(result = !!expr, initial = initial, yield = .nth)
     )
   }
 }

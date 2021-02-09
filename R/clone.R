@@ -8,7 +8,7 @@
 #' @param parent the environment to put the `Iterator`
 #' @return a copy of the `Iterator` passed as a parameter
 #' @examples
-#' it <- Iterator('m <- m + 1', c(m = 0), m)
+#' it <- Iterator({m <- m + 1}, c(m = 0), m)
 #' other <- clone(it)
 #' yield_next(it)
 #' current(other) == current(it) # false

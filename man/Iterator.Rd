@@ -32,31 +32,37 @@ iteration (unless you do something strange in the code, like including \link{<<-
 }
 \examples{
 #Create the Collatz sequence starting with 50 and print out the first 30 elements
-expr <- "if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1"
-collatz <- Iterator(result = expr,
-                    initial = c(n = 50),
-                    yield = n)
+collatz <- Iterator({
+            if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1
+           },
+           initial = c(n = 50),
+           yield = n)
 
 seq <- yield_more(collatz, 30)
+
+# If you want to define the expression outside the Iterator, use [quote()] and `!!`:
+expr <- quote(if (n \%\% 2 == 0) n <- n / 2 else n <- n*3 + 1)
+collatz <- Iterator(!!expr,
+                    c(n = 50),
+                    n)
 
 # using objects defined outside `$initial`:
 # Note that `n` in `$initial` overrides the global `n`
 m <- 100
 n <- 10
-expr <- "out <- n + m"
-it <- Iterator(result = expr,
+it <- Iterator({out <- n + m},
                initial = c(n = -10),
                yield = out)
 
 yield_next(it)
 
 # environments are modified in place, so be aware:
-it <- Iterator('m <- m + 1', c(m = 0), m)
+it <- Iterator({m <- m + 1}, c(m = 0), m)
 other <- it
 yield_next(it)
 current(other)
 
 }
 \seealso{
-\code{\link[=yield_next]{yield_next()}}, \code{\link[=yield_while]{yield_while()}}, \code{\link[=current]{current()}}
+\code{\link[=yield_next]{yield_next()}}, \code{\link[=yield_while]{yield_while()}}, \code{\link[=current]{current()}} \code{\link[rlang:nse-force]{rlang::qq_show()}}
 }

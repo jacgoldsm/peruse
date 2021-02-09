@@ -15,10 +15,11 @@ test_that("prime_within_two", {
 })
 
 test_that("collatz", {
-   expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
-   collatz <- Iterator(result = expr,
-                       initial = list(n = 50),
-                       yield = n)
+   collatz <- Iterator({
+                if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1
+              },
+              initial = list(n = 50),
+              yield = n)
 
    expect_equal(yield_next(collatz), 25L)
 })
@@ -37,10 +38,11 @@ test_that("grepl_set", {
 })
 
 test_that("is_Iterator", {
-  expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
-  collatz <- Iterator(result = expr,
-                      initial = list(n = 50),
-                      yield = n);
+  collatz <- Iterator({
+              if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1
+             },
+             initial = list(n = 50),
+             yield = n);
   expect_true(is_Iterator(collatz))
 })
 
@@ -53,16 +55,16 @@ test_that("range_empty",{
 })
 
 test_that("yield_more",  {
-  expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
-  collatz <- Iterator(result = expr,
+  expr <- quote( if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1 )
+  collatz <- Iterator(result = !!expr,
                       initial = list(n = 50),
                       yield = n)
   expect_equal(yield_more(collatz, 10), c(25,76,38,19,58,29,88,44,22,11))
 })
 
 test_that("current",  {
-  expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
-  collatz <- Iterator(result = expr,
+  expr <- quote(if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1)
+  collatz <- Iterator(result = !!expr,
                       initial = list(n = 50),
                       yield = n)
   expect_equal(current(collatz), 50L)
@@ -71,8 +73,8 @@ test_that("current",  {
 
 
 test_that("move_more", {
-   expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
-   collatz <- Iterator(result = expr,
+   expr <- quote(if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1)
+   collatz <- Iterator(result = !!expr,
                        initial = list(n = 50),
                        yield = n);
    move_more(collatz, 10)
@@ -80,19 +82,21 @@ test_that("move_more", {
 })
 
 test_that("yield_while", {
-  expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1";
-  collatz <- Iterator(result = expr,
-                      initial = list(n = 50),
-                      yield = n)
-  expect_equal(yield_while(collatz, "n != 1L"),
+
+  collatz <- Iterator({
+              if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1
+             },
+             initial = list(n = 50),
+             yield = n)
+  expect_equal(yield_while(collatz, n != 1L),
                c(25, 76, 38, 19, 58, 29, 88, 44, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10,  5, 16,  8,  4,  2,  1))
 })
 
 test_that("Iterators work with environment variables", {
   m <- 100
   n <- 10
-  expr <- "out <- n + m"
-  it <- Iterator(result = expr,
+  expr <- quote(out <- n + m)
+  it <- Iterator(result = !!expr,
                  initial = list(n = -10),
                  yield = out)
   one <- yield_more(it, 5)
@@ -100,7 +104,7 @@ test_that("Iterators work with environment variables", {
 })
 
 test_that("clone creates a copy", {
-  it <- Iterator('m <- m + 1', list(m = 0), m)
+  it <- Iterator({m <- m + 1}, list(m = 0), m)
   other <- clone(it)
   yield_next(it)
   expect_equal(current(other) == current(it), FALSE)
@@ -110,26 +114,28 @@ test_that("stochastic functions work properly", {
   p_success <- 0.8
   threshold <- 100
 
-  expr <- "
-          set.seed(seeds[.iter])
-          n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
-         "
-  iter <- Iterator(expr, list(n = 0, seeds = 1000:1e6), n)
-  sequence <- yield_while(iter, "n <= threshold")
+  iter <- Iterator({
+            set.seed(seeds[.iter])
+            n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
+          },
+          list(n = 0, seeds = 1000:1e6),
+          n)
+
+  sequence <- yield_while(iter, n <= threshold)
   expect_equal(sequence[1:4], c(1,0,1,2))
 })
 
 test_that("yield_while() can see `.iter`", {
-  expr <- "m <- m + 1"
-  it <- Iterator(expr, list(m = 0), m)
-  sequence <- yield_while(it, ".iter < 5")
+  expr <- quote({m <- m + 1})
+  it <- Iterator(!!expr, list(m = 0), m)
+  sequence <- yield_while(it, .iter < 5)
   expect_equal(sequence, c(1,2,3,4))
 })
 
 test_that("yield_while() can see environment variables", {
-  expr <- "m <- m + 1"
+  expr <- quote({m <- m + 1})
   r <- 5
-  it <- Iterator(expr, list(m = 0), m)
-  sequence <- yield_while(it, ".iter < r")
+  it <- Iterator(!!expr, list(m = 0), m)
+  sequence <- yield_while(it, .iter < r)
   expect_equal(sequence, c(1,2,3,4))
 })

@@ -20,7 +20,7 @@ This is a simple wrapper around \code{\link[rlang:env_clone]{rlang::env_clone()}
 clone the Iterator into a different environment.
 }
 \examples{
-it <- Iterator('m <- m + 1', c(m = 0), m)
+it <- Iterator({m <- m + 1}, c(m = 0), m)
 other <- clone(it)
 yield_next(it)
 current(other) == current(it) # false

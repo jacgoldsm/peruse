@@ -7,9 +7,9 @@
 range(a, b, ...)
 }
 \arguments{
-\item{a}{minimum, integer}
+\item{a}{minimum}
 
-\item{b}{supremum, integer}
+\item{b}{supremum}
 
 \item{...}{other params passed to \code{base::seq()}}
 }

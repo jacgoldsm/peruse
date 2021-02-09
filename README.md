@@ -54,12 +54,14 @@ something like this:
 p_success <- 0.5
 threshold <- 100
 
-expr <- "
+
+iter <- Iterator({
           set.seed(seeds[.iter])
           n <- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
-        "
-iter <- Iterator(expr, list(n = 0, seeds = 1000:1e6), n)
-sequence <- yield_while(iter, "n <= threshold")
+        },
+        list(n = 0, seeds = 1000:1e5), 
+        n)
+sequence <- yield_while(iter, n <= threshold)
 
 plot(sequence, main = "How many iterations does it take to get to 100?")
 ```
@@ -78,17 +80,14 @@ seeds <- 1000:1e6
 
 
 for (i in seq_along(probs)) {
-  exprs[i] <- glue::glue(
-    "
-      set.seed(seeds[.iter])
-      n <- n + sample(c(1,-1), 1, prob = c({probs[i]}, 1 - {probs[i]}))
-    "
-    )
-
-  iter <- Iterator(exprs[i], 
-                   list(n = 0),
-                   yield = n)
-  num_iter[i] <- length(yield_while(iter, "n <= threshold"))
+  iter <- Iterator({
+           set.seed(seeds[.iter])
+           n <- n + sample(c(1,-1), 1, prob = c(!!probs[i], 1 - !!probs[i]))
+          }, 
+          list(n = 0),
+          yield = n)
+  
+  num_iter[i] <- length(yield_while(iter, n <= threshold))
 }
 
 plot(x = probs,
@@ -109,8 +108,9 @@ This illustrates a few useful features of Iterators:
     variables, since you don’t have to make a new object for each new
     `Iterator`.
 
--   We can use `glue::glue()` to generate a range of expressions that we
-    can then fill in to create an `Iterator` with a range of parameters.
+-   We can use the forcing operators from {rlang} (!!) to force
+    evaluation of arguments in place, in this case substituting the
+    *expression* of `probs[i]` with the *value* of `probs[i]`.
 
 -   We can refer to the current iteration number in `yield_while()`,
     `yield_more()`, or their silent variants with the variable `.iter`.
@@ -125,14 +125,15 @@ reaches 1:
 
 ``` r
 library(peruse)
-expr <- "if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1"
   
 # Collatz generator starting at 50
-collatz <- Iterator(result = expr,
-                    initial = list(n = 50),
-                    yield = n)
+collatz <- Iterator({
+             if (n %% 2 == 0) n <- n / 2 else n <- n*3 + 1
+           },
+           initial = list(n = 50),
+           yield = n)
 
-yield_while(collatz, cond = "n != 1L")
+yield_while(collatz, n != 1L)
 #>  [1] 25 76 38 19 58 29 88 44 22 11 34 17 52 26 13 40 20 10  5 16  8  4  2  1
 ```
 
@@ -142,13 +143,14 @@ Random Walks, with or without drift, are one of the most commonly used
 type of stochastic processes. How can we simulate one with {peruse}?
 
 ``` r
-expr <- 'n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'
-rwd <- Iterator(result = expr,
-                initial = list(n = 0),
-                yield = n)
+rwd <- Iterator({
+         n <- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))
+       },
+       initial = list(n = 0),
+       yield = n)
 
 
-Value <- yield_while(rwd, "n != 50L & n != -50L")
+Value <- yield_while(rwd, n != 50L & n != -50L)
 
 plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
 ```
