@@ -249,7 +249,7 @@
 <div id="force-defuse" class="section level3">
 <h3 class="hasAnchor">
 <a href="#force-defuse" class="anchor"></a>Force-defuse</h3>
-<p>Since <code>Iterator</code>s don’t use quosures (because they work independently of the environment where they are created), you can’t use <code>{{ }}</code> to force-defuse expressions. Use <code>!! enexpr()</code> instead:</p>
+<p>Since <code>Iterator</code>s don’t use quosures (because they work independently of the environment where they are created), you can’t use <code>{{ }}</code> to force-defuse expressions. Use <code>!! substitute()</code> instead:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">make_random_walk_with_drift</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">drift</span>, <span class="va">variable</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span><span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">+</span> 
