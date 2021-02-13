@@ -243,7 +243,7 @@ yield_more(i, 5)
 
 Since `Iterator`s don’t use quosures (because they work independently of
 the environment where they are created), you can’t use `{{ }}` to
-force-defuse expressions. Use `!! enexpr()` instead:
+force-defuse expressions. Use `!! substitute()` instead:
 
 ``` r
 make_random_walk_with_drift <- function(drift, variable) {
