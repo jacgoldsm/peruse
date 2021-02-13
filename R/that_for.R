@@ -145,7 +145,7 @@ we_have <- function(that_for, formula, result = "vector") {
     # Note: since `expr` is already quoted, forcing just creates the expression,
     # unevaluated
     return(
-      Iterator(result = !!expr, initial = initial, yield = .nth)
+      Iterator(result = !! expr, initial = initial, yield = .nth)
     )
   }
 }

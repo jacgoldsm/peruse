@@ -39,9 +39,7 @@ yield_next <- function(iter) {
   env <- list2env(iter$initial, parent = rlang::caller_env())
   yield_name <- as.character(iter$yield)
 
-  for (j in seq_along(iter$result)) {
-    eval(iter$result[[j]], envir = env)
-  }
+  eval(iter$result, envir = env)
 
   iter$initial <- as.list(env, all.names = TRUE)
 
@@ -51,7 +49,7 @@ yield_next <- function(iter) {
 #'@rdname yields
 #'@export
 yield_more <- function(iter, more = 1L) {
-
+  stopifnot(is_Iterator(iter))
   vec <- vector(length = more)
   iter$initial$.iter <- 1L
     for (i in seq_len(more)) {
@@ -63,13 +61,10 @@ yield_more <- function(iter, more = 1L) {
 }
 
 yield_next_from_helper <- function(iter) {
-  stopifnot(is_Iterator(iter))
   env <- list2env(iter$initial, parent = rlang::caller_env(n = 2))
   yield_name <- as.character(iter$yield)
 
-  for (j in seq_along(iter$result)) {
-    eval(iter$result[[j]], envir = env)
-  }
+  eval(iter$result, envir = env)
 
   iter$initial <- as.list(env, all.names = TRUE)
 

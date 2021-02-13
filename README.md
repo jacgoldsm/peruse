@@ -23,6 +23,9 @@ meet specific criteria. This can either return a vector consisting of
 all the chosen elements or it can return an `Iterator` that lazily
 generates the chosen elements.
 
+At the end of this document, there is a tutorial for metaprogramming
+(that is, programmatically generating code) with `Iterator`s.
+
 ## Installation
 
 You can install the released version of peruse from
@@ -82,7 +85,7 @@ seeds <- 1000:1e6
 for (i in seq_along(probs)) {
   iter <- Iterator({
            set.seed(seeds[.iter])
-           n <- n + sample(c(1,-1), 1, prob = c(!!probs[i], 1 - !!probs[i]))
+           n <- n + sample(c(1,-1), 1, prob = c(!! probs[i], 1 - !! probs[i]))
           }, 
           list(n = 0),
           yield = n)
@@ -108,9 +111,11 @@ This illustrates a few useful features of Iterators:
     variables, since you don’t have to make a new object for each new
     `Iterator`.
 
--   We can use the forcing operators from {rlang} (!!) to force
+-   We can use the forcing operators from `{rlang}` (`!!`) to force
     evaluation of arguments in place, in this case substituting the
-    *expression* of `probs[i]` with the *value* of `probs[i]`.
+    *expression* of `probs[i]` with the *value* of `probs[i]` (see the
+    end of this document for a tutorial on metaprogramming with
+    `Iterator`s).
 
 -   We can refer to the current iteration number in `yield_while()`,
     `yield_more()`, or their silent variants with the variable `.iter`.
@@ -169,7 +174,7 @@ easily do that with the set-builder API:
 ``` r
 2:100 %>% 
   that_for_all(range(2, .x)) %>% 
-  we_have(~.x %% .y != 0)
+  we_have(~.x %% .y)
 #>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
 ```
 
@@ -212,3 +217,53 @@ sequence
 
 Here, we use `clone()` to create an identical `Iterator` to `primes`
 that can be modified separately.
+
+# Tutorial: Metaprogramming with `Iterator`s
+
+`Iterator`s are designed to be flexible, almost as flexible as ordinary
+R functions. They are also designed to be tidy, using tools from the
+“tidyverse” family of R extensions. Unfortunately, those goals are not
+entirely compatible when it comes to metaprogramming, leading to a sort
+of “semi-tidy” evaluation. Use these examples as a reference for
+programmatically generating `Iterator` expressions.
+
+### Forcing
+
+Use `!!` to force evaluation of names, just like you would in `dplyr` or
+any Tidyverse function:
+
+``` r
+p <- 0.5
+i <- Iterator({x <- x + !! p}, list(x = 0), x)
+yield_more(i, 5)
+#> [1] 0.5 1.0 1.5 2.0 2.5
+```
+
+### Force-defuse
+
+Since `Iterator`s don’t use quosures (because they work independently of
+the environment where they are created), you can’t use `{{ }}` to
+force-defuse expressions. Use `!! enexpr()` instead:
+
+``` r
+make_random_walk_with_drift <- function(drift, variable) {
+  Iterator({!! substitute(variable) <- !! substitute(variable) + 
+                                      sample(
+                                        c(-1,1), 
+                                        1, 
+                                        TRUE, 
+                                        c(!! substitute(drift), 1 - !! substitute(drift)))
+                                },
+           initial = list(x = 0), !! substitute(variable))
+}
+
+yield_more(make_random_walk_with_drift(0.5, x), 5)
+#> [1]  1  2  1  0 -1
+```
+
+### Indirection
+
+Since `Iterator`s don’t use data masks, they don’t have `.data` and
+`.env` pronouns. If you have a variable in `iter$initial` and a variable
+with the same name in your global environment, just force immediate
+evaluation of the environment variable with `!!`.

@@ -31,11 +31,11 @@
 #' @export
 
 yield_while <- function(iter, cond) {
-
+  stopifnot(is_Iterator(iter))
   ret <- vector()
   cond <- rlang::enexpr(cond)
   iter$initial$.iter <- 1L
-  while (eval(cond, envir = iter$initial, enclos = rlang::caller_env())) {
+  while (eval(cond, iter$initial, rlang::caller_env())) {
       ret <- c(ret, yield_next_from_helper(iter))
       iter$initial$.iter <- iter$initial$.iter + 1L
   }

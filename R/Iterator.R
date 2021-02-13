@@ -59,7 +59,7 @@ Iterator <- function(result,
                       yield) {
   yield <- rlang::enexpr(yield)
 
-  result <- rlang::enexprs(result)
+  result <- rlang::enexpr(result)
 
   if (!rlang::is_dictionaryish(initial)) {
     rlang::abort("Every element must have a valid and unique name in `initial`. ")
