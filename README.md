@@ -181,7 +181,7 @@ easily do that with the set-builder API:
 In the equation, we can reference the left-hand side of the equation
 with the positional variable `.x`, and the right-hand side (that is, the
 argument in `that_for_all()`) with `.y`. The equation can be anything
-recognized as a function by `purrr::as_mapper()`.
+recognized as a function by `rlang::as_function()`.
 
 But how about if we want to generate the first 100 prime numbers? We
 don’t know the range of values this should fall in (well, mathematicians
@@ -273,7 +273,7 @@ and `NA <= NA` return `NA`. Second, expressions of the form
 As a result, an expression like this will not work:
 
 ``` r
-c(1:20, NA_integer_) %>% that_for_all(range(2, .x)) %>% we_have(~ .x %% .y)
+c(2:20, NA_integer_) %>% that_for_all(range(2, .x)) %>% we_have(~ .x %% .y)
 ```
 
 In fact, this will fail for two reasons: `range(2, .x)` will not work
@@ -321,6 +321,22 @@ yield_more(i, 5)
 #> [1] 0.5 1.0 1.5 2.0 2.5
 ```
 
+There is no built-in mechanism to force evaluation of names in the
+`$initial` list, but you can use tools like `rlang::list2()` to do so.
+`$initial` can be anything coercible to list.
+
+``` r
+p <- 0.1
+x <- as.symbol("my_var")
+i <- Iterator({!! x <- !! x + !! p}, rlang::list2(!! x := 0), !! x)
+yield_more(i, 5)
+#> [1] 0.1 0.2 0.3 0.4 0.5
+```
+
+Note the use of the “walrus” operator (`:=`) to assign names in
+`rlang::list2()`, see the documentation in `rlang::nse-force()` for more
+details.
+
 ### Force-defuse
 
 Since `Iterator`s don’t use quosures (because they work independently of
@@ -329,14 +345,13 @@ force-defuse expressions. Use `!! substitute()` instead:
 
 ``` r
 make_random_walk_with_drift <- function(drift, variable) {
-  Iterator({!! substitute(variable) <- !! substitute(variable) + 
-                                      sample(
-                                        c(-1,1), 
-                                        1, 
-                                        TRUE, 
-                                        c(!! substitute(drift), 1 - !! substitute(drift)))
-                                },
-           initial = list(x = 0), !! substitute(variable))
+  Iterator({!! substitute(variable) <- (
+    !! substitute(variable) + sample(c(-1,1), 
+                                     1,
+                                     TRUE,
+                                     c(!! substitute(drift), 1 - !! substitute(drift)))
+                                )},
+           initial = rlang::list2(!! substitute(variable) := 0), !! substitute(variable))
 }
 
 yield_more(make_random_walk_with_drift(0.5, x), 5)
