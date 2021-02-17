@@ -86,6 +86,7 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div id="peruse" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#peruse" class="anchor"></a>peruse</h1></div>
@@ -94,6 +95,7 @@
 <p>The {peruse} package is aimed at making it easier to generate irregular sequences that are difficult to generate with existing tools.</p>
 <p>The heart of {peruse} is the <code>S3</code> class <code>Iterator</code>. An <code>Iterator</code> allows the user to write an arbitrary R expression that returns the next element of a sequence of R objects. It then saves the state of the <code>Iterator</code>, meaning the next time evaluation is invoked, the initial state will be the result of the previous iteration. This is most useful for generating recursive sequences, those where each iteration depends on previous ones.</p>
 <p>The package also provides a simple, tidy API for set building, allowing the user to generate a set consisting of the elements of a vector that meet specific criteria. This can either return a vector consisting of all the chosen elements or it can return an <code>Iterator</code> that lazily generates the chosen elements.</p>
+<p>At the end of this document, there is a tutorial for metaprogramming (that is, programmatically generating code) with <code>Iterator</code>s.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -116,12 +118,14 @@
 <code class="sourceCode R"><span class="va">p_success</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
 <span class="va">threshold</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 
-<span class="va">expr</span> <span class="op">&lt;-</span> <span class="st">"
-          set.seed(seeds[.iter])
-          n &lt;- n + sample(c(1,-1), 1, prob = c(p_success, 1 - p_success))
-        "</span>
-<span class="va">iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="va">expr</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span>, seeds <span class="op">=</span> <span class="fl">1000</span><span class="op">:</span><span class="fl">1e6</span><span class="op">)</span>, <span class="va">n</span><span class="op">)</span>
-<span class="va">sequence</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">iter</span>, <span class="st">"n &lt;= threshold"</span><span class="op">)</span>
+
+<span class="va">iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span>
+          <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">seeds</span><span class="op">[</span><span class="va">.iter</span><span class="op">]</span><span class="op">)</span>
+          <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">1</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">p_success</span>, <span class="fl">1</span> <span class="op">-</span> <span class="va">p_success</span><span class="op">)</span><span class="op">)</span>
+        <span class="op">}</span>,
+        <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span>, seeds <span class="op">=</span> <span class="fl">1000</span><span class="op">:</span><span class="fl">1e5</span><span class="op">)</span>, 
+        <span class="va">n</span><span class="op">)</span>
+<span class="va">sequence</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">iter</span>, <span class="va">n</span> <span class="op">&lt;=</span> <span class="va">threshold</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">sequence</span>, main <span class="op">=</span> <span class="st">"How many iterations does it take to get to 100?"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
@@ -135,17 +139,14 @@
 
 
 <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">exprs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span><span class="op">(</span>
-    <span class="st">"
-      set.seed(seeds[.iter])
-      n &lt;- n + sample(c(1,-1), 1, prob = c({probs[i]}, 1 - {probs[i]}))
-    "</span>
-    <span class="op">)</span>
-
-  <span class="va">iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="va">exprs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, 
-                   <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
-                   yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
-  <span class="va">num_iter</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">iter</span>, <span class="st">"n &lt;= threshold"</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">iter</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span>
+           <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">seeds</span><span class="op">[</span><span class="va">.iter</span><span class="op">]</span><span class="op">)</span>
+           <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="fl">1</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span> <span class="va">probs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fl">1</span> <span class="op">-</span> <span class="op">!</span><span class="op">!</span> <span class="va">probs</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+          <span class="op">}</span>, 
+          <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
+          yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
+  
+  <span class="va">num_iter</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">iter</span>, <span class="va">n</span> <span class="op">&lt;=</span> <span class="va">threshold</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">probs</span>,
@@ -157,7 +158,7 @@
 <p>This illustrates a few useful features of Iterators:</p>
 <ul>
 <li><p>We can use environment variables in either our expression or our <code>while</code> condition to represent constants. In this case, <code>threshold</code> doesn’t change between iterations or between parameters. If you are creating many <code>Iterator</code>s, it can be faster to use environment variables, since you don’t have to make a new object for each new <code>Iterator</code>.</p></li>
-<li><p>We can use <code><a href="https://glue.tidyverse.org/reference/glue.html">glue::glue()</a></code> to generate a range of expressions that we can then fill in to create an <code>Iterator</code> with a range of parameters.</p></li>
+<li><p>We can use the forcing operators from <a href="https://rlang.r-lib.org">rlang</a> (<code>!!</code>) to force evaluation of arguments in place, in this case substituting the <em>expression</em> of <code>probs[i]</code> with the <em>value</em> of <code>probs[i]</code> (see the end of this document for a tutorial on metaprogramming with <code>Iterator</code>s).</p></li>
 <li><p>We can refer to the current iteration number in <code><a href="reference/yield_while.html">yield_while()</a></code>, <code><a href="reference/yield.html">yield_more()</a></code>, or their silent variants with the variable <code>.iter</code>.</p></li>
 </ul>
 </div>
@@ -167,14 +168,15 @@
 <p>A Collatz sequence is a particular sequence of natural numbers that mathematicians think always reaches 1 at some point, no matter the starting point. We can’t prove that one way or the other, but we can create an <code>Iterator</code> that lazily generates a Collatz sequence until it reaches 1:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jacgoldsm/peruse">peruse</a></span><span class="op">)</span>
-<span class="va">expr</span> <span class="op">&lt;-</span> <span class="st">"if (n %% 2 == 0) n &lt;- n / 2 else n &lt;- n*3 + 1"</span>
   
 <span class="co"># Collatz generator starting at 50</span>
-<span class="va">collatz</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span>result <span class="op">=</span> <span class="va">expr</span>,
-                    initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>,
-                    yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
+<span class="va">collatz</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span>
+             <span class="kw">if</span> <span class="op">(</span><span class="va">n</span> <span class="op">%%</span> <span class="fl">2</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">2</span> <span class="kw">else</span> <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span><span class="op">*</span><span class="fl">3</span> <span class="op">+</span> <span class="fl">1</span>
+           <span class="op">}</span>,
+           initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>,
+           yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
 
-<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">collatz</span>, cond <span class="op">=</span> <span class="st">"n != 1L"</span><span class="op">)</span>
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">collatz</span>, <span class="va">n</span> <span class="op">!=</span> <span class="fl">1L</span><span class="op">)</span>
 <span class="co">#&gt;  [1] 25 76 38 19 58 29 88 44 22 11 34 17 52 26 13 40 20 10  5 16  8  4  2  1</span></code></pre></div>
 </div>
 <div id="random-walk-with-drift" class="section level3">
@@ -182,13 +184,14 @@
 <a href="#random-walk-with-drift" class="anchor"></a>Random Walk with Drift</h3>
 <p>Random Walks, with or without drift, are one of the most commonly used type of stochastic processes. How can we simulate one with {peruse}?</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">expr</span> <span class="op">&lt;-</span> <span class="st">'n &lt;- n + sample(c(-1L, 1L), size = 1L, prob = c(0.25, 0.75))'</span>
-<span class="va">rwd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span>result <span class="op">=</span> <span class="va">expr</span>,
-                initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
-                yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">rwd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span>
+         <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">n</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1L</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span>
+       <span class="op">}</span>,
+       initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
+       yield <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
 
 
-<span class="va">Value</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">rwd</span>, <span class="st">"n != 50L &amp; n != -50L"</span><span class="op">)</span>
+<span class="va">Value</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">rwd</span>, <span class="va">n</span> <span class="op">!=</span> <span class="fl">50L</span> <span class="op">&amp;</span> <span class="va">n</span> <span class="op">!=</span> <span class="op">-</span><span class="fl">50L</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Value</span>, main <span class="op">=</span> <span class="st">"The Value of the Iterator after a Given Number of Iterations"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
@@ -201,7 +204,7 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span>
+  <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span><span class="op">)</span>
 <span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
 <p>In the equation, we can reference the left-hand side of the equation with the positional variable <code>.x</code>, and the right-hand side (that is, the argument in <code><a href="reference/sets.html">that_for_all()</a></code>) with <code>.y</code>. The equation can be anything recognized as a function by <code><a href="https://purrr.tidyverse.org/reference/as_mapper.html">purrr::as_mapper()</a></code>.</p>
 <p>But how about if we want to generate the first 100 prime numbers? We don’t know the range of values this should fall in (well, mathematicians do), so we can use laziness to our advantage:</p>
@@ -226,9 +229,120 @@
 <span class="co">#&gt;  [73] 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463</span>
 <span class="co">#&gt;  [91] 467 479 487 491 499 503 509 521 523 541</span></code></pre></div>
 <p>Here, we use <code><a href="reference/clone.html">clone()</a></code> to create an identical <code>Iterator</code> to <code>primes</code> that can be modified separately.</p>
+<p><code>Iterator</code>s that are created from set comprehension have several utilities:</p>
+<ul>
+<li><p>Refer to the vector <code>.x</code> with the variable <code>.x_vector</code></p></li>
+<li><p>Refer to the current index of <code>.x_vector</code> with <code>.i</code> (not to be confused with <code>.iter</code>).</p></li>
+</ul>
+<p>Here is an example of putting those together to yield to the end of the sequence:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">primes_100</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="va">.x_vector</span><span class="op">[</span><span class="va">.i</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">100</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+<p>As you can see, the sequence terminates with <code>NA</code>, with a message that the end has been reached.</p>
+<p>There is also a convenience variable, <code>.finished</code>, that is <code>TRUE</code> if and only if the result has reached the end of the sequence. So another way to generate the same result is:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">primes_100</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="op">!</span><span class="va">.finished</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+</div>
+<div id="missing-values" class="section level3">
+<h3 class="hasAnchor">
+<a href="#missing-values" class="anchor"></a>Missing Values</h3>
+<p>Set comprehension does not specially handle missing values. All the elements of set <code>.x</code> will be compared with all the elements of set <code>.y</code> by <code>formula</code>, and the value of <code>.x</code> will be included if and only if the condition returns <code>TRUE</code>. If the comparison returns <code>NA</code>, the expression will terminate with an error.</p>
+<p>Be aware of two things: First, expressions like <code>NA == NA</code>, <code>NA &gt; NA</code>, and <code>NA &lt;= NA</code> return <code>NA</code>. Second, expressions of the form <code>if (NA) action</code> are illegal and will result in an error.</p>
+<p>As a result, an expression like this will not work:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="cn">NA_integer_</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span><span class="op">)</span></code></pre></div>
+<p>In fact, this will fail for two reasons: <code><a href="reference/range.html">range(2, .x)</a></code> will not work when <code>.x</code> is <code>NA</code>, and the comparison <code>if (NA %% 2)</code> will also not work.</p>
+<p>Normally, you will want to drop <code>NA</code> values from your vectors before using set comprehension. If you are careful, you can write valid code with <code>NA</code>s, but it will be very painful by comparison:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">20</span>, <span class="cn">NA_integer_</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA</span> <span class="kw">else</span> <span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op">||</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span><span class="op">)</span>
+<span class="co">#&gt; [1]  2  3  5  7 11 13 17 19 NA</span></code></pre></div>
+<p>Here, we avoid <code><a href="reference/range.html">range(2, NA)</a></code> with our conditional, and avoid having <code>NA</code> in the <code>if</code> statement in <code><a href="reference/sets.html">we_have()</a></code> by making sure to return <code>TRUE</code> when <code>.x</code> is missing.</p>
 </div>
 </div>
 </div>
+<div id="tutorial-metaprogramming-with-iterators" class="section level1">
+<h1 class="hasAnchor">
+<a href="#tutorial-metaprogramming-with-iterators" class="anchor"></a>Tutorial: Metaprogramming with <code>Iterator</code>s</h1>
+<p><code>Iterator</code>s are designed to be flexible, almost as flexible as ordinary R functions. They are also designed to be tidy, using tools from the “tidyverse” family of R extensions. Unfortunately, those goals are not entirely compatible when it comes to metaprogramming, leading to a sort of “semi-tidy” evaluation. Use these examples as a reference for programmatically generating <code>Iterator</code> expressions.</p>
+<p>In almost all cases, the environment in which an Iterator is made does not effect its execution; rather, the environment from which <code><a href="reference/yield.html">yield_next()</a></code> or its cousins is called determines evaluation. In this way, it is similar to ordinary R functions. The one small exception will be detailed at the end.</p>
+<div id="forcing" class="section level3">
+<h3 class="hasAnchor">
+<a href="#forcing" class="anchor"></a>Forcing</h3>
+<p>Use <code>!!</code> to force evaluation of names, just like you would in <code>dplyr</code> or any Tidyverse function:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
+<span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">+</span> <span class="op">!</span><span class="op">!</span> <span class="va">p</span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, <span class="va">x</span><span class="op">)</span>
+<span class="fu"><a href="reference/yield.html">yield_more</a></span><span class="op">(</span><span class="va">i</span>, <span class="fl">5</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.5 1.0 1.5 2.0 2.5</span></code></pre></div>
+</div>
+<div id="force-defuse" class="section level3">
+<h3 class="hasAnchor">
+<a href="#force-defuse" class="anchor"></a>Force-defuse</h3>
+<p>Since <code>Iterator</code>s don’t use quosures (because they work independently of the environment where they are created), you can’t use <code>{{ }}</code> to force-defuse expressions. Use <code>!! substitute()</code> instead:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">make_random_walk_with_drift</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">drift</span>, <span class="va">variable</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span><span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">+</span> 
+                                      <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>
+                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, 
+                                        <span class="fl">1</span>, 
+                                        <span class="cn">TRUE</span>, 
+                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">drift</span><span class="op">)</span>, <span class="fl">1</span> <span class="op">-</span> <span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">drift</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+                                <span class="op">}</span>,
+           initial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, <span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="fu"><a href="reference/yield.html">yield_more</a></span><span class="op">(</span><span class="fu">make_random_walk_with_drift</span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">x</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span>
+<span class="co">#&gt; [1]  1  2  1  0 -1</span></code></pre></div>
+</div>
+<div id="indirection" class="section level3">
+<h3 class="hasAnchor">
+<a href="#indirection" class="anchor"></a>Indirection</h3>
+<p>Since <code>Iterator</code>s don’t use data masks, they don’t have <code>.data</code> and <code>.env</code> pronouns. If you have a variable in <code>iter$initial</code> and a variable with the same name in your global environment, just force immediate evaluation of the environment variable with <code>!!</code>.</p>
+</div>
+<div id="one-exception" class="section level3">
+<h3 class="hasAnchor">
+<a href="#one-exception" class="anchor"></a>One Exception</h3>
+<p>Ordinarily, <code>Iterator</code>s work independently from the environment in which they were created. The one exception is when an <code>Iterator</code> is created from the template,</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iterator</span> <span class="op">&lt;-</span> <span class="va">.x</span> <span class="op">%&gt;%</span> <span class="va">expression_with_.x</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="va">formula</span>, <span class="st">"Iterator"</span><span class="op">)</span></code></pre></div>
+<p>the variable <code>expression_with_.x</code> is turned into a quosure. That means that it will always be evaluated in the environment where <code>iterator</code> was made.</p>
+<p>For a concrete example, consider:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fl">2</span>
+<span class="va">it</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="va">offset</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+ <span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">offset</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+  <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">it</span>, <span class="op">!</span><span class="va">.finished</span><span class="op">)</span> <span class="co"># print the whole sequence</span>
+ <span class="op">}</span>
+ 
+ <span class="fu">fun</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+<p>We can see that the code does not select elements that are divisible by 2 but not any other numbers, as would be the case with offset equal to three. Our expression <code><a href="reference/range.html">range(offset, .x)</a></code> is evaluated in the global environment, not in the execution environment of <code>fun()</code>.</p>
+</div>
+</div>
+<div id="citation" class="section level1">
+<h1 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h1>
+<p>This software contains a modified version of a small piece of code from the <code>purrr</code> package, by Hadley Wickham, Lionel Henry, and RStudio, freely available under the MIT License.</p>
+</div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
