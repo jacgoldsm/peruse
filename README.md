@@ -76,7 +76,6 @@ could do something like this:
 
 ``` r
 probs <- seq(0.5,0.95, by = 0.01)
-exprs <- rep(NA, length(probs))
 num_iter <- rep(NA, length(probs))
 threshold <- 20
 seeds <- 1000:1e6
