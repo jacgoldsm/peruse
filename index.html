@@ -229,6 +229,49 @@
 <span class="co">#&gt;  [73] 367 373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463</span>
 <span class="co">#&gt;  [91] 467 479 487 491 499 503 509 521 523 541</span></code></pre></div>
 <p>Here, we use <code><a href="reference/clone.html">clone()</a></code> to create an identical <code>Iterator</code> to <code>primes</code> that can be modified separately.</p>
+<p><code>Iterator</code>s that are created from set comprehension have several utilities:</p>
+<ul>
+<li><p>Refer to the vector <code>.x</code> with the variable <code>.x_vector</code></p></li>
+<li><p>Refer to the current index of <code>.x_vector</code> with <code>.i</code> (not to be confused with <code>.iter</code>).</p></li>
+</ul>
+<p>Here is an example of putting those together to yield to the end of the sequence:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">primes_100</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="va">.x_vector</span><span class="op">[</span><span class="va">.i</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">100</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+<p>As you can see, the sequence terminates with <code>NA</code>, with a message that the end has been reached.</p>
+<p>There is also a convenience variable, <code>.finished</code>, that is <code>TRUE</code> if and only if the result has reached the end of the sequence. So another way to generate the same result is:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">primes_100</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+              <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="op">!</span><span class="va">.finished</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+</div>
+<div id="missing-values" class="section level3">
+<h3 class="hasAnchor">
+<a href="#missing-values" class="anchor"></a>Missing Values</h3>
+<p>Set comprehension does not specially handle missing values. All the elements of set <code>.x</code> will be compared with all the elements of set <code>.y</code> by <code>formula</code>, and the value of <code>.x</code> will be included if and only if the condition returns <code>TRUE</code>. If the comparison returns <code>NA</code>, the expression will terminate with an error.</p>
+<p>Be aware of two things: First, expressions like <code>NA == NA</code>, <code>NA &gt; NA</code>, and <code>NA &lt;= NA</code> return <code>NA</code>. Second, expressions of the form <code>if (NA) action</code> are illegal and will result in an error.</p>
+<p>As a result, an expression like this will not work:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="cn">NA_integer_</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span><span class="op">)</span></code></pre></div>
+<p>In fact, this will fail for two reasons: <code><a href="reference/range.html">range(2, .x)</a></code> will not work when <code>.x</code> is <code>NA</code>, and the comparison <code>if (NA %% 2)</code> will also not work.</p>
+<p>Normally, you will want to drop <code>NA</code> values from your vectors before using set comprehension. If you are careful, you can write valid code with <code>NA</code>s, but it will be very painful by comparison:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">20</span>, <span class="cn">NA_integer_</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA</span> <span class="kw">else</span> <span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op">||</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span><span class="op">)</span>
+<span class="co">#&gt; [1]  2  3  5  7 11 13 17 19 NA</span></code></pre></div>
+<p>Here, we avoid <code><a href="reference/range.html">range(2, NA)</a></code> with our conditional, and avoid having <code>NA</code> in the <code>if</code> statement in <code><a href="reference/sets.html">we_have()</a></code> by making sure to return <code>TRUE</code> when <code>.x</code> is missing.</p>
 </div>
 </div>
 </div>
@@ -236,11 +279,12 @@
 <h1 class="hasAnchor">
 <a href="#tutorial-metaprogramming-with-iterators" class="anchor"></a>Tutorial: Metaprogramming with <code>Iterator</code>s</h1>
 <p><code>Iterator</code>s are designed to be flexible, almost as flexible as ordinary R functions. They are also designed to be tidy, using tools from the “tidyverse” family of R extensions. Unfortunately, those goals are not entirely compatible when it comes to metaprogramming, leading to a sort of “semi-tidy” evaluation. Use these examples as a reference for programmatically generating <code>Iterator</code> expressions.</p>
+<p>In almost all cases, the environment in which an Iterator is made does not effect its execution; rather, the environment from which <code><a href="reference/yield.html">yield_next()</a></code> or its cousins is called determines evaluation. In this way, it is similar to ordinary R functions. The one small exception will be detailed at the end.</p>
 <div id="forcing" class="section level3">
 <h3 class="hasAnchor">
 <a href="#forcing" class="anchor"></a>Forcing</h3>
 <p>Use <code>!!</code> to force evaluation of names, just like you would in <code>dplyr</code> or any Tidyverse function:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
 <span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">+</span> <span class="op">!</span><span class="op">!</span> <span class="va">p</span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>, <span class="va">x</span><span class="op">)</span>
 <span class="fu"><a href="reference/yield.html">yield_more</a></span><span class="op">(</span><span class="va">i</span>, <span class="fl">5</span><span class="op">)</span>
@@ -250,7 +294,7 @@
 <h3 class="hasAnchor">
 <a href="#force-defuse" class="anchor"></a>Force-defuse</h3>
 <p>Since <code>Iterator</code>s don’t use quosures (because they work independently of the environment where they are created), you can’t use <code>{{ }}</code> to force-defuse expressions. Use <code>!! substitute()</code> instead:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">make_random_walk_with_drift</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">drift</span>, <span class="va">variable</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="reference/Iterator.html">Iterator</a></span><span class="op">(</span><span class="op">{</span><span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op">+</span> 
                                       <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>
@@ -270,6 +314,33 @@
 <a href="#indirection" class="anchor"></a>Indirection</h3>
 <p>Since <code>Iterator</code>s don’t use data masks, they don’t have <code>.data</code> and <code>.env</code> pronouns. If you have a variable in <code>iter$initial</code> and a variable with the same name in your global environment, just force immediate evaluation of the environment variable with <code>!!</code>.</p>
 </div>
+<div id="one-exception" class="section level3">
+<h3 class="hasAnchor">
+<a href="#one-exception" class="anchor"></a>One Exception</h3>
+<p>Ordinarily, <code>Iterator</code>s work independently from the environment in which they were created. The one exception is when an <code>Iterator</code> is created from the template,</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">iterator</span> <span class="op">&lt;-</span> <span class="va">.x</span> <span class="op">%&gt;%</span> <span class="va">expression_with_.x</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="va">formula</span>, <span class="st">"Iterator"</span><span class="op">)</span></code></pre></div>
+<p>the variable <code>expression_with_.x</code> is turned into a quosure. That means that it will always be evaluated in the environment where <code>iterator</code> was made.</p>
+<p>For a concrete example, consider:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fl">2</span>
+<span class="va">it</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="va">offset</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
+ <span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">offset</span> <span class="op">&lt;-</span> <span class="fl">3</span>
+  <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">it</span>, <span class="op">!</span><span class="va">.finished</span><span class="op">)</span> <span class="co"># print the whole sequence</span>
+ <span class="op">}</span>
+ 
+ <span class="fu">fun</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; (Note: result has reached end of sequence)</span>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
+<span class="co">#&gt; [26] NA</span></code></pre></div>
+<p>We can see that the code does not select elements that are divisible by 2 but not any other numbers, as would be the case with offset equal to three. Our expression <code><a href="reference/range.html">range(offset, .x)</a></code> is evaluated in the global environment, not in the execution environment of <code>fun()</code>.</p>
+</div>
+</div>
+<div id="citation" class="section level1">
+<h1 class="hasAnchor">
+<a href="#citation" class="anchor"></a>Citation</h1>
+<p>This software contains a modified version of a small piece of code from the <code>purrr</code> package, by Hadley Wickham, Lionel Henry, and RStudio, freely available under the MIT License.</p>
 </div>
 
   </div>
