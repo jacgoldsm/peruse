@@ -1,2 +1,3 @@
-utils::globalVariables(c(".nth", ".iter"), "peruse", add = TRUE)
+utils::globalVariables(c(".nth", ".iter", ".x_vector", "y_name", "formula_name"),
+                       "peruse", add = TRUE)
 

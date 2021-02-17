@@ -20,8 +20,8 @@ we_have(that_for, formula, result = "vector")
 
 \item{that_for}{A list passed to \code{\link[=we_have]{we_have()}}—can be ignored with proper syntax}
 
-\item{formula}{A function, lambda, or formula. Must produce something understood by
-\code{\link[purrr:map2]{purrr::map2_int()}}}
+\item{formula}{A function, lambda, or formula. Must be understood by
+\code{\link[rlang:as_function]{rlang::as_function()}}}
 
 \item{result}{Should the expression return a \code{vector} or an \code{Iterator}?}
 }
@@ -37,11 +37,16 @@ Always use the basic syntax:
 but see the examples for more detail.
 }
 \details{
-\code{formula} can be anything that is recognized as a function by \code{\link[purrr:as_mapper]{purrr::as_mapper()}}.
-Although \code{\link[purrr:map2]{purrr::map2_lgl()}} would seem the obvious choice, the formula is actually
-evaluated with \code{\link[purrr:map2]{purrr::map2_int()}}, where 0 represents FALSE and everything else
-represents TRUE. This allows formulas like \code{~ .x \%\% .y}, which produce integers,
-to be used in \code{we_have()}.
+\code{formula} can be anything that is recognized as a function by \code{\link[rlang:as_function]{rlang::as_function()}}.
+See the examples for how to specify the end of a sequence when used with an \code{Iterator};
+sequences terminate with \code{NA}.
+
+Handling missing values in these expressions is possible and sometimes desirable but
+potentially painful because \code{NA} values can't be compared with normal operators.
+See the README for a detailed example.
+
+Note that \code{.x \%>\% that_for_all(.y)} is vacuously true if \code{.y} is empty, while
+\code{.x \%>\% that_for_any(.y)} is vacuously false if \code{.y} is empty.
 }
 \note{
 if \code{.y} is an numeric vector, you probably want a value obtained from
@@ -64,6 +69,14 @@ this difference should never matter.
 #c.f.
 primes <- 2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y, "Iterator")
 yield_next(primes)
+primes2 <- clone(primes)
+
+# Refer to the vector .x with `.x_vector` and the current index of that vector with `.i`
+# For example, to yield to the end of the sequence:
+yield_while(primes, .x_vector[.i] <= length(.x_vector))
+# `.finished` is an alias for `.x_vector[.i] > length(.x_vector)`
+# Equivalent to previous expression:
+yield_while(primes2, !.finished)
 {c("I", "Don't", "wan't", "chicken") \%>\%
              that_for_all("\'") \%>\%
              we_have(~grepl(.y, .x))}
@@ -74,4 +87,9 @@ primes \%>\% that_for_any(primes) \%>\% we_have(~abs(.x - .y) == 2)
 (2:100 \%>\% that_for_all(range(2, .x)) \%>\% we_have(~.x \%\% .y)) \%>\%
     that_for_any(range(2, .x)) \%>\% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y)
 
+}
+\seealso{
+The implementation of these functions involves code adapted from \code{\link[purrr:every]{purrr::every()}}
+and \code{\link[purrr:every]{purrr::some()}}, by Lionel Henry, Hadley Wickham, and RStudio, available under the
+MIT license.
 }

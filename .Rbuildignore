@@ -18,3 +18,5 @@
 ^\.github$
 ^release_0.2\.html$
 ^release_0.2\.rmd$
+^release-0.3.0\.html$
+^release-0.3.0\.rmd$

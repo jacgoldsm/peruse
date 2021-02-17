@@ -6,7 +6,6 @@
 
 # Version 0.2.0
 
-* Will be released soon as Version 0.2.0
 
 * Removed `as_Iterator()`
 
@@ -33,7 +32,6 @@ added `clone()`
 
 * Added a well-defined search path for `Iterator`s
 
-* Added seed arguments for reproducibility to `yield_more()`, `yield_while()`, and `move_more()`
 
 * Made error messages more clear for `Iterator`
 
@@ -43,4 +41,8 @@ added `clone()`
 
 * Completely changed the `move_*()` backend to use `yield_*()`
 
-* Use `map2_int()` instead of `map2_lgl()` to get more general formulas
+* Changed the `we_have()` backend to be fully lazy
+
+* Removed dependency on {purrr}
+
+* Added new features to set comprehension with `Iterator`s

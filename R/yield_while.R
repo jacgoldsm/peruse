@@ -38,6 +38,9 @@ yield_while <- function(iter, cond) {
   while (eval(cond, iter$initial, rlang::caller_env())) {
       ret <- c(ret, yield_next_from_helper(iter))
       iter$initial$.iter <- iter$initial$.iter + 1L
+      if (!is.null(iter$initial$.finished)) {
+        if (iter$initial$.finished) break
+      }
   }
   iter$initial <- within(iter$initial, rm(.iter))
   ret

@@ -10,11 +10,20 @@
 #' `.x %>% that_for_all(.y) %>% we_have_*(f(.x, .y))`,
 #' but see the examples for more detail.
 #'
-#' @details `formula` can be anything that is recognized as a function by [purrr::as_mapper()].
-#' Although [purrr::map2_lgl()] would seem the obvious choice, the formula is actually
-#' evaluated with [purrr::map2_int()], where 0 represents FALSE and everything else
-#' represents TRUE. This allows formulas like `~ .x %% .y`, which produce integers,
-#' to be used in `we_have()`.
+#' @details `formula` can be anything that is recognized as a function by [rlang::as_function()].
+#' See the examples for how to specify the end of a sequence when used with an `Iterator`;
+#' sequences terminate with `NA`.
+#'
+#' Handling missing values in these expressions is possible and sometimes desirable but
+#' potentially painful because `NA` values can't be compared with normal operators.
+#' See the README for a detailed example.
+#'
+#' Note that `.x %>% that_for_all(.y)` is vacuously true if `.y` is empty, while
+#' `.x %>% that_for_any(.y)` is vacuously false if `.y` is empty.
+#'
+#' @seealso The implementation of these functions involves code adapted from [purrr::every()]
+#' and [purrr::some()], by Lionel Henry, Hadley Wickham, and RStudio, available under the
+#' MIT license.
 #'
 #' @note if `.y` is an numeric vector, you probably want a value obtained from
 #' `range(start, end)` rather than `start:end` or `seq.int(start,end)`,
@@ -32,8 +41,8 @@
 #'
 #' @param .x A set, represented as either an atomic vector or a list
 #' @param .y A set to compare to `.x`
-#' @param formula A function, lambda, or formula. Must produce something understood by
-#' [purrr::map2_int()]
+#' @param formula A function, lambda, or formula. Must be understood by
+#' [rlang::as_function()]
 #' @param result Should the expression return a `vector` or an `Iterator`?
 #' @param that_for A list passed to [we_have()]—can be ignored with proper syntax
 #'
@@ -43,7 +52,14 @@
 #' #c.f.
 #' primes <- 2:100 %>% that_for_all(range(2, .x)) %>% we_have(~.x %% .y, "Iterator")
 #' yield_next(primes)
-
+#' primes2 <- clone(primes)
+#'
+#' # Refer to the vector .x with `.x_vector` and the current index of that vector with `.i`
+#' # For example, to yield to the end of the sequence:
+#' yield_while(primes, .x_vector[.i] <= length(.x_vector))
+#' # `.finished` is an alias for `.x_vector[.i] > length(.x_vector)`
+#' # Equivalent to previous expression:
+#' yield_while(primes2, !.finished)
 #' {c("I", "Don't", "wan't", "chicken") %>%
 #'              that_for_all("\'") %>%
 #'              we_have(~grepl(.y, .x))}
@@ -61,19 +77,19 @@ NULL
 #' @rdname funs
 #' @export
 that_for_all <- function(.x, .y) {
-  .y <- rlang::enexpr(.y)
-  structure(list(.x = .x,
-                 .y = .y,
-                 quant = 'all'))
+  .y <- rlang::enquo(.y)
+  list(.x = .x,
+       .y = .y,
+       quant = 'all')
 }
 
 #' @rdname funs
 #' @export
 that_for_any <- function(.x, .y) {
-  .y <- rlang::enexpr(.y)
-  structure(list(.x = .x,
-                 .y = .y,
-                 quant = 'any'))
+  .y <- rlang::enquo(.y)
+  list(.x = .x,
+       .y = .y,
+       quant = 'any')
 }
 
 
@@ -83,64 +99,62 @@ that_for_any <- function(.x, .y) {
 we_have <- function(that_for, formula, result = "vector") {
 
   if (result == "vector") {
+    ret <- rep(NA, length(that_for$.x))
 
-    quant <- match.fun(that_for$quant) # either `all()` or `any()`
-    ret <- rep(NA, length(that_for$.x)) # defaults to logical, will be coerced
-                                        # if it gets any other values
-    for (i in seq_along(that_for$.x)) {
-      bool_vec <- purrr::map2_int(that_for$.x[i],
-                                  rlang::eval_bare(that_for$.y, rlang::env(.x = that_for$.x[i])),
-                                  formula)
-      if (quant(bool_vec)) ret[i] <- that_for$.x[i]
+    if (that_for$quant == "all") {
+      for (i in seq_along(that_for$.x)) {
+        current_y_vector <- rlang::eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
+        ret[i] <- every2(that_for$.x[i], current_y_vector, formula)
       }
 
-    return(ret[which(!is.na(ret))])
+    } else {
+      for (i in seq_along(that_for$.x)) {
+        current_y_vector <- rlang::eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
+        ret[i] <- some2(that_for$.x[i], current_y_vector, formula)
+      }
+    }
 
+    return(that_for$.x[which(ret)])
   }
 
   if (result == "Iterator") {
 
+  .finished <- FALSE
 
+  .fun <- NA
   if (that_for$quant == "all") {
-    expr <- quote({
-    repeat {
-    bool_vec <- purrr::map2_int(x_name[i],
-                                rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
-                                formula_name)
-
-    if (all(bool_vec)) {
-          .nth <- x_name[i]
-          i <- i + 1L
-          break
-    } else {
-          i <- i + 1L
-    }
-    }
-
-    })
+    .fun <- every2
   } else if (that_for$quant == "any") {
-    expr <- quote({
-    repeat {
-    bool_vec <- purrr::map2_int(x_name[i],
-                                rlang::eval_bare(y_name, rlang::env(.x = x_name[i])),
-                                formula_name)
+    .fun <- some2
+  } else rlang::abort("Invalid Quantifier")
 
-    if (any(bool_vec)) {
-          .nth <- x_name[i]
-          i <- i + 1L
-          break
-    } else {
-          i <- i + 1L
-    }
-    }
-    })
-  } else rlang::abort("Invalid quantifier")
+  expr <- rlang::expr({
+    if (.i > length(.x_vector)) rlang::abort("Error: attempt to call `yield_next()` without any more elements of sequence")
+    ret <- FALSE
+    .fun <- !! .fun
+    while(!ret) {
+      current_y_vector <- rlang::eval_tidy(y_name, list(.x = .x_vector[.i]))
+      ret <- .fun(.x_vector[.i], current_y_vector, formula_name)
 
-    initial <- rlang::env(i = 1,
-                          .nth = 0,
-                          x_name = that_for$.x,
-                          y_name = that_for$.y,
-                          formula_name = formula)
+      if (ret) {
+        .nth <- .x_vector[.i]
+      }
+      .i <- .i + 1L
+
+      if (.i > length(.x_vector)) {
+        message("(Note: result has reached end of sequence)")
+        .finished <- TRUE
+        .nth <- NA
+        break
+      }
+    }
+  })
+    initial <- list(.i = 1L,
+                    .nth = NA,
+                    .x_vector = that_for$.x,
+                    y_name = that_for$.y,
+                    formula_name = formula,
+                    .finished = .finished)
 
     # Note: since `expr` is already quoted, forcing just creates the expression,
     # unevaluated
@@ -148,4 +162,39 @@ we_have <- function(that_for, formula, result = "vector") {
       Iterator(result = !! expr, initial = initial, yield = .nth)
     )
   }
+  }
+
+
+every2 <- function(.x, .y, .p, ...) {
+  .p <- rlang::as_function(.p)
+  if (length(.y) == 0L) return(TRUE) # condition holds vacuously
+  for (i in seq_along(.x)) {
+    for(j in seq_along(.y)) {
+      val <- .p(.x[[i]], .y[[j]], ...)
+
+      if (!val) {
+        return(FALSE)
+      }
+    }
+  }
+
+  TRUE
 }
+
+some2 <- function(.x, .y, .p, ...) {
+  .p <- rlang::as_function(.p)
+  if (length(.y) == 0L) return(FALSE) # returns false vacuously
+  val <- FALSE
+  for (i in seq_along(.x)) {
+    for (j in seq_along(.y)) {
+      val <- val || .p(.x[[i]], .y[[j]], ...)
+
+      if (val) {
+        return(TRUE)
+      }
+    }
+  }
+
+  val
+}
+

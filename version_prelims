@@ -1,7 +1,0 @@
-Version 0.1.1 -- preliminary
-
-* Removed `as_Iterator()`
-
-* Changes `is_Iterator()` to use `inherits()` instead of `class() ==`
-
-* Fixed bug in `we_have()` that wrote over an old set-created `Iterator` when a new one was made, even with a different name

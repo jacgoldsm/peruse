@@ -218,6 +218,82 @@ sequence
 Here, we use `clone()` to create an identical `Iterator` to `primes`
 that can be modified separately.
 
+`Iterator`s that are created from set comprehension have several
+utilities:
+
+-   Refer to the vector `.x` with the variable `.x_vector`
+
+-   Refer to the current index of `.x_vector` with `.i` (not to be
+    confused with `.iter`).
+
+Here is an example of putting those together to yield to the end of the
+sequence:
+
+``` r
+primes_100 <- 2:100 %>% 
+              that_for_all(range(2, .x)) %>% 
+              we_have(~.x %% .y, "Iterator")
+
+yield_while(primes_100, .x_vector[.i] <= 100)
+#> (Note: result has reached end of sequence)
+#>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+#> [26] NA
+```
+
+As you can see, the sequence terminates with `NA`, with a message that
+the end has been reached.
+
+There is also a convenience variable, `.finished`, that is `TRUE` if and
+only if the result has reached the end of the sequence. So another way
+to generate the same result is:
+
+``` r
+primes_100 <- 2:100 %>% 
+              that_for_all(range(2, .x)) %>% 
+              we_have(~.x %% .y, "Iterator")
+
+yield_while(primes_100, !.finished)
+#> (Note: result has reached end of sequence)
+#>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+#> [26] NA
+```
+
+### Missing Values
+
+Set comprehension does not specially handle missing values. All the
+elements of set `.x` will be compared with all the elements of set `.y`
+by `formula`, and the value of `.x` will be included if and only if the
+condition returns `TRUE`. If the comparison returns `NA`, the expression
+will terminate with an error.
+
+Be aware of two things: First, expressions like `NA == NA`, `NA > NA`,
+and `NA <= NA` return `NA`. Second, expressions of the form
+`if (NA) action` are illegal and will result in an error.
+
+As a result, an expression like this will not work:
+
+``` r
+c(1:20, NA_integer_) %>% that_for_all(range(2, .x)) %>% we_have(~ .x %% .y)
+```
+
+In fact, this will fail for two reasons: `range(2, .x)` will not work
+when `.x` is `NA`, and the comparison `if (NA %% 2)` will also not work.
+
+Normally, you will want to drop `NA` values from your vectors before
+using set comprehension. If you are careful, you can write valid code
+with `NA`s, but it will be very painful by comparison:
+
+``` r
+c(2:20, NA_integer_) %>% 
+  that_for_all(if (is.na(.x)) NA else range(2, .x)) %>% 
+  we_have(~ is.na(.x) || .x %% .y)
+#> [1]  2  3  5  7 11 13 17 19 NA
+```
+
+Here, we avoid `range(2, NA)` with our conditional, and avoid having
+`NA` in the `if` statement in `we_have()` by making sure to return
+`TRUE` when `.x` is missing.
+
 # Tutorial: Metaprogramming with `Iterator`s
 
 `Iterator`s are designed to be flexible, almost as flexible as ordinary
@@ -226,6 +302,12 @@ R functions. They are also designed to be tidy, using tools from the
 entirely compatible when it comes to metaprogramming, leading to a sort
 of “semi-tidy” evaluation. Use these examples as a reference for
 programmatically generating `Iterator` expressions.
+
+In almost all cases, the environment in which an Iterator is made does
+not effect its execution; rather, the environment from which
+`yield_next()` or its cousins is called determines evaluation. In this
+way, it is similar to ordinary R functions. The one small exception will
+be detailed at the end.
 
 ### Forcing
 
@@ -267,3 +349,44 @@ Since `Iterator`s don’t use data masks, they don’t have `.data` and
 `.env` pronouns. If you have a variable in `iter$initial` and a variable
 with the same name in your global environment, just force immediate
 evaluation of the environment variable with `!!`.
+
+### One Exception
+
+Ordinarily, `Iterator`s work independently from the environment in which
+they were created. The one exception is when an `Iterator` is created
+from the template,
+
+``` r
+iterator <- .x %>% expression_with_.x %>% we_have(formula, "Iterator")
+```
+
+the variable `expression_with_.x` is turned into a quosure. That means
+that it will always be evaluated in the environment where `iterator` was
+made.
+
+For a concrete example, consider:
+
+``` r
+offset <- 2
+it <- 2:100 %>% that_for_all(range(offset, .x)) %>% we_have(~ .x %% .y, "Iterator")
+ fun <- function() {
+  offset <- 3
+  yield_while(it, !.finished) # print the whole sequence
+ }
+ 
+ fun()
+#> (Note: result has reached end of sequence)
+#>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+#> [26] NA
+```
+
+We can see that the code does not select elements that are divisible by
+2 but not any other numbers, as would be the case with offset equal to
+three. Our expression `range(offset, .x)` is evaluated in the global
+environment, not in the execution environment of `fun()`.
+
+# Citation
+
+This software contains a modified version of a small piece of code from
+the `purrr` package, by Hadley Wickham, Lionel Henry, and RStudio,
+freely available under the MIT License.

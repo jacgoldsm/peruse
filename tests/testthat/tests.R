@@ -8,7 +8,7 @@ test_that("prime numbers with logical coercion", {
                17L)
 })
 
-test_that("prime_within_two", {
+test_that("prime_within_two_of_square_number", {
   expect_equal(((2:100 %>% that_for_all(range(2,.x)) %>% we_have(~.x %% .y != 0)) %>%
                                that_for_any(range(2, .x)) %>% we_have(~sqrt(.x + 2) == .y | sqrt(.x - 2) == .y))[2],
           11L)
@@ -138,4 +138,18 @@ test_that("yield_while() can see environment variables", {
   it <- Iterator(!!expr, list(m = 0), m)
   sequence <- yield_while(it, .iter < r)
   expect_equal(sequence, c(1,2,3,4))
+})
+
+test_that("Sequence ends work right with `yield_while()", {
+  primes_100 <- 2:100 %>%
+    that_for_all(range(2, .x)) %>%
+    we_have(~.x %% .y, "Iterator")
+  primes_100_2 <- clone(primes_100)
+  primes_100_3 <- clone(primes_100)
+  expect_equal(yield_while(primes_100, .x_vector[.i] <= 100),
+               yield_while(primes_100_2, !.finished))
+  expect_equal(yield_while(primes_100_3, !.finished),
+               c(2:100 %>%
+                 that_for_all(range(2, .x)) %>%
+                 we_have(~.x %% .y), NA))
 })

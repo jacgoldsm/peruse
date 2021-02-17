@@ -12,6 +12,7 @@
 #' @examples
 #' range(1,5)
 #' range(9,10)
+#' range(1,6, by = 2)
 #' @export
 
 range <- function(a,b, ...) {
