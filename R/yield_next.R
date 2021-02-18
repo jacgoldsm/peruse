@@ -37,13 +37,12 @@ NULL
 yield_next <- function(iter) {
   stopifnot(is_Iterator(iter))
   env <- list2env(iter$initial, parent = rlang::caller_env())
-  yield_name <- as.character(iter$yield)
 
   eval(iter$result, envir = env)
 
   iter$initial <- as.list(env, all.names = TRUE)
 
-  return(iter$initial[[yield_name]])
+  return(iter$initial[[iter$yield]])
 }
 
 #'@rdname yields
@@ -62,11 +61,10 @@ yield_more <- function(iter, more = 1L) {
 
 yield_next_from_helper <- function(iter) {
   env <- list2env(iter$initial, parent = rlang::caller_env(n = 2))
-  yield_name <- as.character(iter$yield)
 
   eval(iter$result, envir = env)
 
   iter$initial <- as.list(env, all.names = TRUE)
 
-  return(iter$initial[[yield_name]])
+  return(iter$initial[[iter$yield]])
 }

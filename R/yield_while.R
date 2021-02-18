@@ -32,16 +32,28 @@
 
 yield_while <- function(iter, cond) {
   stopifnot(is_Iterator(iter))
-  ret <- vector()
+  ret <- rep(NA, 1e3)
   cond <- rlang::enexpr(cond)
   iter$initial$.iter <- 1L
+  i <- 1L
+
+ if (!is.null(iter$initial$.finished)) {
   while (eval(cond, iter$initial, rlang::caller_env())) {
-      ret <- c(ret, yield_next_from_helper(iter))
+    # Efficiently resizes `ret` in the style of `std::vector()` from the STL
+      if (i > length(ret)) ret <- c(ret, rep(NA, length(ret)))
+      ret[[i]] <- yield_next_from_helper(iter)
+      i <- i + 1L
       iter$initial$.iter <- iter$initial$.iter + 1L
-      if (!is.null(iter$initial$.finished)) {
-        if (iter$initial$.finished) break
-      }
+      if (iter$initial$.finished) break
   }
+ } else {
+   while (eval(cond, iter$initial, rlang::caller_env())) {
+     if (i > length(ret)) ret <- c(ret, rep(NA, length(ret)))
+     ret[[i]] <- yield_next_from_helper(iter)
+     i <- i + 1L
+     iter$initial$.iter <- iter$initial$.iter + 1L
+   }
+ }
   iter$initial <- within(iter$initial, rm(.iter))
-  ret
+  ret[1:i - 1]
 }
