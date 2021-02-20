@@ -50,21 +50,21 @@ yield_next <- function(iter) {
 yield_more <- function(iter, more = 1L) {
   stopifnot(is_Iterator(iter))
   vec <- vector(length = more)
-  iter$initial$.iter <- 1L
+  env <- list2env(iter$initial, parent = rlang::caller_env())
+  env$.iter <- 1L
+
     for (i in seq_len(more)) {
-      vec[[i]] <- yield_next_from_helper(iter)
-      iter$initial$.iter <- iter$initial$.iter + 1L
+      vec[[i]] <- yield_next_from_helper(iter, env)
+      env$.iter <- env$.iter + 1L
     }
+  iter$initial <- as.list(env, all.names = TRUE)
   iter$initial <- within(iter$initial, rm(.iter))
   return(vec)
 }
 
-yield_next_from_helper <- function(iter) {
-  env <- list2env(iter$initial, parent = rlang::caller_env(n = 2))
+yield_next_from_helper <- function(iter, env) {
 
   eval(iter$result, envir = env)
 
-  iter$initial <- as.list(env, all.names = TRUE)
-
-  return(iter$initial[[iter$yield]])
+  return(env[[iter$yield]])
 }

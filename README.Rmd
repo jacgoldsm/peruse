@@ -138,6 +138,39 @@ plot(Value, main = "The Value of the Iterator after a Given Number of Iterations
 
 Here, we can see that `seq` gets to `50` after about `100` iterations when it is weighted `3:1` odds in favor of adding `1` over adding `-1` to the prior value.
 
+## A Note
+
+Helper functions `yield_more()`, `yield_while()`, `move_more()`, and `move_while()` behave mostly like syntactic sugar for explicit loops. So,
+```{r}
+it <- Iterator(x <- x + 1L, list(x = 0), x)
+it2 <- clone(it)
+x <- numeric(100)
+for (i in 1:100) {
+  x[i] <- yield_next(it)
+}
+```
+will give the same result as
+```{r}
+y <- yield_more(it2, 100)
+```
+
+However, doing it the latter way is significantly more efficient than the former. This is because a lot of the overhead only needs to be done once per call to `yield`. That means that a lot less has to be done on every iteration when you explicitly call `yield_more()`.
+
+This is even more true with `yield_while()`. Pretend we don't know how long this `Iterator` will take to reach 10,000. Doing something like:
+```{r}
+x <- numeric()
+condition <- TRUE
+while (it$initial$x < 10000) {
+  x <- c(x, yield_next(it))
+}
+```
+is very inefficient because it requires reallocating the vector on every iteration. On the other hand, the following is both easier to read and much more efficient:
+```{r}
+y <- yield_while(it2, x < 10000)
+```
+
+Internally, `yield_while()` uses an efficient algorithm for resizing the result in linear amortized time. As a result, it will evaluate much faster.
+
 ### Primes
 How about generating all the prime numbers between `1` and `100`? We can easily do that with the set-builder API:
 ```{r}

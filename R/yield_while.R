@@ -35,25 +35,24 @@ yield_while <- function(iter, cond) {
   ret <- rep(NA, 1e3)
   cond <- rlang::enexpr(cond)
   iter$initial$.iter <- 1L
-  i <- 1L
+  env <- list2env(iter$initial, parent = rlang::caller_env())
 
  if (!is.null(iter$initial$.finished)) {
-  while (eval(cond, iter$initial, rlang::caller_env())) {
+  while (eval(cond, env)) {
     # Efficiently resizes `ret` in the style of `std::vector()` from the STL
-      if (i > length(ret)) ret <- c(ret, rep(NA, length(ret)))
-      ret[[i]] <- yield_next_from_helper(iter)
-      i <- i + 1L
-      iter$initial$.iter <- iter$initial$.iter + 1L
-      if (iter$initial$.finished) break
+      if (env$.iter > length(ret)) ret <- c(ret, rep(NA, length(ret)))
+      ret[[env$.iter]] <- yield_next_from_helper(iter, env)
+      env$.iter <- env$.iter + 1L
+      if (env$.finished) break
   }
  } else {
-   while (eval(cond, iter$initial, rlang::caller_env())) {
-     if (i > length(ret)) ret <- c(ret, rep(NA, length(ret)))
-     ret[[i]] <- yield_next_from_helper(iter)
-     i <- i + 1L
-     iter$initial$.iter <- iter$initial$.iter + 1L
+   while (eval(cond, env)) {
+     if (env$.iter > length(ret)) ret <- c(ret, rep(NA, length(ret)))
+     ret[[env$.iter]] <- yield_next_from_helper(iter, env)
+     env$.iter <- env$.iter + 1L
    }
  }
+  iter$initial <- as.list(env, all.names = TRUE)
   iter$initial <- within(iter$initial, rm(.iter))
-  ret[1:i - 1]
+  ret[1:env$.iter - 1]
 }

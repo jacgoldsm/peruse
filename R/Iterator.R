@@ -67,7 +67,7 @@ Iterator <- function(result,
 
   envir <- rlang::env(initial = as.list(initial),
                       result = result,
-                      yield = yield)
+                      yield = as.character(yield))
   structure(envir,
             class = "Iterator")
 }
