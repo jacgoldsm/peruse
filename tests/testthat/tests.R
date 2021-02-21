@@ -104,10 +104,12 @@ test_that("Iterators work with environment variables", {
 })
 
 test_that("clone creates a copy", {
-  it <- Iterator({m <- m + 1}, list(m = 0), m)
-  other <- clone(it)
+  it <- Iterator({m <- m + n}, list(m = 0, n = 1), m)
+  other <- clone(it, m = 100, n = 100)
   yield_next(it)
   expect_equal(current(other) == current(it), FALSE)
+  a <- yield_next(other)
+  expect_equal(a, 200)
 })
 
 test_that("stochastic functions work properly", {

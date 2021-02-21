@@ -205,6 +205,19 @@ sequence
 
 Here, we use `clone()` to create an identical `Iterator` to `primes` that can be modified separately.
 
+`clone()` also carries optional arguments that override the `$initial` parameters in the old `Iterator`. For example,
+
+```{r}
+it <- Iterator({m <- m + n}, list(m = 0, n = 1), m)
+it2 <- clone(it, n = 5)
+yield_next(it)
+yield_next(it2)
+```
+
+Here, we overrode `n = 1` in `it` with `n = 5` in `it2`.
+
+## Set Utilities
+
 `Iterator`s that are created from set comprehension have several utilities:
 
 * Refer to the vector `.x` with the variable `.x_vector`
