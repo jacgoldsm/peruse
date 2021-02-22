@@ -215,7 +215,6 @@
 <p>This is even more true with <code><a href="reference/yield_while.html">yield_while()</a></code>. Pretend we don’t know how long this <code>Iterator</code> will take to reach 10,000. Doing something like:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">condition</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
 <span class="kw">while</span> <span class="op">(</span><span class="va">it</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">x</span> <span class="op">&lt;</span> <span class="fl">10000</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="reference/yield.html">yield_next</a></span><span class="op">(</span><span class="va">it</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
@@ -282,19 +281,17 @@
 
 <span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="va">.x_vector</span><span class="op">[</span><span class="va">.i</span><span class="op">]</span> <span class="op">&lt;=</span> <span class="fl">100</span><span class="op">)</span>
 <span class="co">#&gt; (Note: result has reached end of sequence)</span>
-<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
-<span class="co">#&gt; [26] NA</span></code></pre></div>
-<p>As you can see, the sequence terminates with <code>NA</code>, with a message that the end has been reached.</p>
-<p>There is also a convenience variable, <code>.finished</code>, that is <code>TRUE</code> if and only if the result has reached the end of the sequence. So another way to generate the same result is:</p>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
+<p>As you can see, the sequence terminates with a message that the end has been reached.</p>
+<p>In reality, the sequence will terminate at the end anyway, so you can generate the whole sequence like this:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">primes_100</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">100</span> <span class="op">%&gt;%</span> 
               <span class="fu"><a href="reference/sets.html">that_for_all</a></span><span class="op">(</span><span class="fu"><a href="reference/range.html">range</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">.x</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
               <span class="fu"><a href="reference/sets.html">we_have</a></span><span class="op">(</span><span class="op">~</span><span class="va">.x</span> <span class="op">%%</span> <span class="va">.y</span>, <span class="st">"Iterator"</span><span class="op">)</span>
 
-<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="op">!</span><span class="va">.finished</span><span class="op">)</span>
+<span class="fu"><a href="reference/yield_while.html">yield_while</a></span><span class="op">(</span><span class="va">primes_100</span>, <span class="cn">T</span><span class="op">)</span>
 <span class="co">#&gt; (Note: result has reached end of sequence)</span>
-<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
-<span class="co">#&gt; [26] NA</span></code></pre></div>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
 <div id="missing-values" class="section level3">
 <h3 class="hasAnchor">
 <a href="#missing-values" class="anchor"></a>Missing Values</h3>
@@ -378,8 +375,7 @@
  
  <span class="fu">fun</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; (Note: result has reached end of sequence)</span>
-<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span>
-<span class="co">#&gt; [26] NA</span></code></pre></div>
+<span class="co">#&gt;  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</span></code></pre></div>
 <p>We can see that the code does not select elements that are divisible by 2 but not any other numbers, as would be the case with offset equal to three. Our expression <code><a href="reference/range.html">range(offset, .x)</a></code> is evaluated in the global environment, not in the execution environment of <code>fun()</code>.</p>
 </div>
 </div>
