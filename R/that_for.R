@@ -1,6 +1,5 @@
 #' @name sets
 #' @rdname funs
-#'
 #' @import magrittr
 #' @title R Set Comprehension
 #'
@@ -11,8 +10,7 @@
 #' but see the examples for more detail.
 #'
 #' @details `formula` can be anything that is recognized as a function by [rlang::as_function()].
-#' See the examples for how to specify the end of a sequence when used with an `Iterator`;
-#' sequences terminate with `NA`.
+#' See the examples for how to specify the end of a sequence when used with an `Iterator`.
 #'
 #' Handling missing values in these expressions is possible and sometimes desirable but
 #' potentially painful because `NA` values can't be compared with normal operators.
@@ -77,7 +75,7 @@ NULL
 #' @rdname funs
 #' @export
 that_for_all <- function(.x, .y) {
-  .y <- rlang::enquo(.y)
+  .y <- enquo(.y)
   list(.x = .x,
        .y = .y,
        quant = 'all')
@@ -86,7 +84,7 @@ that_for_all <- function(.x, .y) {
 #' @rdname funs
 #' @export
 that_for_any <- function(.x, .y) {
-  .y <- rlang::enquo(.y)
+  .y <- enquo(.y)
   list(.x = .x,
        .y = .y,
        quant = 'any')
@@ -103,13 +101,13 @@ we_have <- function(that_for, formula, result = "vector") {
 
     if (that_for$quant == "all") {
       for (i in seq_along(that_for$.x)) {
-        current_y_vector <- rlang::eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
+        current_y_vector <- eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
         ret[i] <- every2(that_for$.x[i], current_y_vector, formula)
       }
 
     } else {
       for (i in seq_along(that_for$.x)) {
-        current_y_vector <- rlang::eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
+        current_y_vector <- eval_tidy(that_for$.y, list(.x = that_for$.x[i]))
         ret[i] <- some2(that_for$.x[i], current_y_vector, formula)
       }
     }

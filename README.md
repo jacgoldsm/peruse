@@ -196,7 +196,6 @@ long this `Iterator` will take to reach 10,000. Doing something like:
 
 ``` r
 x <- numeric()
-condition <- TRUE
 while (it$initial$x < 10000) {
   x <- c(x, yield_next(it))
 }
@@ -301,25 +300,22 @@ primes_100 <- 2:100 %>%
 yield_while(primes_100, .x_vector[.i] <= 100)
 #> (Note: result has reached end of sequence)
 #>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
-#> [26] NA
 ```
 
-As you can see, the sequence terminates with `NA`, with a message that
-the end has been reached.
+As you can see, the sequence terminates with a message that the end has
+been reached.
 
-There is also a convenience variable, `.finished`, that is `TRUE` if and
-only if the result has reached the end of the sequence. So another way
-to generate the same result is:
+In reality, the sequence will terminate at the end anyway, so you can
+generate the whole sequence like this:
 
 ``` r
 primes_100 <- 2:100 %>% 
               that_for_all(range(2, .x)) %>% 
               we_have(~.x %% .y, "Iterator")
 
-yield_while(primes_100, !.finished)
+yield_while(primes_100, T)
 #> (Note: result has reached end of sequence)
 #>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
-#> [26] NA
 ```
 
 ### Missing Values
@@ -456,7 +452,6 @@ it <- 2:100 %>% that_for_all(range(offset, .x)) %>% we_have(~ .x %% .y, "Iterato
  fun()
 #> (Note: result has reached end of sequence)
 #>  [1]  2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
-#> [26] NA
 ```
 
 We can see that the code does not select elements that are divisible by

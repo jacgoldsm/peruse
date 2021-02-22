@@ -149,9 +149,10 @@ test_that("Sequence ends work right with `yield_while()", {
   primes_100_2 <- clone(primes_100)
   primes_100_3 <- clone(primes_100)
   expect_equal(yield_while(primes_100, .x_vector[.i] <= 100),
-               yield_while(primes_100_2, !.finished))
-  expect_equal(yield_while(primes_100_3, !.finished),
-               c(2:100 %>%
+               yield_while(primes_100_2, T))
+  expect_equal(yield_while(primes_100_3, T),
+               2:100 %>%
                  that_for_all(range(2, .x)) %>%
-                 we_have(~.x %% .y), NA))
+                 we_have(~.x %% .y))
+  expect_error(yield_next(primes_100))
 })

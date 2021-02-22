@@ -1,6 +1,7 @@
 #'@name yield
 #'@rdname yields
 #'
+#'@rawNamespace import(rlang, except = set_names)
 #'@title Increment an Iterator and Return the Next Value(s)
 #'
 #'@description Finds the value of the next iteration(s) of an Iterator object
@@ -36,11 +37,13 @@ NULL
 #'@export
 yield_next <- function(iter) {
   stopifnot(is_Iterator(iter))
-  env <- list2env(iter$initial, parent = rlang::caller_env())
+  iter$initial$.iter <- 1L
+  env <- list2env(iter$initial, parent = caller_env())
 
-  eval(iter$result, envir = env)
+  eval_bare(iter$result, env = env)
 
   iter$initial <- as.list(env, all.names = TRUE)
+  iter$initial <- within(iter$initial, rm(.iter))
 
   return(iter$initial[[iter$yield]])
 }
@@ -50,21 +53,18 @@ yield_next <- function(iter) {
 yield_more <- function(iter, more = 1L) {
   stopifnot(is_Iterator(iter))
   vec <- vector(length = more)
-  env <- list2env(iter$initial, parent = rlang::caller_env())
+  env <- list2env(iter$initial, parent = caller_env())
   env$.iter <- 1L
+  expr <- iter$result
+  char <- iter$yield
 
     for (i in seq_len(more)) {
-      vec[[i]] <- yield_next_from_helper(iter, env)
-      env$.iter <- env$.iter + 1L
+      eval_bare(expr, env = env)
+      vec[[i]] <- env[[char]]
+      env$.iter <- i
     }
   iter$initial <- as.list(env, all.names = TRUE)
   iter$initial <- within(iter$initial, rm(.iter))
   return(vec)
 }
 
-yield_next_from_helper <- function(iter, env) {
-
-  eval(iter$result, envir = env)
-
-  return(env[[iter$yield]])
-}

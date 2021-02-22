@@ -1,5 +1,6 @@
 #' yield_while
 #'
+#'
 #' @description Keep yielding the next element of an `Iterator` while a condition is met.
 #' A condition is a logical expression involving variables in `iter$initial` or variables
 #' that are defined in the enclosure. Refer to the number of the current iteration with `.iter`.
@@ -33,22 +34,26 @@
 yield_while <- function(iter, cond) {
   stopifnot(is_Iterator(iter))
   ret <- rep(NA, 1e3)
-  cond <- rlang::enexpr(cond)
+  cond <- enexpr(cond)
   iter$initial$.iter <- 1L
-  env <- list2env(iter$initial, parent = rlang::caller_env())
+  env <- list2env(iter$initial, parent = caller_env())
+  expr <- iter$result
+  char <- iter$yield
 
  if (!is.null(iter$initial$.finished)) {
-  while (eval(cond, env)) {
+  while (eval_bare(cond, env)) {
     # Efficiently resizes `ret` in the style of `std::vector()` from the STL
       if (env$.iter > length(ret)) ret <- c(ret, rep(NA, length(ret)))
-      ret[[env$.iter]] <- yield_next_from_helper(iter, env)
-      env$.iter <- env$.iter + 1L
+      eval_bare(expr, env = env)
       if (env$.finished) break
+      ret[[env$.iter]] <- env[[char]]
+      env$.iter <- env$.iter + 1L
   }
  } else {
-   while (eval(cond, env)) {
+   while (eval_bare(cond, env)) {
      if (env$.iter > length(ret)) ret <- c(ret, rep(NA, length(ret)))
-     ret[[env$.iter]] <- yield_next_from_helper(iter, env)
+     eval_bare(expr, env = env)
+     ret[[env$.iter]] <- env[[char]]
      env$.iter <- env$.iter + 1L
    }
  }

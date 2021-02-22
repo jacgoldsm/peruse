@@ -4,24 +4,28 @@
 \alias{clone}
 \title{clone}
 \usage{
-clone(iter, parent = rlang::env_parent(iter))
+clone(iter, ...)
 }
 \arguments{
 \item{iter}{an \code{Iterator} object}
 
-\item{parent}{the environment to put the \code{Iterator}}
+\item{...}{optionally override the \verb{$initial} parameters in \code{iter}}
 }
 \value{
 a copy of the \code{Iterator} passed as a parameter
 }
 \description{
 Clone an Iterator, making an exact copy that can then be modified separately.
-This is a simple wrapper around \code{\link[rlang:env_clone]{rlang::env_clone()}}. Includes the option to
-clone the Iterator into a different environment.
+This is a simple wrapper around \code{\link[rlang:env_clone]{rlang::env_clone()}}. Optionally,
+override old initial parameters.
 }
 \examples{
-it <- Iterator({m <- m + 1}, c(m = 0), m)
+it <- Iterator({m <- m + n}, list(m = 0, n = 1), m)
 other <- clone(it)
 yield_next(it)
 current(other) == current(it) # false
+
+it2 <- clone(other, n = 5)
+yield_next(it2)
+it2$initial$n  # 5
 }

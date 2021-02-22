@@ -38,8 +38,7 @@ but see the examples for more detail.
 }
 \details{
 \code{formula} can be anything that is recognized as a function by \code{\link[rlang:as_function]{rlang::as_function()}}.
-See the examples for how to specify the end of a sequence when used with an \code{Iterator};
-sequences terminate with \code{NA}.
+See the examples for how to specify the end of a sequence when used with an \code{Iterator}.
 
 Handling missing values in these expressions is possible and sometimes desirable but
 potentially painful because \code{NA} values can't be compared with normal operators.
