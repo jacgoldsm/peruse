@@ -101,6 +101,23 @@ plot(x = probs,
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
+Alternatively, using functional programming:
+
+``` r
+make <- function(p) {
+  iter <- Iterator({
+    set.seed(seeds[.iter])
+    n <- n + sample(c(1,-1), 1, prob = c(!! p, 1 - !! p))
+  },
+  list(n = 0),
+  yield = n)
+
+  length(yield_while(iter, n <= threshold))
+}
+
+num_iter <- sapply(seq(0.5,0.95, by = 0.01), make)
+```
+
 This illustrates a few useful features of Iterators:
 
 -   We can use environment variables in either our expression or our
@@ -159,7 +176,7 @@ Value <- yield_while(rwd, n != 50L & n != -50L)
 plot(Value, main = "The Value of the Iterator after a Given Number of Iterations")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 Here, we can see that `seq` gets to `50` after about `100` iterations
 when it is weighted `3:1` odds in favor of adding `1` over adding `-1`
@@ -399,19 +416,29 @@ details.
 
 ### Force-defuse
 
-Since `Iterator`s don’t use quosures (because they work independently of
-the environment where they are created), you can’t use `{{ }}` to
-force-defuse expressions. Use `!! substitute()` instead:
+Function arguments are a special data structure in R. They really
+represent up to three different things: the name given to the argument
+in the function, possibly the name of the argument when the function is
+called if it is named, and the value of the argument passed to the
+function. Since `Iterator`s don’t use quosures (because they work
+independently of the environment where they are created), you can’t use
+`{{ }}` to force-defuse expressions.
+
+-   To get a variable name from a parameter name, `substitute()` the
+    variable at the beginning.
+
+-   If you want the *value* of the variable, just leave it be.
+
+Then use the `bang-bang` (!!) operator to add all of them to the
+`Iterator`:
 
 ``` r
 make_random_walk_with_drift <- function(drift, variable) {
-  Iterator({!! substitute(variable) <- (
-    !! substitute(variable) + sample(c(-1,1), 
-                                     1,
-                                     TRUE,
-                                     c(!! substitute(drift), 1 - !! substitute(drift)))
-                                )},
-           initial = rlang::list2(!! substitute(variable) := 0), !! substitute(variable))
+  variable <- substitute(variable)  # creates a variable whose value is x
+  Iterator({
+    !! variable <- !! variable + sample(c(-1,1), 1, TRUE, c(!! drift, 1 - !! drift))
+              },
+    initial = rlang::list2(!! variable := 0), !! variable)
 }
 
 yield_more(make_random_walk_with_drift(0.5, x), 5)
