@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -328,7 +328,7 @@
 <div id="tutorial-metaprogramming-with-iterators" class="section level1">
 <h1 class="hasAnchor">
 <a href="#tutorial-metaprogramming-with-iterators" class="anchor"></a>Tutorial: Metaprogramming with <code>Iterator</code>s</h1>
-<p><code>Iterator</code>s are designed to be flexible, almost as flexible as ordinary R functions. They are also designed to be tidy, using tools from the “tidyverse” family of R extensions. Unfortunately, those goals are not entirely compatible when it comes to metaprogramming, leading to a sort of “semi-tidy” evaluation. Use these examples as a reference for programmatically generating <code>Iterator</code> expressions.</p>
+<p><code>Iterator</code>s are designed to be flexible, almost as flexible as ordinary R functions. They are also designed to be tidy, using tools from the “Tidyverse” family of R extensions. Unfortunately, those goals are not entirely compatible when it comes to metaprogramming, leading to a sort of “semi-tidy” evaluation. Use these examples as a reference for programmatically generating <code>Iterator</code> expressions.</p>
 <p>In almost all cases, the environment in which an Iterator is made does not effect its execution; rather, the environment from which <code><a href="reference/yield.html">yield_next()</a></code> or its cousins is called determines evaluation. In this way, it is similar to ordinary R functions. The one small exception will be detailed at the end.</p>
 <div id="forcing" class="section level3">
 <h3 class="hasAnchor">
