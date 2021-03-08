@@ -375,7 +375,7 @@ Here, we avoid `range(2, NA)` with our conditional, and avoid having
 
 `Iterator`s are designed to be flexible, almost as flexible as ordinary
 R functions. They are also designed to be tidy, using tools from the
-“tidyverse” family of R extensions. Unfortunately, those goals are not
+“Tidyverse” family of R extensions. Unfortunately, those goals are not
 entirely compatible when it comes to metaprogramming, leading to a sort
 of “semi-tidy” evaluation. Use these examples as a reference for
 programmatically generating `Iterator` expressions.

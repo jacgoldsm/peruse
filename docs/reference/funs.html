@@ -75,7 +75,7 @@ but see the examples for more detail." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -182,8 +182,7 @@ For <code>we_have()</code>, a vector of the same type as <code>.x</code> if <cod
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>formula</code> can be anything that is recognized as a function by <code><a href='https://rlang.r-lib.org/reference/as_function.html'>rlang::as_function()</a></code>.
-See the examples for how to specify the end of a sequence when used with an <code>Iterator</code>;
-sequences terminate with <code>NA</code>.</p>
+See the examples for how to specify the end of a sequence when used with an <code>Iterator</code>.</p>
 <p>Handling missing values in these expressions is possible and sometimes desirable but
 potentially painful because <code>NA</code> values can't be compared with normal operators.
 See the README for a detailed example.</p>
@@ -220,10 +219,10 @@ MIT license.</p></div>
 <span class='co'># Refer to the vector .x with `.x_vector` and the current index of that vector with `.i`</span>
 <span class='co'># For example, to yield to the end of the sequence:</span>
 <span class='fu'><a href='yield_while.html'>yield_while</a></span><span class='op'>(</span><span class='va'>primes</span>, <span class='va'>.x_vector</span><span class='op'>[</span><span class='va'>.i</span><span class='op'>]</span> <span class='op'>&lt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>.x_vector</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>(Note: result has reached end of sequence)</span></div><div class='output co'>#&gt;  [1]  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 NA</div><div class='input'><span class='co'># `.finished` is an alias for `.x_vector[.i] &gt; length(.x_vector)`</span>
+</div><div class='output co'>#&gt; <span class='message'>(Note: result has reached end of sequence)</span></div><div class='output co'>#&gt;  [1]  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</div><div class='input'><span class='co'># `.finished` is an alias for `.x_vector[.i] &gt; length(.x_vector)`</span>
 <span class='co'># Equivalent to previous expression:</span>
 <span class='fu'><a href='yield_while.html'>yield_while</a></span><span class='op'>(</span><span class='va'>primes2</span>, <span class='op'>!</span><span class='va'>.finished</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>(Note: result has reached end of sequence)</span></div><div class='output co'>#&gt;  [1]  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 NA</div><div class='input'><span class='op'>{</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"I"</span>, <span class='st'>"Don't"</span>, <span class='st'>"wan't"</span>, <span class='st'>"chicken"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+</div><div class='output co'>#&gt; <span class='message'>(Note: result has reached end of sequence)</span></div><div class='output co'>#&gt;  [1]  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97</div><div class='input'><span class='op'>{</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"I"</span>, <span class='st'>"Don't"</span>, <span class='st'>"wan't"</span>, <span class='st'>"chicken"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
              <span class='fu'>that_for_all</span><span class='op'>(</span><span class='st'>"\'"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
              <span class='fu'>we_have</span><span class='op'>(</span><span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grepl</a></span><span class='op'>(</span><span class='va'>.y</span>, <span class='va'>.x</span><span class='op'>)</span><span class='op'>)</span><span class='op'>}</span>
 </div><div class='output co'>#&gt; [1] "Don't" "wan't"</div><div class='input'><span class='co'>#Twin primes 1 through 100</span>

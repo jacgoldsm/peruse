@@ -41,8 +41,8 @@
 
 <meta property="og:title" content="clone — clone" />
 <meta property="og:description" content="Clone an Iterator, making an exact copy that can then be modified separately.
-This is a simple wrapper around rlang::env_clone(). Includes the option to
-clone the Iterator into a different environment." />
+This is a simple wrapper around rlang::env_clone(). Optionally,
+override old initial parameters." />
 
 
 
@@ -74,7 +74,7 @@ clone the Iterator into a different environment." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peruse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -137,11 +137,11 @@ clone the Iterator into a different environment." />
 
     <div class="ref-description">
     <p>Clone an Iterator, making an exact copy that can then be modified separately.
-This is a simple wrapper around <code><a href='https://rlang.r-lib.org/reference/env_clone.html'>rlang::env_clone()</a></code>. Includes the option to
-clone the Iterator into a different environment.</p>
+This is a simple wrapper around <code><a href='https://rlang.r-lib.org/reference/env_clone.html'>rlang::env_clone()</a></code>. Optionally,
+override old initial parameters.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>clone</span><span class='op'>(</span><span class='va'>iter</span>, parent <span class='op'>=</span> <span class='fu'>rlang</span><span class='fu'>::</span><span class='fu'><a href='https://rlang.r-lib.org/reference/env_parent.html'>env_parent</a></span><span class='op'>(</span><span class='va'>iter</span><span class='op'>)</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>clone</span><span class='op'>(</span><span class='va'>iter</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,8 +151,8 @@ clone the Iterator into a different environment.</p>
       <td><p>an <code>Iterator</code> object</p></td>
     </tr>
     <tr>
-      <th>parent</th>
-      <td><p>the environment to put the <code>Iterator</code></p></td>
+      <th>...</th>
+      <td><p>optionally override the <code>$initial</code> parameters in <code>iter</code></p></td>
     </tr>
     </table>
 
@@ -161,11 +161,15 @@ clone the Iterator into a different environment.</p>
     <p>a copy of the <code>Iterator</code> passed as a parameter</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>it</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span><span class='op'>{</span><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='va'>m</span> <span class='op'>+</span> <span class='fl'>1</span><span class='op'>}</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>m <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>, <span class='va'>m</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='va'>it</span> <span class='op'>&lt;-</span> <span class='fu'><a href='Iterator.html'>Iterator</a></span><span class='op'>(</span><span class='op'>{</span><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='va'>m</span> <span class='op'>+</span> <span class='va'>n</span><span class='op'>}</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>m <span class='op'>=</span> <span class='fl'>0</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>, <span class='va'>m</span><span class='op'>)</span>
 <span class='va'>other</span> <span class='op'>&lt;-</span> <span class='fu'>clone</span><span class='op'>(</span><span class='va'>it</span><span class='op'>)</span>
 <span class='fu'><a href='yield.html'>yield_next</a></span><span class='op'>(</span><span class='va'>it</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='fu'><a href='current.html'>current</a></span><span class='op'>(</span><span class='va'>other</span><span class='op'>)</span> <span class='op'>==</span> <span class='fu'><a href='current.html'>current</a></span><span class='op'>(</span><span class='va'>it</span><span class='op'>)</span> <span class='co'># false</span>
-</div><div class='output co'>#&gt; [1] FALSE</div></pre>
+</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='va'>it2</span> <span class='op'>&lt;-</span> <span class='fu'>clone</span><span class='op'>(</span><span class='va'>other</span>, n <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+<span class='fu'><a href='yield.html'>yield_next</a></span><span class='op'>(</span><span class='va'>it2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 5</div><div class='input'><span class='va'>it2</span><span class='op'>$</span><span class='va'>initial</span><span class='op'>$</span><span class='va'>n</span>  <span class='co'># 5</span>
+</div><div class='output co'>#&gt; [1] 5</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -32,7 +32,6 @@ added `clone()`
 
 * Added a well-defined search path for `Iterator`s
 
-
 * Made error messages more clear for `Iterator`
 
 * Added `move_while()`
